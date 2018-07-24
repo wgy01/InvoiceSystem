@@ -1,0 +1,80 @@
+html,
+body {
+	width: 100%;
+	height: 100%;
+	font-size: 14px !important;
+	/*打印不能让body有overflow: hidden样式*/
+	/*overflow: hidden;*/
+}
+#app {
+	height: 100%;
+}
+h1,
+h2,
+h3 {
+	color: #1c2438;
+}
+
+h1 {
+	font-size: 16px !important;
+}
+
+h2 {
+	font-size: 14px;
+}
+
+h3 {
+	font-size: 12px;
+}
+
+/*打印执行*/
+@media print {
+	/*表格*/
+	.ivu-table-wrapper {
+		/*width:800px !important;*/
+	}
+	.ivu-table .ivu-table-header table {
+		/*width:799px !important;*/
+		width: auto !important;
+	}
+	.ivu-table .ivu-table-body table {
+		/*width:799px !important;*/
+		width: auto !important;
+	}
+	.ivu-table-wrapper {
+		border: 1px solid #000 !important;
+		border-bottom: 0 !important;
+		border-right: 0 !important;
+	}
+	.ivu-table-border td,
+	.ivu-table-border th {
+		border-right: 1px solid #000 !important;
+	}
+	.ivu-table td,
+	.ivu-table th {
+		border-bottom: 1px solid #000 !important;
+	}
+	.ivu-table:before {
+		background-color: #000 !important;
+	}
+	.ivu-table:after {
+		background-color: #000 !important;
+	}
+	.ivu-table th {
+		background-color: #a5a5a5 !important;
+	}
+	.ivu-table .ivu-table-header tr {
+		color: #000 !important;
+	}
+	/*卡片*/
+	.ivu-card-bordered {
+	    border: 1px solid #000 !important;
+	}
+	.ivu-card-head {
+	    border-bottom: 1px solid #000 !important;
+	}
+	/*不打印*/
+	.no-print {
+		display: none !important;
+	}
+}
