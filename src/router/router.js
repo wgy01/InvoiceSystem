@@ -96,59 +96,32 @@ export const otherRouter = {
 
 export const appRouter = [
 	{
-    	path:'/pages',
+    	path:'/invoiceManage',
         icon:'android-list',
-        name:'pages',
-        title:'页面管理',
+        name:'invoiceManage',
+        title:'发票管理',
         component: Frame,
         children: [
 	        {
-	            path:'page1',
-	            name:'page1',
-	            title:'页面一',
-	            component: resolve => { require(['@/views/pages/page1.vue'], resolve); }
-	        },
-	        {
-	            path:'page2',
-	            name:'page2',
-	            title:'页面一',
-	            component: resolve => { require(['@/views/pages/page2.vue'], resolve); }
+	            path:'invoiceManage-1',
+	            name:'invoiceManage-1',
+	            title:'发票管理',
+	            component: resolve => { require(['@/views/finance/invoiceManage.vue'], resolve); }
 	        },
         ]
     },
 	{
-    	path:'/elsePages',
+    	path:'/templateManage',
         icon:'android-list',
-        name:'elsePages',
-        title:'其他页面',
+        name:'templateManage',
+        title:'模板管理',
         component: Frame,
         children: [
 	        {
-	            path:'page',
-	            name:'page',
-	            title:'其他页面',
-	            component: resolve => { require(['@/views/elsePages/page.vue'], resolve); }
-	        },
-        ]
-    },
-	{
-    	path:'/test',
-        icon:'android-list',
-        name:'test',
-        title:'测试',
-        component: Frame,
-        children: [
-	        {
-	            path:'testPages1',
-	            name:'testPages1',
-	            title:'测试页一',
-	            component: resolve => { require(['@/views/test/testPages1.vue'], resolve); }
-	        },
-	        {
-	            path:'testPages2',
-	            name:'testPages2',
-	            title:'测试页二',
-	            component: resolve => { require(['@/views/test/testPages2.vue'], resolve); }
+	            path:'templateManage-1',
+	            name:'templateManage-1',
+	            title:'模板管理',
+	            component: resolve => { require(['@/views/finance/templateManage.vue'], resolve); }
 	        },
         ]
     },

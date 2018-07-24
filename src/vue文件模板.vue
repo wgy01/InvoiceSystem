@@ -11,6 +11,9 @@
 </template>
 
 <script>
+	
+//import 自定义名称 from '路径';
+	
 export default {
 	components:{//组件模板
 		
@@ -112,5 +115,5 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 </style>
