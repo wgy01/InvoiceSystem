@@ -757,9 +757,3 @@
 		flex-shrink: 0;
 	}
 </style>
-
-<style>
-	.ivu-select-dropdown{
-		width: auto !important;
-	}
-</style>

@@ -2,17 +2,22 @@
 
 	<div>
 		
-		<Card>
+		<Card style="margin-bottom:16px;">
 			
 			<h1 slot="title">创建模板</h1>
 			
-			<forms-template></forms-template>
+			<add-template></add-template>
 			
 		</Card>
 		
-		<Card style="margin-top:16px;">
+		<Card>
 			
 			<h1 slot="title">模板列表</h1>
+			
+			<list-component
+			:table-columns="tableColumns"
+			:table-data="tableData">
+			</list-component>
 			
 		</Card>
 			
@@ -21,12 +26,15 @@
 </template>
 
 <script>
-	
-import formsTemplate from '@/components/formsTemplate.vue';
-	
+
+import addTemplate from '@/components/add-template.vue';//创建模板
+
+import listComponent from '@/components/list-component.vue';//模板列表
+
 export default {
 	components:{//组件模板
-		formsTemplate,
+		addTemplate,
+		listComponent,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -39,6 +47,47 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	tableColumns: [
+                {
+                    title: 'ID',
+                    key: 'id'
+                },
+                {
+                    title: 'Name',
+                    key: 'name'
+                },
+                {
+                    title: 'Age',
+                    key: 'age'
+                },
+                {
+                    title: 'Address',
+                    key: 'address'
+                },
+                {
+                	align: 'center',
+                	width: 130,
+                    title: '操作',
+                    handle: true,
+                },
+            ],
+            tableData: [
+                {
+                	id: 1,
+                    name: 'John Brown',
+                    age: 18,
+                    address: 'New York No. 1 Lake Park',
+                    date: '2016-10-03'
+                },
+                {
+                	id: 2,
+                    name: 'John Brown',
+                    age: 18,
+                    address: 'New York No. 1 Lake Park',
+                    date: '2016-10-03'
+                },
+            ],
         	
         }
     },

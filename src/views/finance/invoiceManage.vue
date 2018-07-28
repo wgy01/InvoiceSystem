@@ -2,26 +2,39 @@
 
 	<div>
 		
-		<Card>
+		<Card v-if="true" style="margin-bottom:16px;">
 			
 			<h1 slot="title">开发票</h1>
 			
+			<add-invoice></add-invoice>
+			
 		</Card>
 		
-		<Card style="margin-top:16px;">
+		<Card>
 			
 			<h1 slot="title">发票列表</h1>
 			
-		</Card>
+			<list-component
+			:table-columns="tableColumns"
+			:table-data="tableData">
+			</list-component>
 			
+		</Card>
+		
 	</div>
 	
 </template>
 
 <script>
+
+import addInvoice from '@/components/addInvoice.vue';//创建发票
+
+import listComponent from '@/components/list-component.vue';//发票列表
+
 export default {
 	components:{//组件模板
-		
+		addInvoice,
+		listComponent,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -34,6 +47,47 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	tableColumns: [
+                {
+                    title: 'ID',
+                    key: 'id'
+                },
+                {
+                    title: 'Name',
+                    key: 'name'
+                },
+                {
+                    title: 'Age',
+                    key: 'age'
+                },
+                {
+                    title: 'Address',
+                    key: 'address'
+                },
+                {
+                	align: 'center',
+                	width: 130,
+                    title: '操作',
+                    handle: true,
+                },
+            ],
+            tableData: [
+                {
+                	id: 1,
+                    name: 'John Brown',
+                    age: 18,
+                    address: 'New York No. 1 Lake Park',
+                    date: '2016-10-03'
+                },
+                {
+                	id: 2,
+                    name: 'John Brown',
+                    age: 18,
+                    address: 'New York No. 1 Lake Park',
+                    date: '2016-10-03'
+                },
+            ],
         	
         }
     },
@@ -52,6 +106,13 @@ export default {
 			});
 			
     	},
+    	handleSubmit(name) {//验证
+            this.$refs[name].validate((valid) => {
+                if (valid) {
+                    this.$Message.success('创建成功');
+                }
+            })
+        }
     	
     },
     computed: {//计算属性
