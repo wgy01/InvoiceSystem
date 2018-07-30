@@ -16,7 +16,9 @@
 			
 			<list-component
 			:table-columns="tableColumns"
-			:table-data="tableData">
+			:table-data="tableData"
+			component-type="templateSE"
+			>
 			</list-component>
 			
 		</Card>
@@ -27,9 +29,31 @@
 
 <script>
 
-import addTemplate from '@/components/add-template.vue';//创建模板
+import addTemplate from '@/components/template/add-template.vue';//创建模板
 
 import listComponent from '@/components/list-component.vue';//模板列表
+
+import axios from 'axios';
+
+let ajax = () => {
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Template/index', {
+			user_id: sessionStorage.getItem('user_id')
+		})
+		.then(response => {
+			if(response.status == 200){
+				resolve(response.data);
+			}
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
 
 export default {
 	components:{//组件模板
@@ -54,16 +78,12 @@ export default {
                     key: 'id'
                 },
                 {
-                    title: 'Name',
-                    key: 'name'
+                    title: '名称',
+                    key: 'title'
                 },
                 {
-                    title: 'Age',
-                    key: 'age'
-                },
-                {
-                    title: 'Address',
-                    key: 'address'
+                    title: '模板说明',
+                    key: 'remark'
                 },
                 {
                 	align: 'center',
@@ -72,36 +92,24 @@ export default {
                     handle: true,
                 },
             ],
-            tableData: [
-                {
-                	id: 1,
-                    name: 'John Brown',
-                    age: 18,
-                    address: 'New York No. 1 Lake Park',
-                    date: '2016-10-03'
-                },
-                {
-                	id: 2,
-                    name: 'John Brown',
-                    age: 18,
-                    address: 'New York No. 1 Lake Park',
-                    date: '2016-10-03'
-                },
-            ],
+            
+            tableData: [],
         	
         }
     },
     methods: {//方法
     	
-    	ajax () {
+    	updateData(){
     		
-    		this.$axios.post('接口路径', {
-    			
+			this.$axios.post('Service/Template/index', {
+				user_id: sessionStorage.getItem('user_id')
 			})
 			.then(response => {
-				
+				if(response.status == 200){
+					this.tableData = response.data;
+				}
 			})
-			.catch(function (error) {
+			.catch(function(error) {
 				console.log(error);
 			});
 			
@@ -126,9 +134,21 @@ export default {
 	
 	//=================组件路由勾子==============================
 	
-//	beforeRouteEnter (to, from, next) {//在组件创建之前调用
-//		
-//	},
+	beforeRouteEnter (to, from, next) {//在组件创建之前调用
+		
+		let tableData = [];
+		
+		(async() => { //es7异步函数
+			
+			tableData = await ajax();
+			
+			next(vm => {//回调
+				vm.tableData = tableData;
+			})
+			
+		})();
+		
+	},
 	
 }
 </script>

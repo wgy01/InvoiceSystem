@@ -6,7 +6,10 @@
 			
 			<h1 slot="title">开发票</h1>
 			
-			<add-invoice></add-invoice>
+			<add-invoice
+			:template-data="templateList"
+			>
+			</add-invoice>
 			
 		</Card>
 		
@@ -27,9 +30,51 @@
 
 <script>
 
-import addInvoice from '@/components/addInvoice.vue';//创建发票
+import addInvoice from '@/components/invoice/add-invoice.vue';//创建发票
 
 import listComponent from '@/components/list-component.vue';//发票列表
+
+import axios from 'axios';
+
+let template = () => {
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Template/index', {
+			user_id: sessionStorage.getItem('user_id')
+		})
+		.then(response => {
+			if(response.status == 200){
+				resolve(response.data);
+			}
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
+let tabel = () => {
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Order/index', {
+			user_id: sessionStorage.getItem('user_id')
+		})
+		.then(response => {
+			if(response.status == 200){
+				resolve(response.data);
+			}
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
 
 export default {
 	components:{//组件模板
@@ -47,6 +92,8 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	templateList: [],
         	
         	tableColumns: [
                 {
@@ -133,9 +180,30 @@ export default {
 	
 	//=================组件路由勾子==============================
 	
-//	beforeRouteEnter (to, from, next) {//在组件创建之前调用
-//		
-//	},
+	beforeRouteEnter (to, from, next) {//在组件创建之前调用
+		
+		let templateList = [];
+		
+		let tabelList = [];
+		
+		(async() => { //es7异步函数
+			
+			templateList = await template();
+			
+			next(vm => {//回调
+				
+				templateList.forEach(item => {
+					vm.templateList.push({
+						label: item.title,
+						value: item.id,
+					});
+				});
+				
+			})
+			
+		})();
+		
+	},
 	
 }
 </script>

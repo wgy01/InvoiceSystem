@@ -5,12 +5,26 @@
 		<Table border :columns="tableColumns" :data="tableData"></Table>
 		
 		<!--弹窗控件-->
-		<Modal v-model="modalShow">
+		<Modal v-model="modalShow" width="80%">
 			<!--标题-->
-	        <p slot="header">标题</p>
+	        <p slot="header">{{title}}</p>
 	        
 	        <!--内容-->
 	        <div v-if="modalShow">
+	        	
+	        	<template-s-e
+	        	v-if="componentType == 'templateSE'"
+	        	:type="btnType"
+	        	:dataID="dataID"
+	        	>
+	        	</template-s-e>
+	        	
+	        	<invoice-s-e
+	        	v-if="componentType == 'invoiceSE'"
+	        	:type="btnType"
+	        	:dataID="dataID"
+	        	>
+	        	</invoice-s-e>
 	        	
 	        </div>
 	        
@@ -27,9 +41,14 @@
 
 <script>
 
+import templateSE from '@/components/template/template-s-e.vue';
+
+import invoiceSE from '@/components/invoice/invoice-s-e.vue';
+
 export default {
 	components:{//组件模板
-		
+		templateSE,
+		invoiceSE,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -47,11 +66,17 @@ export default {
 		
 		tableData: Array,
 		
+		componentType: String,
+		
 	},
     data () {//数据
         return {
         	
         	dataID: null,
+        	
+        	btnType: '',
+        	
+        	title: '',
         	
         	modalShow: false,
         	
@@ -82,9 +107,11 @@ export default {
                         		on: {
                         			click () {
                         				
-                        				_this.dataID = params.row.id;
+                        				_this.btnType = 'edit';
                         				
-                        				console.log('id='+_this.dataID);
+                        				_this.dataID = Number(params.row.id);
+                        				
+                        				_this.title = params.row.title + '（编辑）';
                         				
                         				_this.modalShow = true;
                         				
@@ -103,9 +130,11 @@ export default {
                         		on: {
                         			click () {
                         				
-                        				_this.dataID = params.row.id;
+                        				_this.btnType = 'show';
                         				
-                        				console.log('id='+_this.dataID);
+                        				_this.dataID = Number(params.row.id);
+                        				
+                        				_this.title = params.row.title + '（详情）';
                         				
                         				_this.modalShow = true;
                         				
@@ -120,19 +149,6 @@ export default {
     			
     		});
     		
-    	},
-    	ajax () {
-    		
-    		this.$axios.post('接口路径', {
-    			
-			})
-			.then(response => {
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-			
     	},
     	
     },

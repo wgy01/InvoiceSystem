@@ -4,7 +4,7 @@
 
 window.__var = {
 
-	baseURL : 'http://erp.bzttech.com/app.php/sys/' //线上
+	baseURL : 'http://192.168.2.251:8081/index.php/' //线上
 	
 //	baseURL : 'http://192.168.2.200:801/sys/' //本地
 

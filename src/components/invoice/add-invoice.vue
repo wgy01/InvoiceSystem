@@ -10,7 +10,7 @@
 	        
 	        <FormItem label="选择模板" prop="template">
 	        	<Select v-model="formInline.template" placeholder="选择模板" style="width: 200px;">
-	                <Option value="1">模板1</Option>
+	                <Option v-for="item in templateData" :value="item.value" :key="item.value">{{ item.label }}</Option>
 	            </Select>
 	        </FormItem>
 	        
@@ -48,6 +48,11 @@ export default {
 		 * 默认值 default: ''
 		 * 
 		 */
+		
+		templateData: {
+			type: Array,
+			default: []
+		},
 	},
     data () {//数据
         return {
@@ -62,7 +67,7 @@ export default {
                     { required: true, message: '请输入名称', trigger: 'blur' }
                 ],
                 template: [
-                    { required: true, message: '请选择模板', trigger: 'change' }
+                    { type: 'number', required: true, message: '请选择模板', trigger: 'change' }
                 ],
         	},
         	
@@ -97,6 +102,12 @@ export default {
     },
     watch: {//监测数据变化
 		
+		templateData(){
+			if(this.templateData && this.templateData.length > 0){
+	    		this.formInline.template = this.templateData[0].value;
+	    	}
+		}
+		
 	},
     
     //===================组件钩子===========================
@@ -107,12 +118,6 @@ export default {
     mounted () {//模板被渲染完毕之后执行
     	
 	},
-	
-	//=================组件路由勾子==============================
-	
-//	beforeRouteEnter (to, from, next) {//在组件创建之前调用
-//		
-//	},
 	
 }
 </script>

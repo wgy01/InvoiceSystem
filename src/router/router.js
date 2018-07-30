@@ -115,12 +115,14 @@ export const appRouter = [
         icon:'android-list',
         name:'templateManage',
         title:'模板管理',
+        access: 1,
         component: Frame,
         children: [
 	        {
 	            path:'templateManage-1',
 	            name:'templateManage-1',
 	            title:'模板管理',
+	            access: 1,
 	            component: resolve => { require(['@/views/finance/templateManage.vue'], resolve); }
 	        },
         ]
