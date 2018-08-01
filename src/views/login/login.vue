@@ -52,7 +52,8 @@ export default {
 	},
     watch:{//监测数据变化
 		
-	}
+	},
+	
 }
 </script>
 

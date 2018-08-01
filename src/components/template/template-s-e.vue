@@ -146,6 +146,8 @@ export default {
 			})
 			.then(response => {
 				
+				this.remark = response.data.remark;
+				
 				response.data.setting.forEach(item => {
 				
 					if(item.user_type == 1){//会计
@@ -155,8 +157,6 @@ export default {
 					if(item.user_type == 2){//公司
 						this.companyData.push(item);
 					}
-				
-					this.remark = response.data.remark;
 				
 				});
 					

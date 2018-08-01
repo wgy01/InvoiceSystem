@@ -96,6 +96,21 @@ export const otherRouter = {
 
 export const appRouter = [
 	{
+    	path:'/companyManage',
+        icon:'android-list',
+        name:'companyManage',
+        title:'公司管理',
+        component: Frame,
+        children: [
+	        {
+	            path:'addCompany',
+	            name:'addCompany',
+	            title:'公司管理',
+	            component: resolve => { require(['@/views/finance/companyManage.vue'], resolve); }
+	        },
+        ]
+    },
+	{
     	path:'/invoiceManage',
         icon:'android-list',
         name:'invoiceManage',
@@ -103,8 +118,8 @@ export const appRouter = [
         component: Frame,
         children: [
 	        {
-	            path:'invoiceManage-1',
-	            name:'invoiceManage-1',
+	            path:'invoicePages',
+	            name:'invoicePages',
 	            title:'发票管理',
 	            component: resolve => { require(['@/views/finance/invoiceManage.vue'], resolve); }
 	        },

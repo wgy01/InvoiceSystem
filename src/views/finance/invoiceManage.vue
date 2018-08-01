@@ -2,27 +2,9 @@
 
 	<div>
 		
-		<Card v-if="true" style="margin-bottom:16px;">
-			
-			<h1 slot="title">开发票</h1>
-			
-			<add-invoice
-			:template-data="templateList"
-			>
-			</add-invoice>
-			
-		</Card>
+		<accountant v-if="userType == 1" :templateList="templateList"></accountant>
 		
-		<Card>
-			
-			<h1 slot="title">发票列表</h1>
-			
-			<list-component
-			:table-columns="tableColumns"
-			:table-data="tableData">
-			</list-component>
-			
-		</Card>
+		<company v-if="userType == 2" :remark="remark" :accountantFormsData="accountantFormsData" :companyFormsData="companyFormsData"></company>
 		
 	</div>
 	
@@ -30,9 +12,9 @@
 
 <script>
 
-import addInvoice from '@/components/invoice/add-invoice.vue';//创建发票
+import accountant from '@/components/invoice/accountant.vue';
 
-import listComponent from '@/components/list-component.vue';//发票列表
+import company from '@/components/invoice/company.vue';
 
 import axios from 'axios';
 
@@ -56,12 +38,12 @@ let template = () => {
 
 }
 
-let tabel = () => {
+let templateShow = (templateID) => {
 
 	return new Promise(resolve => {
 
-		axios.post('Service/Order/index', {
-			user_id: sessionStorage.getItem('user_id')
+		axios.post('Service/Template/detail', {
+			id: templateID
 		})
 		.then(response => {
 			if(response.status == 200){
@@ -78,8 +60,8 @@ let tabel = () => {
 
 export default {
 	components:{//组件模板
-		addInvoice,
-		listComponent,
+		accountant,
+		company,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -95,46 +77,17 @@ export default {
         	
         	templateList: [],
         	
-        	tableColumns: [
-                {
-                    title: 'ID',
-                    key: 'id'
-                },
-                {
-                    title: 'Name',
-                    key: 'name'
-                },
-                {
-                    title: 'Age',
-                    key: 'age'
-                },
-                {
-                    title: 'Address',
-                    key: 'address'
-                },
-                {
-                	align: 'center',
-                	width: 130,
-                    title: '操作',
-                    handle: true,
-                },
-            ],
-            tableData: [
-                {
-                	id: 1,
-                    name: 'John Brown',
-                    age: 18,
-                    address: 'New York No. 1 Lake Park',
-                    date: '2016-10-03'
-                },
-                {
-                	id: 2,
-                    name: 'John Brown',
-                    age: 18,
-                    address: 'New York No. 1 Lake Park',
-                    date: '2016-10-03'
-                },
-            ],
+        	userType: sessionStorage.getItem('access'),
+        	
+        	accountantID: '',//会计ID
+        	
+        	templateID: '',//模板ID
+        	
+        	remark: '',//模板说明
+        	
+        	accountantFormsData: [],//会计数据
+        	
+        	companyFormsData: [],//公司数据
         	
         }
     },
@@ -153,13 +106,6 @@ export default {
 			});
 			
     	},
-    	handleSubmit(name) {//验证
-            this.$refs[name].validate((valid) => {
-                if (valid) {
-                    this.$Message.success('创建成功');
-                }
-            })
-        }
     	
     },
     computed: {//计算属性
@@ -184,24 +130,61 @@ export default {
 		
 		let templateList = [];
 		
-		let tabelList = [];
+		let templateForms = [];
 		
-		(async() => { //es7异步函数
+		if(sessionStorage.getItem('access') == 1){//会计
 			
-			templateList = await template();
+			(async() => { //es7异步函数
 			
-			next(vm => {//回调
+				templateList = await template();
 				
-				templateList.forEach(item => {
-					vm.templateList.push({
-						label: item.title,
-						value: item.id,
+				next(vm => {//回调
+					
+					templateList.forEach(item => {//模板数据
+						vm.templateList.push({
+							label: item.title,
+							value: item.id,
+							setting: item.setting,
+							remark: item.remark,
+						});
 					});
-				});
+					
+				})
 				
-			})
+			})();
 			
-		})();
+		}
+		else if(sessionStorage.getItem('access') == 2){//用户
+			
+			(async() => { //es7异步函数
+				
+				templateForms = await templateShow(to.query.templateID);
+				
+				next(vm => {//回调
+					
+					vm.remark = templateForms.remark;
+				
+					templateForms.setting.forEach(item => {
+					
+						if(item.user_type == 1){//会计
+							vm.accountantFormsData.push(item);
+						}
+					
+						if(item.user_type == 2){//公司
+							vm.companyFormsData.push(item);
+						}
+					
+					});
+					
+					vm.accountantID = to.query.accountantID;
+				
+					vm.templateID = to.query.templateID;
+					
+				})
+				
+			})();
+			
+		}
 		
 	},
 	

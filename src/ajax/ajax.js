@@ -65,19 +65,13 @@ import axios from 'axios';
 			
 			console.log('<--返回了数据',_res.data);
 			
-			if(_res.data.code == 1){//获取数据成功
+			if(_res.data.status == 200){//获取数据成功
 				
 			}
 			
-			if(_res.data.code == 0){//获取数据失败
+			if(_res.data.status == 300){//获取数据失败
 				
-				vm.$Message.error(_res.data.msg);
-				
-			}
-			
-			if(_res.data.code == -1){//权限不足
-				
-				vm.$Message.error(_res.data.msg);
+				vm.$Message.error(_res.data.message);
 				
 			}
 			

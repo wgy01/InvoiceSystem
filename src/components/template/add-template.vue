@@ -54,7 +54,7 @@
 
 <script>
 
-import formsTemplate from '@/components/forms-template.vue';//模板列表
+import formsTemplate from '@/components/forms-template.vue';
 
 export default {
 	components:{//组件模板

@@ -9,9 +9,13 @@
 	        </FormItem>
 	        
 	        <FormItem label="选择模板" prop="template">
-	        	<Select v-model="formInline.template" placeholder="选择模板" style="width: 200px;">
+	        	<Select v-model="formInline.template" placeholder="选择模板" @on-change="selectChange" style="width: 200px;">
 	                <Option v-for="item in templateData" :value="item.value" :key="item.value">{{ item.label }}</Option>
 	            </Select>
+	        </FormItem>
+	        
+	        <FormItem label="公司ID" prop="companyID">
+	        	<Input v-model="formInline.companyID" clearable placeholder="输入公司ID" style="width: 200px;"></Input>
 	        </FormItem>
 	        
 	    </Form>
@@ -20,9 +24,45 @@
 	    	
 	    	<h2 slot="title">模板预览</h2>
 	    	
-	    	<div>
-	    		213213
-	    	</div>
+	    	<Card style="margin-bottom: 16px;">
+	    	
+		    	<h2 slot="title">模板说明</h2>
+		    	
+		    	<div>{{remark}}</div>
+		    	
+		    </Card>
+	    	
+	    	<Card style="margin-bottom: 16px;">
+	    		
+	    		<h2 slot="title">公司字段</h2>
+	    		
+	    		<forms-template
+	            ref="formsInstance1"
+	            @on-change="formsChange"
+	            :NoHandle="true"
+	            :user-type="2"
+	            :out-forms-data="companyData"
+	            show-type="show"
+	            >
+	            </forms-template>
+	    		
+	    	</Card>
+	    	
+	    	<Card>
+	    		
+	    		<h2 slot="title">会计字段</h2>
+	    		
+	    		<forms-template
+	            ref="formsInstance2"
+	            @on-change="formsChange"
+	            :NoHandle="false"
+	            :user-type="1"
+	            :out-forms-data="accountantData"
+	            show-type="show"
+	            >
+	            </forms-template>
+	    		
+	    	</Card>
 	    	
 	    </Card>
 	    
@@ -36,9 +76,11 @@
 
 <script>
 
+import formsTemplate from '@/components/forms-template.vue';
+
 export default {
 	components:{//组件模板
-		
+		formsTemplate
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -49,7 +91,7 @@ export default {
 		 * 
 		 */
 		
-		templateData: {
+		templateData: {//模板数据
 			type: Array,
 			default: []
 		},
@@ -60,6 +102,7 @@ export default {
         	formInline: {
         		name: '',
         		template: '',
+        		companyID: '',
         	},
         	
         	ruleInline: {
@@ -69,7 +112,18 @@ export default {
                 template: [
                     { type: 'number', required: true, message: '请选择模板', trigger: 'change' }
                 ],
+                companyID: [
+                    { required: true, message: '请输入公司ID', trigger: 'blur' }
+                ],
         	},
+        	
+        	remark: '',//模板说明
+        	
+        	accountantData: [],//会计数据
+        	
+        	companyData: [],//公司数据
+        	
+        	formsList: [],//发生改变后的表单数据
         	
         }
     },
@@ -88,13 +142,54 @@ export default {
 			});
 			
     	},
-    	handleSubmit(name) {
+    	handleSubmit(name) {//创建发票
+    		console.log(this.formsList);
             this.$refs[name].validate((valid) => {
                 if (valid) {
                     this.$Message.success('创建成功');
                 }
             })
-        }
+       },
+       selectChange(val){//选择模板改变触发
+       	
+       		this.templateData.forEach(item => {
+       			
+       			if(item.value == val){
+       				
+       				this.remark = item.remark;
+       				
+       				//this.formsList = item.setting;
+       				
+       				item.setting.forEach(item2 => {
+				
+						if(item2.user_type == 1){//会计
+							this.accountantData.push(item2);
+						}
+					
+						if(item2.user_type == 2){//公司
+							this.companyData.push(item2);
+						}
+					
+					});
+       				
+       			}
+       			
+       		});
+       		
+       },
+       formsChange(){//模板表单发生改变时
+    		
+    		let A = this.$refs.formsInstance1.formsList.data;
+    		
+    		let B = this.$refs.formsInstance2.formsList.data;
+    		
+    		let arr = [];
+    		
+    		arr.push(...A,...B);
+    		
+    		this.formsList = arr;
+    		
+    	},
     	
     },
     computed: {//计算属性
@@ -102,7 +197,7 @@ export default {
     },
     watch: {//监测数据变化
 		
-		templateData(){
+		templateData(){//默认模板
 			if(this.templateData && this.templateData.length > 0){
 	    		this.formInline.template = this.templateData[0].value;
 	    	}

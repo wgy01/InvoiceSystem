@@ -28,6 +28,10 @@ Vue.use(Print);//注册打印插件
 import ajax from './ajax/ajax.js'
 Vue.prototype.$axios = ajax;//挂载到Vue
 
+//复制插件
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
+
 //主组件
 import App from './App'
 

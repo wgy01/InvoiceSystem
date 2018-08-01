@@ -71,12 +71,12 @@ export default {
 		
 		userType: Number,//用户类型
 		
-		NoHandle: {
+		NoHandle: {//不可操作input
 			type: Boolean,
 			default: false
 		},
 		
-		showType: {
+		showType: {//显示类型编辑或详情
 			type: String,
 			required: true
 		},

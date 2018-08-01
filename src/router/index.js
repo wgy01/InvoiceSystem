@@ -21,6 +21,11 @@ export const router = new Router({
 
 router.beforeEach((to, from, next) => {
 	
+	if(to.name == 'invoicePages'){
+		sessionStorage.setItem('path',to.fullPath);
+		sessionStorage.setItem('query',JSON.stringify(to.query));
+	}
+	
 //	router.app.$Loading.start();//全局创建一个显示页面加载
 	
 	if(sessionStorage.getItem('locking') === '1' && to.name !== 'locking') { // 判断当前是否是锁定状态（这里是用来完成锁屏功能）

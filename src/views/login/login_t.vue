@@ -91,11 +91,22 @@ export default {
 							
 							sessionStorage.setItem('access',response.data.user_type);//把用户类型存起来
 							
-							sessionStorage.setItem('isadmin',response.data.user_type);
+							sessionStorage.setItem('isadmin',response.data.user_type);//管理员
 							
-							this.$router.replace({//登陆成功跳转路由到首页
-								name:'home_index'
-							});
+							if(sessionStorage.getItem('path') && response.data.user_type == 2){
+								
+								this.$router.replace({
+									path: sessionStorage.getItem('path')
+								});
+								
+							}else{
+								
+								this.$router.replace({//登陆成功跳转路由到首页
+									name: 'home_index'
+								});
+								
+							}
+							
 							
 							this.$Message.success(response.message);
 							
@@ -146,6 +157,7 @@ export default {
 	mounted(){//模板被渲染完毕之后执行
 		
 	},
+	
 }
 </script>
 

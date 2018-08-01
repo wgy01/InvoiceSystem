@@ -1,0 +1,181 @@
+<template>
+
+	<div>
+		
+		<Card>
+			
+			<h1 slot="title">会计公司名称</h1>
+			
+			<div>
+				
+				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
+					
+					<FormItem label="选择公司" prop="company">
+			        	<Select v-model="formInline.company" placeholder="选择公司" style="width: 200px;">
+			                <Option v-for="item in companyList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+			            </Select>
+			        </FormItem>
+					
+			        <FormItem label="金额" prop="money">
+			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 200px;"></Input>
+			        </FormItem>
+			        
+			    </Form>
+			    
+		    	<Card style="margin-bottom: 16px;">
+		    	
+			    	<h2 slot="title">模板说明</h2>
+			    	
+			    	<div>{{remark}}</div>
+			    	
+			    </Card>
+		    	
+		    	<Card style="margin-bottom: 16px;">
+		    		
+		    		<h2 slot="title">公司字段</h2>
+		    		
+		    		<forms-template
+		            ref="formsInstance1"
+		            @on-change="formsChange"
+		            :NoHandle="false"
+		            :user-type="2"
+		            :out-forms-data="companyFormsData"
+		            show-type="show"
+		            >
+		            </forms-template>
+		    		
+		    	</Card>
+		    	
+		    	<Card>
+		    		
+		    		<h2 slot="title">会计字段</h2>
+		    		
+		    		<forms-template
+		            ref="formsInstance2"
+		            @on-change="formsChange"
+		            :NoHandle="true"
+		            :user-type="1"
+		            :out-forms-data="accountantFormsData"
+		            show-type="show"
+		            >
+		            </forms-template>
+		    		
+		    	</Card>
+			    	
+			    <div style="text-align: center;padding-top: 16px;">
+			    	<Button type="primary" @click="handleSubmit('formInline')">创建发票</Button>
+			    </div>
+				
+			</div>
+			
+		</Card>
+		
+	</div>
+	
+</template>
+
+<script>
+
+import formsTemplate from '@/components/forms-template.vue';
+
+export default {
+	components:{//组件模板
+		formsTemplate
+	},
+	props:{//组件道具（参数）
+		/* ****属性用法*****
+		 * 
+		 * 传递类型 type: Array | Number | String | Object
+		 * 为必传 required: true
+		 * 默认值 default: ''
+		 * 
+		 */
+		
+		remark: String,//模板说明
+        	
+    	accountantFormsData: Array,//会计数据
+    	
+    	companyFormsData: Array,//公司数据
+    	
+    	companyList: Array,//公司列表
+		
+	},
+    data () {//数据
+        return {
+        	
+        	formInline: {
+        		money: '',
+        	},
+        	
+        	ruleInline: {
+        		money: [
+                    { required: true, message: '请输入金额', trigger: 'blur' }
+                ],
+                company: [
+                    { type: 'number', required: true, message: '请选择公司', trigger: 'change' }
+                ],
+        	},
+        	
+        	formsList: [],//发生改变后的表单数据
+        	
+        }
+    },
+    methods: {//方法
+    	
+    	ajax () {
+    		
+    		this.$axios.post('接口路径', {
+    			
+			})
+			.then(response => {
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+			
+    	},
+    	handleSubmit(name) {//创建发票
+    		console.log(this.formsList);
+            this.$refs[name].validate((valid) => {
+                if (valid) {
+                    this.$Message.success('创建成功');
+                }
+            })
+       },
+       formsChange(){//模板表单发生改变时
+    		
+    		let A = this.$refs.formsInstance1.formsList.data;
+    		
+    		let B = this.$refs.formsInstance2.formsList.data;
+    		
+    		let arr = [];
+    		
+    		arr.push(...A,...B);
+    		
+    		this.formsList = arr;
+    		
+    	},
+    	
+    },
+    computed: {//计算属性
+        	
+    },
+    watch: {//监测数据变化
+		
+	},
+    
+    //===================组件钩子===========================
+    
+    created () {//实例被创建完毕之后执行
+    	
+	},
+    mounted () {//模板被渲染完毕之后执行
+    	
+	},
+	
+}
+</script>
+
+<style scoped>
+</style>
