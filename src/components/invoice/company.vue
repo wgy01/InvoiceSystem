@@ -136,12 +136,19 @@ export default {
 			
     	},
     	handleSubmit(name) {//创建发票
-    		console.log(this.formsList);
+    		
             this.$refs[name].validate((valid) => {
+            	
                 if (valid) {
+                	
+                	console.log(this.formsList);
+                	
                     this.$Message.success('创建成功');
+                    
                 }
+                
             })
+            
        },
        formsChange(){//模板表单发生改变时
     		
