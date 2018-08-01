@@ -128,9 +128,9 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
-		let templateList = [];
+		let templateList = [];//模板列表
 		
-		let templateForms = [];
+		let templateForms = [];//模板表单
 		
 		if(sessionStorage.getItem('access') == 1){//会计
 			
