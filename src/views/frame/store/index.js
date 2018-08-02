@@ -37,7 +37,7 @@ const mainFrame = {
 			appRouter.forEach((item, index) => { //遍历菜单路由appRouter数组
 				
 				if(item.access !== undefined && isadmin != 1) { //这是有权限的父级路由
-
+					
 					if(plant.oneOf(item.access, accessCode)) { //权限匹配的父级(如果父级有权限又不匹配就整个父级都不存)
 
 						if(item.children.length === 1) { //是一级菜单

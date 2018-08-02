@@ -40,7 +40,7 @@ let ajax = () => {
 	return new Promise(resolve => {
 
 		axios.post('Service/Template/index', {
-			user_id: sessionStorage.getItem('user_id')
+			user_id: sessionStorage.getItem('userId')
 		})
 		.then(response => {
 			if(response.status == 200){
@@ -102,7 +102,7 @@ export default {
     	updateData(){
     		
 			this.$axios.post('Service/Template/index', {
-				user_id: sessionStorage.getItem('user_id')
+				user_id: sessionStorage.getItem('userId')
 			})
 			.then(response => {
 				if(response.status == 200){

@@ -8,7 +8,7 @@
 			
 			<div>
 				
-				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="80">
+				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
 			
 			        <FormItem label="选择模板" prop="templateID">
 			        	<Select v-model="formInline.templateID" placeholder="选择模板" style="width: 200px;">
@@ -57,7 +57,7 @@ export default {
         	
         	formInline: {
         		templateID: '',
-        		accountantID: sessionStorage.getItem('user_id'),
+        		accountantID: sessionStorage.getItem('userId'),
         	},
         	
         	ruleInline: {

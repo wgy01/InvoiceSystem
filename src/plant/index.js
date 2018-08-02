@@ -9,7 +9,7 @@ let plant = {
 
 //--------------------------设置浏览器title标题-----------------------------------
 plant.title = function (title) {
-    title = title || '系统';//默认值
+    title = title || '发票系统';//默认值
     window.document.title = title;
 };
 

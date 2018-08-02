@@ -9,7 +9,7 @@
             		<!--logo-->
             		<div class="logo" :style="!isCollapsed && themeType == 'light' ? { borderRight:'1px solid #DDDEE1' } : ''">
             			
-            			<div>系统框架</div>
+            			<div>发票系统</div>
             			
             		</div>
             		
@@ -111,11 +111,11 @@
 	            			<div class="right">
 	            				<div class="L">
 									
-									<div style="color: #bbbec4;">功能1</div>
+									<!--<div style="color: #bbbec4;">功能1</div>
 									
 									<div style="color: #bbbec4;">功能2</div>
 									
-									<div style="color: #bbbec4;">功能3</div>
+									<div style="color: #bbbec4;">功能3</div>-->
 									
 									<div>
 										<Dropdown trigger="click" @on-click="themeClick">
@@ -251,7 +251,7 @@
             	
                 isCollapsed: false,
                 
-                userName:sessionStorage.getItem('user'),//用户名
+                userName:sessionStorage.getItem('userName'),//用户名
                 
                 menuList:this.$store.state.mainFrame.menuList,//菜单列表
                 
@@ -522,7 +522,7 @@
         		let themeType = name.slice(2);
         		
         		let themeData = {
-        			user: sessionStorage.getItem('user'),
+        			user: sessionStorage.getItem('userName'),
         			type: themeType,
         			color: color,
         		};

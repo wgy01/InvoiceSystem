@@ -46,14 +46,14 @@ router.beforeEach((to, from, next) => {
 	
 	else {
 		
-		if(!sessionStorage.getItem('user') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
+		if(!sessionStorage.getItem('userName') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
 			
 			//console.log('未登录，而且当前页面不是登录页');
 			next({
 				name: 'login'//这里表示要跳转到name值为'login'的路由(通过name来显示页面)
 			});
 			
-		}else if(sessionStorage.getItem('user') && to.name === 'login') { // 判断是否已经登录且前往的是登录页
+		}else if(sessionStorage.getItem('userName') && to.name === 'login') { // 判断是否已经登录且前往的是登录页
 			
 			//console.log('已经登录，而且当前页面是登录页');
 			next({

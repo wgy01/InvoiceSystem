@@ -2,9 +2,31 @@
 
 	<div>
 		
-		<accountant v-if="userType == 1" :templateList="templateList"></accountant>
+		<accountant v-if="userType == 1" :templateList="templateList" style="margin-bottom: 16px;"></accountant>
 		
-		<company v-if="userType == 2" :remark="remark" :accountantFormsData="accountantFormsData" :companyFormsData="companyFormsData"></company>
+		<company
+		v-else-if="userType == 2"
+		:remark="remark"
+		:accountantFormsData="accountantFormsData"
+		:companyFormsData="companyFormsData"
+		:accountantID="accountantID"
+		:templateID="templateID"
+		style="margin-bottom: 16px;"
+		>
+		</company>
+		
+		<Card>
+			
+			<h1 slot="title">发票列表</h1>
+			
+			<list-component
+			:table-columns="tableColumns"
+			:table-data="tableData"
+			component-type="templateSE"
+			>
+			</list-component>
+			
+		</Card>
 		
 	</div>
 	
@@ -16,6 +38,8 @@ import accountant from '@/components/invoice/accountant.vue';
 
 import company from '@/components/invoice/company.vue';
 
+import listComponent from '@/components/list-component.vue';
+
 import axios from 'axios';
 
 let template = () => {
@@ -23,7 +47,7 @@ let template = () => {
 	return new Promise(resolve => {
 
 		axios.post('Service/Template/index', {
-			user_id: sessionStorage.getItem('user_id')
+			user_id: sessionStorage.getItem('userId')
 		})
 		.then(response => {
 			if(response.status == 200){
@@ -62,6 +86,7 @@ export default {
 	components:{//组件模板
 		accountant,
 		company,
+		listComponent,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -77,17 +102,40 @@ export default {
         	
         	templateList: [],
         	
-        	userType: sessionStorage.getItem('access'),
+        	userType: sessionStorage.getItem('userType'),
         	
-        	accountantID: '',//会计ID
+        	accountantID: null,//会计ID
         	
-        	templateID: '',//模板ID
+        	templateID: null,//模板ID
         	
         	remark: '',//模板说明
         	
         	accountantFormsData: [],//会计数据
         	
         	companyFormsData: [],//公司数据
+        	
+        	tableColumns: [
+                {
+                    title: 'ID',
+                    key: 'id'
+                },
+                {
+                    title: '名称',
+                    key: 'title'
+                },
+                {
+                    title: '模板说明',
+                    key: 'remark'
+                },
+                {
+                	align: 'center',
+                	width: 130,
+                    title: '操作',
+                    handle: true,
+                },
+            ],
+            
+            tableData: [],
         	
         }
     },
@@ -112,7 +160,7 @@ export default {
         	
     },
     watch: {//监测数据变化
-		
+    	
 	},
     
     //===================组件钩子===========================
@@ -132,7 +180,7 @@ export default {
 		
 		let templateForms = [];//模板表单
 		
-		if(sessionStorage.getItem('access') == 1){//会计
+		if(sessionStorage.getItem('userType') == 1){//会计
 			
 			(async() => { //es7异步函数
 			
@@ -153,36 +201,89 @@ export default {
 				
 			})();
 			
-		}
-		else if(sessionStorage.getItem('access') == 2){//用户
+		}else if(sessionStorage.getItem('userType') == 2){//用户
 			
-			(async() => { //es7异步函数
+			if(to.query.accountantID && to.query.templateID){
 				
-				templateForms = await templateShow(to.query.templateID);
+				(async() => { //es7异步函数
 				
-				next(vm => {//回调
+					templateForms = await templateShow(to.query.templateID);
+				
+					next(vm => {//回调
 					
-					vm.remark = templateForms.remark;
+						vm.remark = templateForms.remark;
 				
-					templateForms.setting.forEach(item => {
+						templateForms.setting.forEach(item => {
 					
+							if(item.user_type == 1){//会计
+								vm.accountantFormsData.push(item);
+							}
+					
+							if(item.user_type == 2){//公司
+								vm.companyFormsData.push(item);
+							}
+					
+						});
+						
+						vm.accountantID = Number(to.query.accountantID);
+				
+						vm.templateID = Number(to.query.templateID);
+					
+					})
+				
+				})();
+				
+			}else{
+				
+				next(vm => {
+					
+					vm.accountantID = Number(to.query.accountantID);
+				
+					vm.templateID = Number(to.query.templateID);
+					
+				});
+				
+			}
+			
+			
+		}
+		
+	},
+	beforeRouteUpdate (to, from, next) {// 在当前路由改变，但是该组件被复用时调用
+		
+		this.accountantID = Number(to.query.accountantID);
+				
+		this.templateID = Number(to.query.templateID);
+		
+		if(sessionStorage.getItem('userType') == 2 && to.query.accountantID && to.query.templateID){
+			
+			this.$axios.post('Service/Template/detail', {
+				id: to.query.templateID
+			})
+			.then(response => {
+				if(response.status == 200){
+				
+					this.remark = response.data.remark;
+				
+					response.data.setting.forEach(item => {
+			
 						if(item.user_type == 1){//会计
-							vm.accountantFormsData.push(item);
+							this.accountantFormsData.push(item);
 						}
-					
+			
 						if(item.user_type == 2){//公司
-							vm.companyFormsData.push(item);
+							this.companyFormsData.push(item);
 						}
-					
+			
 					});
-					
-					vm.accountantID = to.query.accountantID;
 				
-					vm.templateID = to.query.templateID;
-					
-				})
-				
-			})();
+				}
+			})
+			.catch(function(error) {
+				console.log(error);
+			});
+			
+			next();
 			
 		}
 		

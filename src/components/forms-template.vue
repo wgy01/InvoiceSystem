@@ -26,7 +26,10 @@
 					</FormItem>
 				</Col>
 				
-				<Col span="4" v-if="showType == 'show'" style="text-align: right;display: flex;align-items: center;justify-content: flex-end;">
+				<Col span="4"
+				v-if="showType == 'show'"
+				style="text-align: right;display: flex;align-items: center;justify-content: flex-end;"
+				>
 					{{item.name}}：
 				</Col>
 				

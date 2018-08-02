@@ -2,7 +2,7 @@
 
 	<div>
 		
-		<Card>
+		<Card v-if="accountantID && templateID">
 			
 			<h1 slot="title">会计公司名称</h1>
 			
@@ -63,9 +63,33 @@
 		    	</Card>
 			    	
 			    <div style="text-align: center;padding-top: 16px;">
-			    	<Button type="primary" @click="handleSubmit('formInline')">创建发票</Button>
+			    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
 			    </div>
 				
+			</div>
+			
+		</Card>
+		
+		<!--发票链接模块-->
+		
+		<Card v-else>
+			
+			<h1 slot="title">发票链接</h1>
+			
+			<div>
+				
+				<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
+					
+			        <FormItem label="发票链接" prop="invoiceURL">
+			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接"></Input>
+			        </FormItem>
+			        
+			    </Form>
+				
+			    <div style="text-align: center;">
+			    	<Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
+			    </div>
+			    
 			</div>
 			
 		</Card>
@@ -98,7 +122,11 @@ export default {
     	companyFormsData: Array,//公司数据
     	
     	companyList: Array,//公司列表
-		
+    	
+    	accountantID: Number,
+    	
+    	templateID: Number,
+    	
 	},
     data () {//数据
         return {
@@ -106,13 +134,21 @@ export default {
         	formInline: {
         		money: '',
         	},
-        	
         	ruleInline: {
         		money: [
                     { required: true, message: '请输入金额', trigger: 'blur' }
                 ],
                 company: [
                     { type: 'number', required: true, message: '请选择公司', trigger: 'change' }
+                ],
+        	},
+        	
+        	formInline2: {
+        		invoiceURL: '',
+        	},
+        	ruleInline2: {
+        		invoiceURL: [
+                    { required: true, message: '请输入链接', trigger: 'blur' }
                 ],
         	},
         	
@@ -144,6 +180,47 @@ export default {
                 	console.log(this.formsList);
                 	
                     this.$Message.success('创建成功');
+                    
+                }
+                
+            })
+            
+       },
+       handleSubmit2(name) {
+    		
+            this.$refs[name].validate((valid) => {
+            	
+                if (valid) {
+                	
+                	let getUrlParams = (url,name) => {
+                		let startIndex = url.indexOf('?');
+                		let parameter = url.substr(startIndex);
+					    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+					    let r = parameter.substr(1).match(reg);  
+					    if (r != null) return unescape(r[2]); 
+					  	return null; 
+					}
+                	
+                	this.$router.push(
+			    		{
+			    			name: this.$route.name,
+			    			query: {
+			    				accountantID: getUrlParams(this.formInline2.invoiceURL,'accountantID'),
+    							templateID: getUrlParams(this.formInline2.invoiceURL,'templateID'),
+			    			}
+			    		}
+		    		);
+		    		
+		    		if(this.$route.query.accountantID && this.$route.query.templateID){
+		    			
+		    			this.$Message.success('跳转成功');
+		    			
+		    		}else{
+		    			
+		    			this.$Message.error('链接错误');
+		    			
+		    		}
+		    		
                     
                 }
                 

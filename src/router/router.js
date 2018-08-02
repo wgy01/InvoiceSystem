@@ -49,7 +49,7 @@ export const otherRouter = {
             component: resolve => { require(['@/views/home/home.vue'], resolve); }
         },
         {
-            path: 'myCenter',
+            path: 'myCenter/',
             title: '个人中心',
             name: 'myCenter_index',//放在这里的路由要加上后缀名：_index
             component: resolve => { require(['@/views/userPages/myCenter.vue'], resolve); }
@@ -100,12 +100,14 @@ export const appRouter = [
         icon:'android-list',
         name:'companyManage',
         title:'公司管理',
+        access: [2],
         component: Frame,
         children: [
 	        {
 	            path:'addCompany',
 	            name:'addCompany',
 	            title:'公司管理',
+	            access: [2],
 	            component: resolve => { require(['@/views/finance/companyManage.vue'], resolve); }
 	        },
         ]
@@ -130,14 +132,14 @@ export const appRouter = [
         icon:'android-list',
         name:'templateManage',
         title:'模板管理',
-        access: 1,
+        access: [1],
         component: Frame,
         children: [
 	        {
 	            path:'templateManage-1',
 	            name:'templateManage-1',
 	            title:'模板管理',
-	            access: 1,
+	            access: [1],
 	            component: resolve => { require(['@/views/finance/templateManage.vue'], resolve); }
 	        },
         ]
