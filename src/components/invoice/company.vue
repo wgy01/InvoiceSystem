@@ -10,8 +10,8 @@
 				
 				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
 					
-					<FormItem label="选择公司" prop="company">
-			        	<Select v-model="formInline.company" placeholder="选择公司" style="width: 200px;">
+					<FormItem label="选择公司" prop="companyId">
+			        	<Select v-model="formInline.companyId" placeholder="选择公司" style="width: 200px;">
 			                <Option v-for="item in companyList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 			            </Select>
 			        </FormItem>
@@ -133,12 +133,13 @@ export default {
         	
         	formInline: {
         		money: '',
+        		companyId: '',
         	},
         	ruleInline: {
         		money: [
                     { required: true, message: '请输入金额', trigger: 'blur' }
                 ],
-                company: [
+                companyId: [
                     { type: 'number', required: true, message: '请选择公司', trigger: 'change' }
                 ],
         	},
@@ -186,7 +187,7 @@ export default {
             })
             
        },
-       handleSubmit2(name) {
+       handleSubmit2(name) {//获取发票
     		
             this.$refs[name].validate((valid) => {
             	

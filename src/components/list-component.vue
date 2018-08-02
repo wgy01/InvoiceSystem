@@ -26,6 +26,13 @@
 	        	>
 	        	</invoice-s-e>
 	        	
+	        	<company-s-e
+	        	v-if="componentType == 'companySE'"
+	        	:type="btnType"
+	        	:dataID="dataID"
+	        	>
+	        	</company-s-e>
+	        	
 	        </div>
 	        
 	        <!--页脚-->
@@ -45,10 +52,13 @@ import templateSE from '@/components/template/template-s-e.vue';
 
 import invoiceSE from '@/components/invoice/invoice-s-e.vue';
 
+import companySE from '@/components/company/company-s-e.vue';
+
 export default {
 	components:{//组件模板
 		templateSE,
 		invoiceSE,
+		companySE,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****

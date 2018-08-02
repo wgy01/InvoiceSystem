@@ -31,7 +31,7 @@
 			<list-component
 			:table-columns="tableColumns"
 			:table-data="tableData"
-			component-type="templateSE"
+			component-type="companySE"
 			>
 			</list-component>
 			
@@ -80,10 +80,6 @@ export default {
                     key: 'title'
                 },
                 {
-                    title: '模板说明',
-                    key: 'remark'
-                },
-                {
                 	align: 'center',
                 	width: 130,
                     title: '操作',
@@ -91,7 +87,12 @@ export default {
                 },
             ],
             
-            tableData: [],
+            tableData: [
+            	{
+            		id: 1,
+            		title: '公司123',
+            	}
+            ],
             
         }
     },
