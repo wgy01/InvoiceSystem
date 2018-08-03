@@ -183,13 +183,17 @@ export default {
 					})
 					.then(response => {
 						
+						if(response.status == 200){
+							
+							this.$Message.success('创建成功');
+							
+						}
+						
 					})
 					.catch(function (error) {
 						console.log(error);
 					});
                 	
-                    this.$Message.success('创建成功');
-                    
                 }
                 
             })
