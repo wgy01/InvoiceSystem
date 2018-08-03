@@ -2,9 +2,30 @@
 
 	<div>
 		
-		<Card v-if="accountantID && templateID">
+		<!--发票链接模块-->
+		<Card style="margin-bottom: 16px;">
 			
-			<h1 slot="title">会计公司名称</h1>
+			<h1 slot="title">发票链接</h1>
+			
+			<div>
+				
+				<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
+					
+			        <FormItem label="发票链接" prop="invoiceURL">
+			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接" style="max-width: 340px;"></Input>
+			            <Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
+			        </FormItem>
+			        
+			    </Form>
+				
+			</div>
+			
+		</Card>
+		
+		<!--发票-->
+		<Card>
+			
+			<h1 slot="title">{{companyName}}</h1>
 			
 			<div>
 				
@@ -12,7 +33,7 @@
 					
 					<FormItem label="选择公司" prop="companyId">
 			        	<Select v-model="formInline.companyId" placeholder="选择公司" style="width: 200px;">
-			                <Option v-for="item in companyList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+			                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 			            </Select>
 			        </FormItem>
 					
@@ -22,17 +43,17 @@
 			        
 			    </Form>
 			    
-		    	<Card style="margin-bottom: 16px;">
+		    	<!--<Card style="margin-bottom: 16px;">
 		    	
 			    	<h2 slot="title">模板说明</h2>
 			    	
 			    	<div>{{remark}}</div>
 			    	
-			    </Card>
+			    </Card>-->
 		    	
 		    	<Card style="margin-bottom: 16px;">
 		    		
-		    		<h2 slot="title">公司字段</h2>
+		    		<h2 slot="title">公司填写</h2>
 		    		
 		    		<forms-template
 		            ref="formsInstance1"
@@ -48,7 +69,7 @@
 		    	
 		    	<Card>
 		    		
-		    		<h2 slot="title">会计字段</h2>
+		    		<h2 slot="title">会计填写</h2>
 		    		
 		    		<forms-template
 		            ref="formsInstance2"
@@ -66,30 +87,6 @@
 			    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
 			    </div>
 				
-			</div>
-			
-		</Card>
-		
-		<!--发票链接模块-->
-		
-		<Card v-else>
-			
-			<h1 slot="title">发票链接</h1>
-			
-			<div>
-				
-				<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
-					
-			        <FormItem label="发票链接" prop="invoiceURL">
-			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接"></Input>
-			        </FormItem>
-			        
-			    </Form>
-				
-			    <div style="text-align: center;">
-			    	<Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
-			    </div>
-			    
 			</div>
 			
 		</Card>
@@ -115,17 +112,15 @@ export default {
 		 * 
 		 */
 		
-		remark: String,//模板说明
+		invoiceID: Number,//发票ID
+		
+		companyName: String,//会计公司名称
         	
     	accountantFormsData: Array,//会计数据
     	
     	companyFormsData: Array,//公司数据
     	
-    	companyList: Array,//公司列表
-    	
-    	accountantID: Number,
-    	
-    	templateID: Number,
+    	companyDataList: Array,//公司列表
     	
 	},
     data () {//数据
@@ -172,13 +167,26 @@ export default {
 			});
 			
     	},
-    	handleSubmit(name) {//创建发票
+    	handleSubmit(name) {//提交发票
     		
             this.$refs[name].validate((valid) => {
             	
                 if (valid) {
                 	
-                	console.log(this.formsList);
+                	this.$axios.post('Service/Order/edit', {
+    					id: this.invoiceID,
+    					conf: JSON.stringify(this.formsList),
+    					url: '',
+    					company_id: this.formInline.companyId,
+    					user_id: sessionStorage.getItem('userId'),
+    					money: this.formInline.money,
+					})
+					.then(response => {
+						
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
                 	
                     this.$Message.success('创建成功');
                     
@@ -193,36 +201,39 @@ export default {
             	
                 if (valid) {
                 	
-                	let getUrlParams = (url,name) => {
-                		let startIndex = url.indexOf('?');
-                		let parameter = url.substr(startIndex);
-					    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
-					    let r = parameter.substr(1).match(reg);  
-					    if (r != null) return unescape(r[2]); 
-					  	return null; 
-					}
+                	let params = '';
                 	
-                	this.$router.push(
-			    		{
-			    			name: this.$route.name,
-			    			query: {
-			    				accountantID: getUrlParams(this.formInline2.invoiceURL,'accountantID'),
-    							templateID: getUrlParams(this.formInline2.invoiceURL,'templateID'),
-			    			}
-			    		}
-		    		);
-		    		
-		    		if(this.$route.query.accountantID && this.$route.query.templateID){
-		    			
-		    			this.$Message.success('跳转成功');
-		    			
-		    		}else{
-		    			
-		    			this.$Message.error('链接错误');
-		    			
-		    		}
-		    		
-                    
+                	if(this.formInline2.invoiceURL.indexOf('/#/') >= 0){
+                		
+                		params = this.formInline2.invoiceURL.substr(this.formInline2.invoiceURL.indexOf('/#/')+3);
+                		
+                	}else{
+                		
+                		params = this.formInline2.invoiceURL;
+                		
+                	}
+                	
+                  	this.$axios.post('Service/Order/detail', {
+						id: params
+					})
+					.then(response => {
+						
+						if(response.status == 200){
+							
+							sessionStorage.setItem('params',params);
+							
+							this.$Message.success('获取成功');
+							
+						}
+						
+					})
+					.catch(function(error) {
+						console.log(error);
+					});
+                  	
+                	
+                }else{
+                	
                 }
                 
             })
@@ -247,6 +258,12 @@ export default {
         	
     },
     watch: {//监测数据变化
+		
+		companyDataList(){//默认模板
+			if(this.companyDataList && this.companyDataList.length > 0){
+	    		this.formInline.companyId = this.companyDataList[0].value;
+	    	}
+		},
 		
 	},
     

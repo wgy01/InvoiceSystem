@@ -8,7 +8,7 @@
 	        </FormItem>
 	    </Form>
 	    
-	    <Card v-if="type == 'show'" style="margin-bottom: 16px;">
+	    <Card dis-hover v-if="type == 'show'" style="margin-bottom: 16px;">
 	    	
 	    	<h2 slot="title">模板说明</h2>
 	    	
@@ -80,7 +80,7 @@ export default {
 		
 		dataID: {
 			type: Number,
-			required: true
+			//required: true
 		},
 		
 	},
@@ -146,19 +146,29 @@ export default {
 			})
 			.then(response => {
 				
+				let accountantArr = [];
+				
+				let companyArr = [];
+				
 				this.remark = response.data.remark;
 				
 				response.data.setting.forEach(item => {
 				
 					if(item.user_type == 1){//会计
-						this.accountantData.push(item);
-					}
-				
-					if(item.user_type == 2){//公司
-						this.companyData.push(item);
+						
+						accountantArr.push(item);
+						
+					}else if(item.user_type == 2){//公司
+						
+						companyArr.push(item);
+						
 					}
 				
 				});
+				
+				this.accountantData = accountantArr;
+				
+				this.companyData = companyArr;
 					
 			})
 			.catch(function (error) {
@@ -192,12 +202,19 @@ export default {
     },
     watch: {//监测数据变化
 		
+		dataID(v){
+			this.dataID = v;
+			this.show();
+		}
+		
 	},
     
     //===================组件钩子===========================
     
     created () {//实例被创建完毕之后执行
-    	this.show();
+    	if(this.dataID){
+    		this.show();
+    	}
 	},
     mounted () {//模板被渲染完毕之后执行
     	

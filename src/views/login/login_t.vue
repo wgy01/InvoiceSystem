@@ -95,10 +95,10 @@ export default {
 							
 							//sessionStorage.setItem('isadmin',response.data.user_type);//管理员权限
 							
-							if(sessionStorage.getItem('path') && response.data.user_type == 2){
+							if(sessionStorage.getItem('params') && response.data.user_type == 2){
 								
 								this.$router.replace({
-									path: sessionStorage.getItem('path')
+									name: 'invoicePages'
 								});
 								
 							}else{

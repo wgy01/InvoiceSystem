@@ -100,14 +100,12 @@ export const appRouter = [
         icon:'android-list',
         name:'companyManage',
         title:'公司管理',
-        access: [2],
         component: Frame,
         children: [
 	        {
 	            path:'addCompany',
 	            name:'addCompany',
 	            title:'公司管理',
-	            access: [2],
 	            component: resolve => { require(['@/views/finance/companyManage.vue'], resolve); }
 	        },
         ]

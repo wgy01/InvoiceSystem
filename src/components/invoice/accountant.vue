@@ -11,17 +11,42 @@
 				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
 			
 			        <FormItem label="选择模板" prop="templateID">
-			        	<Select v-model="formInline.templateID" placeholder="选择模板" style="width: 200px;">
+			        	<Select v-model="formInline.templateID" filterable placeholder="选择模板" @on-change="selectChange" style="width: 200px;">
 			                <Option v-for="item in templateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 			            </Select>
+			            <Button type="primary" @click="onClickUrl">点击生成链接</Button>
 			        </FormItem>
 			        
 			    </Form>
 				
-				<div>
-					<label>点击复制链接：</label>
-					<a @click="copy">{{URL + '?' + 'accountantID=' + formInline.accountantID + '&templateID=' + formInline.templateID}}</a>
+				<div style="display: flex;padding: 16px 0;">
+					
+					<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
+						<Icon type="link"></Icon>
+						<span>点击链接进行复制：</span>
+					</label>
+					
+					<div class="Masked-box">
+						<div class="Masked" v-show="masked">
+							<Icon type="information-circled"></Icon>
+							<span>链接已更新，请重新生成</span>
+						</div>
+						<a v-clipboard:copy="invoiceUrl" v-clipboard:success="onCopy">{{invoiceUrl}}</a>
+					</div>
+					
 			    </div>
+			    
+			    <Card style="margin-top: 16px">
+					
+					<h2 slot="title">模板预览</h2>
+					
+					<template-s-e
+		        	type="show"
+		        	:dataID="Number(formInline.templateID)"
+		        	>
+		        	</template-s-e>
+					
+				</Card>
 				
 			</div>
 			
@@ -33,9 +58,11 @@
 
 <script>
 
+import templateSE from '@/components/template/template-s-e.vue';
+
 export default {
 	components:{//组件模板
-		
+		templateSE,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -57,7 +84,6 @@ export default {
         	
         	formInline: {
         		templateID: '',
-        		accountantID: sessionStorage.getItem('userId'),
         	},
         	
         	ruleInline: {
@@ -66,7 +92,9 @@ export default {
                 ],
         	},
         	
-        	URL: window.location.href,
+        	invoiceUrl: '',
+        	
+        	masked: false,
         	
         }
     },
@@ -85,38 +113,59 @@ export default {
 			});
 			
     	},
-    	handleSubmit(name) {//创建发票
+    	selectChange(val){//选择模板改变时
+    		
+    		if(this.invoiceUrl){
+    			this.masked = true;
+    		}
+    		
+    	},
+    	onCopy(){//复制
+    		
+        	this.$Message.success('复制成功');
+        	
+    	},
+    	setInvoiceUrl(URL){//发票链接
+    		
+    		let invoiceUrl = '';
+    		
+    		let getUrlParams = (url,name) => {
+    			let startIndex = url.indexOf('?');
+	    		let parameter = url.substr(startIndex);
+			    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+			    let r = parameter.substr(1).match(reg);  
+			    if (r != null) return unescape(r[2]);
+			  	return null;
+    		}
+    		
+    		invoiceUrl = 'http://'+ window.location.host +'/#/'+ getUrlParams(URL,'orderID');
+    		
+    		return invoiceUrl;
+    		
+    	},
+    	onClickUrl(name) {//点击生成链接
+            
+            this.$axios.post('Service/Order/add', {
+    			user_account: sessionStorage.getItem('userId'),
+    			template_id: this.formInline.templateID,
+			})
+			.then(response => {
+				
+				if(response.status == 200){
+					this.invoiceUrl = this.setInvoiceUrl(response.data.link);
+					this.masked = false;
+				}
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
             
     	},
-    	copy(){//复制
-    		
-    		let txt = this.URL + '?accountantID=' + this.formInline.accountantID + '&templateID=' + this.formInline.templateID;
-    		
-    		this.$refs['formInline'].validate((valid) => {
-    			
-                if (valid) {
-                	
-                	this.$copyText(txt).then((e) => {
-                		
-                		this.$Message.success('复制成功');
-                		
-			        },(e) => {
-			        	console.log(e);
-			        })
-                	
-                }else{
-                	
-                	this.$Message.error('复制失败!');
-                	
-                }
-                
-            })
-    		
-    	}
     	
     },
     computed: {//计算属性
-        	
+        
     },
     watch: {//监测数据变化
 		
@@ -140,5 +189,21 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+	
+	.Masked-box{
+		width: 100%;
+		position: relative;
+		display: inline-block;
+		.Masked{
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(255,255,255,0.8);
+			color: #ed3f14;
+		}
+	}
+	
 </style>

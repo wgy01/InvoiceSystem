@@ -14,6 +14,10 @@
 			            <Input v-model="formInline.name" clearable placeholder="输入公司名称" style="width: 200px;"></Input>
 			        </FormItem>
 			        
+			        <FormItem label="公司描述">
+			            <Input type="textarea" :rows="1" v-model="formInline.remark" clearable placeholder="公司描述..."></Input>
+			        </FormItem>
+			        
 			    </Form>
 				
 				<div style="text-align: center;">
@@ -45,6 +49,26 @@
 
 import listComponent from '@/components/list-component.vue';
 
+import axios from 'axios';
+
+let companyList = () => {
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Company/index', {
+			user_id: sessionStorage.getItem('userId')
+		})
+		.then(response => {
+			resolve(response.data);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
 export default {
 	components:{//组件模板
 		listComponent,
@@ -63,6 +87,7 @@ export default {
         	
             formInline: {
         		name: '',
+        		remark: '',
         	},
         	ruleInline: {
         		name: [
@@ -72,6 +97,8 @@ export default {
         	
         	tableColumns: [
                 {
+                	align: 'center',
+                	width: 80,
                     title: 'ID',
                     key: 'id'
                 },
@@ -80,45 +107,50 @@ export default {
                     key: 'title'
                 },
                 {
-                	align: 'center',
-                	width: 130,
-                    title: '操作',
-                    handle: true,
+                    title: '公司描述',
+                    key: 'remark'
                 },
             ],
             
-            tableData: [
-            	{
-            		id: 1,
-            		title: '公司123',
-            	}
-            ],
+            tableData: [],
             
         }
     },
     methods: {//方法
     	
-    	ajax () {
-    		
-    		this.$axios.post('接口路径', {
-    			
-			})
-			.then(response => {
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-			
-    	},
     	handleSubmit(name) {//创建公司
     		
             this.$refs[name].validate((valid) => {
             	
                 if (valid) {
                 	
-                    this.$Message.success('创建成功');
-                    
+                	this.$axios.post('Service/Company/add', {
+		    			user_id: sessionStorage.getItem('userId'),
+		    			title: this.formInline.name,
+		    			remark: this.formInline.remark,
+					})
+					.then(response => {
+						
+						if(response.status = 200){
+							
+							this.formInline = {
+								name: '',
+								remark: '',
+							};
+							
+							this.$Message.success('创建成功');
+							
+							(async() => {
+								this.tableData = await companyList();
+							})();
+							
+						}
+						
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+                	
                 }
                 
             })
@@ -140,6 +172,23 @@ export default {
 	},
     mounted () {//模板被渲染完毕之后执行
     	
+	},
+	//=================组件路由勾子==============================
+	
+	beforeRouteEnter (to, from, next) {//在组件创建之前调用
+		
+		(async() => {
+			
+			let companyDataList = await companyList();
+			
+			next(vm => {
+			
+				vm.tableData = companyDataList;
+				
+			});
+			
+		})();
+		
 	},
 	
 }

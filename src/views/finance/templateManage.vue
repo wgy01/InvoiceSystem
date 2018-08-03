@@ -43,9 +43,7 @@ let ajax = () => {
 			user_id: sessionStorage.getItem('userId')
 		})
 		.then(response => {
-			if(response.status == 200){
-				resolve(response.data);
-			}
+			resolve(response.data);
 		})
 		.catch(function(error) {
 			console.log(error);

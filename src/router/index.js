@@ -21,8 +21,8 @@ export const router = new Router({
 
 router.beforeEach((to, from, next) => {
 	
-	if(to.name == 'invoicePages'){
-		sessionStorage.setItem('path',to.fullPath);
+	if(to.params[0]){
+		sessionStorage.setItem('params',to.params[0]);
 	}
 	
 //	router.app.$Loading.start();//全局创建一个显示页面加载

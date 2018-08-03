@@ -6,11 +6,11 @@
 		
 		<company
 		v-else-if="userType == 2"
-		:remark="remark"
+		:invoiceID="invoiceID"
+		:companyName="companyName"
 		:accountantFormsData="accountantFormsData"
 		:companyFormsData="companyFormsData"
-		:accountantID="accountantID"
-		:templateID="templateID"
+		:companyDataList="companyDataList"
 		style="margin-bottom: 16px;"
 		>
 		</company>
@@ -42,7 +42,7 @@ import listComponent from '@/components/list-component.vue';
 
 import axios from 'axios';
 
-let template = () => {
+let template = () => {//模板列表
 
 	return new Promise(resolve => {
 
@@ -50,9 +50,7 @@ let template = () => {
 			user_id: sessionStorage.getItem('userId')
 		})
 		.then(response => {
-			if(response.status == 200){
-				resolve(response.data);
-			}
+			resolve(response.data);
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -62,17 +60,33 @@ let template = () => {
 
 }
 
-let templateShow = (templateID) => {
+let templateShow = () => {//模板表单显示
 
 	return new Promise(resolve => {
 
-		axios.post('Service/Template/detail', {
-			id: templateID
+		axios.post('Service/Order/detail', {
+			id: sessionStorage.getItem('params')
 		})
 		.then(response => {
-			if(response.status == 200){
-				resolve(response.data);
-			}
+			resolve(response.data);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
+let companyList = () => {//公司列表
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Company/index', {
+			user_id: sessionStorage.getItem('userId')
+		})
+		.then(response => {
+			resolve(response.data);
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -104,15 +118,15 @@ export default {
         	
         	userType: sessionStorage.getItem('userType'),
         	
-        	accountantID: null,//会计ID
+        	invoiceID: null,//发票id
         	
-        	templateID: null,//模板ID
-        	
-        	remark: '',//模板说明
+        	companyName: '',//会计公司名称
         	
         	accountantFormsData: [],//会计数据
         	
         	companyFormsData: [],//公司数据
+        	
+        	companyDataList: [],//公司列表
         	
         	tableColumns: [
                 {
@@ -181,6 +195,8 @@ export default {
 		
 		let templateForms = [];//模板表单
 		
+		let companyDataList = [];//公司列表数据
+		
 		if(sessionStorage.getItem('userType') == 1){//会计
 			
 			(async() => { //es7异步函数
@@ -204,32 +220,53 @@ export default {
 			
 		}else if(sessionStorage.getItem('userType') == 2){//用户
 			
-			if(to.query.accountantID && to.query.templateID){
+			if(true){
 				
 				(async() => { //es7异步函数
 				
-					templateForms = await templateShow(to.query.templateID);
+					templateForms = await templateShow();
+					
+					companyDataList = await companyList();
 				
 					next(vm => {//回调
-					
-						vm.remark = templateForms.remark;
-				
-						templateForms.setting.forEach(item => {
-					
-							if(item.user_type == 1){//会计
-								vm.accountantFormsData.push(item);
-							}
-					
-							if(item.user_type == 2){//公司
-								vm.companyFormsData.push(item);
-							}
-					
-						});
 						
-						vm.accountantID = Number(to.query.accountantID);
-				
-						vm.templateID = Number(to.query.templateID);
+						if(templateForms){
+							
+							vm.invoiceID = templateForms.id;
+							
+							vm.companyName = templateForms.mixture.data.account.title;
+						
+							templateForms.conf.forEach(item => {
 					
+								if(item.user_type == 1){//会计
+									vm.accountantFormsData.push(item);
+								}
+					
+								if(item.user_type == 2){//公司
+									vm.companyFormsData.push(item);
+								}
+					
+							});
+							
+						}
+						
+						if(companyDataList){
+							
+							let arr = [];
+							
+							companyDataList.forEach(item => {
+								
+								arr.push({
+									label: item.title,
+									value: item.id,
+								});
+								
+							})
+							
+							vm.companyDataList = arr;
+							
+						}
+						
 					})
 				
 				})();
@@ -238,53 +275,10 @@ export default {
 				
 				next(vm => {
 					
-					vm.accountantID = Number(to.query.accountantID);
-				
-					vm.templateID = Number(to.query.templateID);
-					
 				});
 				
 			}
 			
-			
-		}
-		
-	},
-	beforeRouteUpdate (to, from, next) {// 在当前路由改变，但是该组件被复用时调用
-		
-		this.accountantID = Number(to.query.accountantID);
-				
-		this.templateID = Number(to.query.templateID);
-		
-		if(sessionStorage.getItem('userType') == 2 && to.query.accountantID && to.query.templateID){
-			
-			this.$axios.post('Service/Template/detail', {
-				id: to.query.templateID
-			})
-			.then(response => {
-				if(response.status == 200){
-				
-					this.remark = response.data.remark;
-				
-					response.data.setting.forEach(item => {
-			
-						if(item.user_type == 1){//会计
-							this.accountantFormsData.push(item);
-						}
-			
-						if(item.user_type == 2){//公司
-							this.companyFormsData.push(item);
-						}
-			
-					});
-				
-				}
-			})
-			.catch(function(error) {
-				console.log(error);
-			});
-			
-			next();
 			
 		}
 		
