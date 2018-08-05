@@ -87,7 +87,7 @@ export default {
                 	align: 'center',
                 	width: 130,
                     title: '操作',
-                    handle: true,
+                    handle: ['edit','show'],
                 },
             ],
             
@@ -97,19 +97,13 @@ export default {
     },
     methods: {//方法
     	
-    	updateData(){
+    	updateData(){//更新表格数据
     		
-			this.$axios.post('Service/Template/index', {
-				user_id: sessionStorage.getItem('userId')
-			})
-			.then(response => {
-				if(response.status == 200){
-					this.tableData = response.data;
-				}
-			})
-			.catch(function(error) {
-				console.log(error);
-			});
+			(async() => { //es7异步函数
+			
+				this.tableData = await ajax();
+				
+			})();
 			
     	},
     	
@@ -134,7 +128,7 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
-		let tableData = null;//模板列表
+		let tableData = [];//模板列表
 		
 		(async() => { //es7异步函数
 			

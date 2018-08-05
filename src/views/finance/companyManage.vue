@@ -112,9 +112,9 @@ export default {
                 },
                 {
                 	align: 'center',
-                	width: 130,
+                	width: 80,
                     title: '操作',
-                    handle: true,
+                    handle: ['edit'],
                 },
             ],
             
@@ -162,6 +162,15 @@ export default {
             })
             
        },
+       updateData(){//更新表格数据
+    		
+			(async() => {
+				
+				this.tableData = await companyList();
+				
+			})();
+			
+    	},
     	
     },
     computed: {//计算属性
@@ -183,7 +192,7 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
-		let companyDataList = null;//公司列表
+		let companyDataList = [];//公司列表
 		
 		(async() => {
 			

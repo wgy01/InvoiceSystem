@@ -222,7 +222,7 @@ export default {
                 	align: 'center',
                 	width: 130,
                     title: '操作',
-                    handle: true,
+                    handle: ['edit','show'],
                 },
             ],
             
@@ -253,6 +253,19 @@ export default {
     			
     		}
     		
+    	},
+    	updateData(){//更新表格数据
+    		
+			(async() => { //es7异步函数
+				
+				if(this.userType == 1){
+					this.tableData = await accountantInvoiceList();
+				}else if(this.userType == 2){
+					this.tableData = await companyInvoiceList();
+				}
+				
+			})();
+			
     	},
     	
     },

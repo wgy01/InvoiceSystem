@@ -181,6 +181,7 @@ export default {
 								.then(response => {
 									
 									if(response.status == 200){
+										this.$parent.$parent.$parent.$parent.updateData();
 										this.$parent.$parent.modalShow = false;
 										this.$Message.success('保存成功');
 									}
@@ -229,6 +230,7 @@ export default {
 						.then(response => {
 							
 							if(response.status == 200){
+								this.$parent.$parent.$parent.$parent.updateData();
 								this.$parent.$parent.modalShow = false;
 								this.$Message.success('保存成功');
 							}
