@@ -428,12 +428,12 @@
         		}
         		else if(name === 'exit'){//退出登录
         			
-        			this.$axios.post('login/logout', {
+        			this.$axios.post('Service/User/logout', {
     					
 					})
 					.then(response => {
 						
-						if(response.code == 1){
+						if(response.status == 200){
 							
 							sessionStorage.clear();// 从sessionStorage删除所有保存的数据
 					
@@ -443,7 +443,7 @@
 								name:'login'
 							});
 							
-							this.$Message.success(response.msg);
+							this.$Message.success(response.message);
 							
 						}
 						

@@ -134,7 +134,7 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
-		let tableData = [];
+		let tableData = null;//模板列表
 		
 		(async() => { //es7异步函数
 			

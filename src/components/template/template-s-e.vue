@@ -49,7 +49,7 @@
 	    </Card>
 	    
 	    <div v-if="type == 'edit'" style="text-align: center;padding-top: 16px;">
-	    	<Button type="primary" @click="edit">保存模板</Button>
+	    	<Button type="primary" @click="handleSubmit">保存模板</Button>
 	    </div>
 		
 	</div>
@@ -80,7 +80,6 @@ export default {
 		
 		dataID: {
 			type: Number,
-			//required: true
 		},
 		
 	},
@@ -112,7 +111,7 @@ export default {
     		this.formsList = arr;
     		
     	},
-    	handleSubmit() {
+    	handleSubmit() {//保存模板
     		
 			let [A1,B1,A2,B2] = [true,true,true,true];
 			
@@ -128,18 +127,16 @@ export default {
     			B2 = valid;
     		});
 			
-			if(valid){
-				if(A1 || A2){
-					if(B1 && B2) {
-						this.$Message.success('创建成功');
-					}
-				}else{
-					this.$Message.info('请增加字段！');
+			if(A1 || A2){
+				if(B1 && B2) {
+					this.edit();//编辑
 				}
+			}else{
+				this.$Message.info('请增加字段！');
 			}
     			
        	},
-       	show(){
+       	show(){//详情
        		
        		this.$axios.post('Service/Template/detail', {
        			id: this.dataID
@@ -176,7 +173,7 @@ export default {
 			});
        		
        	},
-    	edit(){
+    	edit(){//编辑
     		
     		this.$axios.post('Service/Template/edit', {
     			id: this.dataID,

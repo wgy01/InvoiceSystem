@@ -110,6 +110,12 @@ export default {
                     title: '公司描述',
                     key: 'remark'
                 },
+                {
+                	align: 'center',
+                	width: 130,
+                    title: '操作',
+                    handle: true,
+                },
             ],
             
             tableData: [],
@@ -138,11 +144,11 @@ export default {
 								remark: '',
 							};
 							
-							this.$Message.success('创建成功');
-							
 							(async() => {
 								this.tableData = await companyList();
 							})();
+							
+							this.$Message.success('创建成功');
 							
 						}
 						
@@ -177,14 +183,14 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
+		let companyDataList = null;//公司列表
+		
 		(async() => {
 			
-			let companyDataList = await companyList();
+			companyDataList = await companyList();
 			
 			next(vm => {
-			
 				vm.tableData = companyDataList;
-				
 			});
 			
 		})();

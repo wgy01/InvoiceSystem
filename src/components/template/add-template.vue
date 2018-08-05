@@ -101,10 +101,9 @@ export default {
     		
     		this.formsList = arr;
     		
-    		console.log(this.formsList);
-    		
     	},
-    	handleSubmit(name) {
+    	handleSubmit(name) {//创建模板
+    		
             this.$refs[name].validate((valid) => {
     			
     			let [A1,B1,A2,B2] = [true,true,true,true];
@@ -132,6 +131,7 @@ export default {
     			}
     			
 			});
+			
        },
        ajax(){
     		
@@ -139,7 +139,7 @@ export default {
     			title: this.formInline.name,
     			remark: this.formInline.remark,
     			setting: JSON.stringify(this.formsList),
-    			user_id: sessionStorage.getItem('user_id')
+    			user_id: sessionStorage.getItem('userId')
 			})
 			.then(response => {
 				if(response.status == 200){

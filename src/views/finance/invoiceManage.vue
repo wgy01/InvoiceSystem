@@ -2,22 +2,29 @@
 
 	<div>
 		
-		<accountant v-if="userType == 1" :templateList="templateList" style="margin-bottom: 16px;"></accountant>
+	    <accountant v-if="userType == 1" :templateList="templateList" style="margin-bottom: 16px;"></accountant>
 		
 		<company
+		style="margin-bottom: 16px;"
 		v-else-if="userType == 2"
 		:invoiceID="invoiceID"
+		:allFormsData="allFormsData"
 		:companyName="companyName"
 		:accountantFormsData="accountantFormsData"
 		:companyFormsData="companyFormsData"
 		:companyDataList="companyDataList"
-		style="margin-bottom: 16px;"
+		@on-submit="submitSucceed"
 		>
 		</company>
 		
 		<Card>
 			
-			<h1 slot="title">发票列表</h1>
+			<div slot="title" style="display: flex;align-items: center;">
+				<h1>发票列表</h1>
+	        	<Select v-if="userType == 2" v-model="companyId" filterable placeholder="选择公司" @on-change="companyChange" style="width: 200px;margin-left: 16px;">
+	                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+	            </Select>
+			</div>
 			
 			<list-component
 			:table-columns="tableColumns"
@@ -96,6 +103,42 @@ let companyList = () => {//公司列表
 
 }
 
+let accountantInvoiceList = () => {//会计发票列表
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Order/account_list', {
+			account_id: sessionStorage.getItem('userId'),
+		})
+		.then(response => {
+			resolve(response.data);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
+let companyInvoiceList = (companyID) => {//公司发票列表
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Order/ticket_list', {
+			company_id: companyID,
+		})
+		.then(response => {
+			resolve(response.data);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
 export default {
 	components:{//组件模板
 		accountant,
@@ -114,11 +157,15 @@ export default {
     data () {//数据
         return {
         	
+        	companyId: '',
+        	
         	templateList: [],
         	
         	userType: sessionStorage.getItem('userType'),
         	
         	invoiceID: null,//发票id
+        	
+        	allFormsData: [],//所有表单数据
         	
         	companyName: '',//会计公司名称
         	
@@ -130,12 +177,46 @@ export default {
         	
         	tableColumns: [
                 {
+                	align: 'center',
+                	width: 80,
                     title: 'ID',
                     key: 'id'
                 },
                 {
-                    title: '名称',
-                    key: 'title'
+                	width: 100,
+                    title: '金额',
+                    key: 'money'
+                },
+                {
+                	width: 160,
+                    title: '创建时间',
+                    key: 'create_time'
+                },
+                {
+                	width: 160,
+                    title: '更新时间',
+                    key: 'update_time'
+                },
+                {
+                    title: '链接',
+                    render: (h, params) => {
+                    	
+                    	let invoiceUrl = '';
+    		
+			    		let getUrlParams = (url,name) => {
+			    			let startIndex = url.indexOf('?');
+				    		let parameter = url.substr(startIndex);
+						    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+						    let r = parameter.substr(1).match(reg);  
+						    if (r != null) return unescape(r[2]);
+						  	return null;
+			    		}
+			    		
+			    		invoiceUrl = 'http://'+ window.location.host +'/#/'+ getUrlParams(params.row.link,'orderID');
+                    	
+                    	return h('span',invoiceUrl)
+                    	
+                    }
                 },
                 {
                 	align: 'center',
@@ -145,29 +226,33 @@ export default {
                 },
             ],
             
-            tableData: [
-            	{
-            		id: 1,
-            		title: '发票123',
-            	}
-            ],
+            tableData: [],
         	
         }
     },
     methods: {//方法
     	
-    	ajax () {
+    	companyChange(val){//选择公司改变时
     		
-    		this.$axios.post('接口路径', {
+    		(async() => {
+    			this.tableData = await companyInvoiceList(val);
+    		})();
+    		
+    	},
+    	submitSucceed(companyId){//提交发票成功时触发
+    		
+    		if(this.companyId == companyId){
     			
-			})
-			.then(response => {
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-			
+    			(async() => {
+    				this.tableData = await companyInvoiceList(companyId);
+    			})();
+    			
+    		}else{
+    			
+    			this.companyId = companyId;
+    			
+    		}
+    		
     	},
     	
     },
@@ -191,96 +276,102 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
-		let templateList = [];//模板列表
+		let templateList = null;//模板列表
 		
-		let templateForms = [];//模板表单
+		let templateForms = null;//模板表单
 		
 		let companyDataList = [];//公司列表数据
 		
-		if(sessionStorage.getItem('userType') == 1){//会计
+		let tableData = [];//发票列表
+		
+		(async() => { //es7异步函数
 			
-			(async() => { //es7异步函数
-			
-				templateList = await template();
+			if(sessionStorage.getItem('userType') == 1){//会计
+				
+				templateList = await template();//模板列表
+				
+				tableData = await accountantInvoiceList();//发票列表
 				
 				next(vm => {//回调
 					
-					templateList.forEach(item => {//模板数据
-						vm.templateList.push({
-							label: item.title,
-							value: item.id,
-							setting: item.setting,
-							remark: item.remark,
+					if(templateList){
+						let arr = [];
+						templateList.forEach(item => {//模板数据
+							arr.push({
+								label: item.title,
+								value: item.id,
+								setting: item.setting,
+								remark: item.remark,
+							});
 						});
-					});
+						vm.templateList = arr;
+					}
+					
+					vm.tableData = tableData;
 					
 				})
 				
-			})();
-			
-		}else if(sessionStorage.getItem('userType') == 2){//用户
-			
-			if(true){
+			}else if(sessionStorage.getItem('userType') == 2){//用户
 				
-				(async() => { //es7异步函数
+				companyDataList = await companyList();//公司列表
 				
-					templateForms = await templateShow();
+				if(companyDataList && companyDataList.length > 0){
 					
-					companyDataList = await companyList();
+					tableData = await companyInvoiceList(companyDataList[0].id);//发票列表
+					
+				}
 				
-					next(vm => {//回调
-						
-						if(templateForms){
-							
-							vm.invoiceID = templateForms.id;
-							
-							vm.companyName = templateForms.mixture.data.account.title;
-						
-							templateForms.conf.forEach(item => {
+				
+				if(sessionStorage.getItem('params')){
+					templateForms = await templateShow();//模板表单
+				}
+				
+				next(vm => {//回调
 					
-								if(item.user_type == 1){//会计
-									vm.accountantFormsData.push(item);
-								}
+					if(templateForms){
+						let accountantArr = [];
+    					let companyArr = [];
+						templateForms.conf.forEach(item => {
+							if(item.user_type == 1){//会计
+								accountantArr.push(item);
+							}
+							if(item.user_type == 2){//公司
+								companyArr.push(item);
+							}
+						});
+						vm.allFormsData = templateForms.conf;//所有表单数据
+						vm.accountantFormsData = accountantArr;//会计表单数据
+						vm.companyFormsData = companyArr;//公司表单数据
+						vm.invoiceID = templateForms.id;//发票ID
+						vm.companyName = templateForms.mixture.data.account.title;//公司名称
+					}
 					
-								if(item.user_type == 2){//公司
-									vm.companyFormsData.push(item);
-								}
-					
+					if(companyDataList){
+						let arr = [];
+						companyDataList.forEach(item => {
+							arr.push({
+								label: item.title,
+								value: item.id,
 							});
-							
-						}
-						
-						if(companyDataList){
-							
-							let arr = [];
-							
-							companyDataList.forEach(item => {
-								
-								arr.push({
-									label: item.title,
-									value: item.id,
-								});
-								
-							})
-							
-							vm.companyDataList = arr;
-							
-						}
-						
-					})
-				
-				})();
+						})
+						vm.companyDataList = arr;
+					}
+					
+					if(companyDataList && companyDataList.length > 0){
+						vm.companyId = companyDataList[0].id;//默认公司ID
+					}
+					
+					vm.tableData = tableData;
+					
+				})
 				
 			}else{
 				
-				next(vm => {
-					
-				});
+				next();
 				
 			}
 			
-			
-		}
+		})();
 		
 	},
 	

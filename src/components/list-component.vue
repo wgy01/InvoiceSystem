@@ -12,6 +12,7 @@
 	        <!--内容-->
 	        <div v-if="modalShow">
 	        	
+	        	<!--模板-->
 	        	<template-s-e
 	        	v-if="componentType == 'templateSE'"
 	        	:type="btnType"
@@ -19,13 +20,16 @@
 	        	>
 	        	</template-s-e>
 	        	
+	        	<!--发票-->
 	        	<invoice-s-e
 	        	v-if="componentType == 'invoiceSE'"
 	        	:type="btnType"
 	        	:dataID="dataID"
+	        	:invoiceLink="invoiceLink"
 	        	>
 	        	</invoice-s-e>
 	        	
+	        	<!--公司-->
 	        	<company-s-e
 	        	v-if="componentType == 'companySE'"
 	        	:type="btnType"
@@ -82,6 +86,8 @@ export default {
     data () {//数据
         return {
         	
+        	invoiceLink: '',
+        	
         	dataID: null,
         	
         	btnType: '',
@@ -121,7 +127,22 @@ export default {
                         				
                         				_this.dataID = Number(params.row.id);
                         				
-                        				_this.title = params.row.title + '（编辑）';
+                        				if(params.row.link){
+                        					
+	                        				let getUrlParams = (url,name) => {
+								    			let startIndex = url.indexOf('?');
+									    		let parameter = url.substr(startIndex);
+											    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+											    let r = parameter.substr(1).match(reg);  
+											    if (r != null) return unescape(r[2]);
+											  	return null;
+								    		}
+								    		
+								    		_this.invoiceLink = getUrlParams(params.row.link,'orderID');
+								    		
+                        				}
+                        				
+                        				_this.title = params.row.title ? params.row.title+'（编辑）' : '编辑';
                         				
                         				_this.modalShow = true;
                         				
@@ -144,7 +165,22 @@ export default {
                         				
                         				_this.dataID = Number(params.row.id);
                         				
-                        				_this.title = params.row.title + '（详情）';
+							    		if(params.row.link){
+                        					
+	                        				let getUrlParams = (url,name) => {
+								    			let startIndex = url.indexOf('?');
+									    		let parameter = url.substr(startIndex);
+											    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+											    let r = parameter.substr(1).match(reg);  
+											    if (r != null) return unescape(r[2]);
+											  	return null;
+								    		}
+								    		
+								    		_this.invoiceLink = getUrlParams(params.row.link,'orderID');
+								    		
+                        				}
+                        				
+                        				_this.title = params.row.title ? params.row.title+'（详情）' : '详情';
                         				
                         				_this.modalShow = true;
                         				

@@ -2,55 +2,59 @@
 
 	<div>
 		
-		<Card>
+		<Collapse>
 			
-			<h1 slot="title">创建发票链接</h1>
-			
-			<div>
-				
-				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
-			
-			        <FormItem label="选择模板" prop="templateID">
-			        	<Select v-model="formInline.templateID" filterable placeholder="选择模板" @on-change="selectChange" style="width: 200px;">
-			                <Option v-for="item in templateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-			            </Select>
-			            <Button type="primary" @click="onClickUrl">点击生成链接</Button>
-			        </FormItem>
-			        
-			    </Form>
-				
-				<div style="display: flex;padding: 16px 0;">
+	        <Panel>
+	        	
+	        	<span>创建发票链接</span>
+	        	
+				<div slot="content">
 					
-					<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
-						<Icon type="link"></Icon>
-						<span>点击链接进行复制：</span>
-					</label>
+					<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
+						
+				        <FormItem label="选择模板" prop="templateID">
+				        	<Select v-model="formInline.templateID" filterable placeholder="选择模板" @on-change="selectChange" style="width: 200px;">
+				                <Option v-for="item in templateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+				            </Select>
+				            <Button type="primary" @click="onClickUrl('formInline')">点击生成链接</Button>
+				        </FormItem>
+				        
+				    </Form>
 					
-					<div class="Masked-box">
-						<div class="Masked" v-show="masked">
-							<Icon type="information-circled"></Icon>
-							<span>链接已更新，请重新生成</span>
+					<div style="display: flex;padding: 16px 0;">
+						
+						<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
+							<Icon type="link"></Icon>
+							<span>点击链接进行复制：</span>
+						</label>
+						
+						<div class="Masked-box">
+							<div class="Masked" v-show="masked">
+								<Icon type="information-circled"></Icon>
+								<span>链接已更新，请重新生成</span>
+							</div>
+							<a v-clipboard:copy="invoiceUrl" v-clipboard:success="onCopy">{{invoiceUrl}}</a>
 						</div>
-						<a v-clipboard:copy="invoiceUrl" v-clipboard:success="onCopy">{{invoiceUrl}}</a>
-					</div>
+						
+				    </div>
+				    
+				    <Card style="margin-top: 16px">
+						
+						<h1 slot="title">模板预览</h1>
+						
+						<template-s-e
+			        	type="show"
+			        	:dataID="Number(formInline.templateID)"
+			        	>
+			        	</template-s-e>
+						
+					</Card>
 					
-			    </div>
-			    
-			    <Card style="margin-top: 16px">
-					
-					<h2 slot="title">模板预览</h2>
-					
-					<template-s-e
-		        	type="show"
-		        	:dataID="Number(formInline.templateID)"
-		        	>
-		        	</template-s-e>
-					
-				</Card>
-				
-			</div>
-			
-		</Card>
+				</div>
+						
+	        </Panel>
+	        
+	    </Collapse>
 		
 	</div>
 	
@@ -145,21 +149,47 @@ export default {
     	},
     	onClickUrl(name) {//点击生成链接
             
-            this.$axios.post('Service/Order/add', {
-    			user_account: sessionStorage.getItem('userId'),
-    			template_id: this.formInline.templateID,
-			})
-			.then(response => {
-				
-				if(response.status == 200){
-					this.invoiceUrl = this.setInvoiceUrl(response.data.link);
-					this.masked = false;
-				}
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
+             this.$refs[name].validate((valid) => {
+            	
+                if (valid) {
+                	
+                	this.$axios.post('Service/Company/index', {
+		    			user_id: sessionStorage.getItem('userId'),
+					})
+					.then(response => {
+						
+						if(response.status == 200){
+							
+							this.$axios.post('Service/Order/add', {
+				    			user_account: sessionStorage.getItem('userId'),
+				    			template_id: this.formInline.templateID,
+							})
+							.then(response => {
+								
+								if(response.status == 200){
+									this.invoiceUrl = this.setInvoiceUrl(response.data.link);
+									this.masked = false;
+								}
+								
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
+							
+						}else{
+							
+							this.$Message.warning('请创建公司！');
+							
+						}
+						
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+                	
+                }
+                
+            });
             
     	},
     	

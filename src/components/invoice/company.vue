@@ -12,7 +12,7 @@
 				<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
 					
 			        <FormItem label="发票链接" prop="invoiceURL">
-			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接" style="max-width: 340px;"></Input>
+			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接" style="max-width: 500px;"></Input>
 			            <Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
 			        </FormItem>
 			        
@@ -23,7 +23,7 @@
 		</Card>
 		
 		<!--发票-->
-		<Card>
+		<Card v-if="invoiceID">
 			
 			<h1 slot="title">{{companyName}}</h1>
 			
@@ -32,7 +32,7 @@
 				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
 					
 					<FormItem label="选择公司" prop="companyId">
-			        	<Select v-model="formInline.companyId" placeholder="选择公司" style="width: 200px;">
+			        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="width: 200px;">
 			                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 			            </Select>
 			        </FormItem>
@@ -61,7 +61,7 @@
 		            :NoHandle="false"
 		            :user-type="2"
 		            :out-forms-data="companyFormsData"
-		            show-type="show"
+		            show-type="edit2"
 		            >
 		            </forms-template>
 		    		
@@ -77,7 +77,7 @@
 		            :NoHandle="true"
 		            :user-type="1"
 		            :out-forms-data="accountantFormsData"
-		            show-type="show"
+		            show-type="edit2"
 		            >
 		            </forms-template>
 		    		
@@ -114,6 +114,8 @@ export default {
 		
 		invoiceID: Number,//发票ID
 		
+		allFormsData: Array,//所有表单数据
+		
 		companyName: String,//会计公司名称
         	
     	accountantFormsData: Array,//会计数据
@@ -140,7 +142,7 @@ export default {
         	},
         	
         	formInline2: {
-        		invoiceURL: '',
+        		invoiceURL: sessionStorage.getItem('params') ? 'http://'+ window.location.host +'/#/'+ sessionStorage.getItem('params') : '',
         	},
         	ruleInline2: {
         		invoiceURL: [
@@ -185,7 +187,9 @@ export default {
 						
 						if(response.status == 200){
 							
-							this.$Message.success('创建成功');
+							this.$emit('on-submit',this.formInline.companyId);
+							
+							this.$Message.success('提交成功');
 							
 						}
 						
@@ -224,6 +228,29 @@ export default {
 						
 						if(response.status == 200){
 							
+							let accountantArr = [];
+							
+	    					let companyArr = [];
+							
+							response.data.conf.forEach(item => {
+								if(item.user_type == 1){//会计
+									accountantArr.push(item);
+								}
+								if(item.user_type == 2){//公司
+									companyArr.push(item);
+								}
+							});
+							
+							this.$parent.invoiceID = response.data.id;//发票ID
+							
+							this.$parent.allFormsData = response.data.conf;//所有表单数据
+							
+							this.$parent.companyName = response.data.mixture.data.account.title;//会计公司名称
+							
+							this.$parent.accountantFormsData = accountantArr;//会计数据
+							
+							this.$parent.companyFormsData = companyArr;//公司数据
+							
 							sessionStorage.setItem('params',params);
 							
 							this.$Message.success('获取成功');
@@ -235,8 +262,6 @@ export default {
 						console.log(error);
 					});
                   	
-                	
-                }else{
                 	
                 }
                 
@@ -264,9 +289,12 @@ export default {
     watch: {//监测数据变化
 		
 		companyDataList(){//默认模板
-			if(this.companyDataList && this.companyDataList.length > 0){
+			if(this.companyDataList.length > 0){
 	    		this.formInline.companyId = this.companyDataList[0].value;
 	    	}
+		},
+		allFormsData(v){
+			this.formsList = v;
 		},
 		
 	},
