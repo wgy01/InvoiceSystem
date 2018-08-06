@@ -2,10 +2,10 @@
 
 	<div>
 		
-		<!--发票链接模块-->
+		<!--发票获取-->
 		<Card style="margin-bottom: 16px;">
 			
-			<h1 slot="title">发票链接</h1>
+			<h1 slot="title">获取发票</h1>
 			
 			<div>
 				
@@ -22,7 +22,7 @@
 			
 		</Card>
 		
-		<!--发票-->
+		<!--操作发票-->
 		<Card v-if="invoiceID">
 			
 			<h1 slot="title">{{companyName}}</h1>
@@ -173,30 +173,52 @@ export default {
     		
             this.$refs[name].validate((valid) => {
             	
+            	let [A1,B1,A2,B2] = [true,true,true,true];
+					
+				this.$refs.formsInstance1.verification((valid) => {
+					A1 = valid;
+	    		},(valid) => {
+	    			B1 = valid;
+	    		});
+	    		
+				this.$refs.formsInstance2.verification((valid) => {
+					A2 = valid;
+	    		},(valid3) => {
+	    			B2 = valid;
+	    		});
+            	
                 if (valid) {
                 	
-                	this.$axios.post('Service/Order/edit', {
-    					id: this.invoiceID,
-    					conf: JSON.stringify(this.formsList),
-    					url: '',
-    					company_id: this.formInline.companyId,
-    					user_id: sessionStorage.getItem('userId'),
-    					money: this.formInline.money,
-					})
-					.then(response => {
-						
-						if(response.status == 200){
+                	if(A1 || A2){
+	                		
+						if(B1 && B2) {
 							
-							this.$emit('on-submit',this.formInline.companyId);
-							
-							this.$Message.success('提交成功');
+							this.$axios.post('Service/Order/edit', {
+		    					id: this.invoiceID,
+		    					conf: JSON.stringify(this.formsList),
+		    					url: '',
+		    					company_id: this.formInline.companyId,
+		    					user_id: sessionStorage.getItem('userId'),
+		    					money: this.formInline.money,
+							})
+							.then(response => {
+								
+								if(response.status == 200){
+									
+									this.$emit('on-submit',this.formInline.companyId);
+									
+									this.$Message.success('提交成功');
+									
+								}
+								
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
 							
 						}
 						
-					})
-					.catch(function (error) {
-						console.log(error);
-					});
+					}
                 	
                 }
                 

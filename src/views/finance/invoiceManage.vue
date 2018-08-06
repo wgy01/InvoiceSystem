@@ -183,6 +183,42 @@ export default {
                     key: 'id'
                 },
                 {
+                    renderHeader: (h, params) => {
+                    	
+                    	let title = '';
+                    	
+                    	if(this.userType == 1){
+                    		
+                    		title = '用户公司';
+                    		
+                    	}else if(this.userType == 2){
+                    		
+                    		title = '会计公司';
+                    		
+                    	}
+                    	
+                    	return h('span',title)
+                    	
+                    },
+                    render: (h, params) => {
+                    	
+                    	let txt = '';
+                    	
+                    	if(this.userType == 1){
+                    		
+                    		txt = params.row.mixture.data.ticket.title;
+                    		
+                    	}else if(this.userType == 2){
+                    		
+                    		txt = params.row.mixture.data.account.title;
+                    		
+                    	}
+                    	
+                    	return h('span',txt)
+                    	
+                    }
+                },
+                {
                 	width: 100,
                     title: '金额',
                     key: 'money'
@@ -261,7 +297,7 @@ export default {
 				if(this.userType == 1){
 					this.tableData = await accountantInvoiceList();
 				}else if(this.userType == 2){
-					this.tableData = await companyInvoiceList();
+					this.tableData = await companyInvoiceList(this.companyId);
 				}
 				
 			})();
@@ -320,7 +356,17 @@ export default {
 						vm.templateList = arr;
 					}
 					
-					vm.tableData = tableData;
+					let tableArr = [];
+					
+					tableData.forEach(item => {
+						
+						if(item.company_id != 0){
+							tableArr.push(item);
+						}
+						
+					})
+					
+					vm.tableData = tableArr;
 					
 				})
 				

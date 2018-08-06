@@ -10,15 +10,28 @@
 	            </Select>
 	        </FormItem>
 			
-	        <FormItem label="金额" prop="money">
+	        <FormItem label="金额(元)" prop="money">
 	            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 200px;"></Input>
 	        </FormItem>
 	        
 	    </Form>
 		
+		
 		<Card style="margin-bottom: 16px;">
 		    		
-    		<h2 slot="title">公司填写</h2>
+    		<h2 slot="title">{{type == 'show' ? '公司字段' : '公司填写'}}</h2>
+    		
+    		<Row style="padding: 6px 0;">
+    			
+    			<Col span="4" style="text-align: right;">
+    				<label style="width: 182px;text-align: right;font-size: 12px;">金额：</label>
+    			</Col>
+    			
+    			<Col span="20">
+    				<span>{{formInline.money}}元</span>
+    			</Col>
+    			
+    		</Row>
     		
     		<forms-template
             ref="formsInstance1"
@@ -26,15 +39,15 @@
             :NoHandle="handle2"
             :user-type="2"
             :out-forms-data="companyFormsData"
-            :show-type="type == 'edit' ? 'edit2' : type"
+            :show-type="showType"
             >
             </forms-template>
     		
     	</Card>
     	
-    	<Card>
+    	<Card v-show="userType == 1 || (userType == 2 && type == 'show')">
     		
-    		<h2 slot="title">会计填写</h2>
+    		<h2 slot="title">{{type == 'show' ? '会计字段' : '会计填写'}}</h2>
     		
     		<forms-template
             ref="formsInstance2"
@@ -149,9 +162,9 @@ export default {
     		if(this.userType == 2){//用户
     			
     			this.$refs['formInline'].validate((valid) => {
-            	
+    				
 	            	let [A1,B1,A2,B2] = [true,true,true,true];
-				
+					
 					this.$refs.formsInstance1.verification((valid) => {
 						A1 = valid;
 		    		},(valid) => {
@@ -160,12 +173,11 @@ export default {
 		    		
 					this.$refs.formsInstance2.verification((valid) => {
 						A2 = valid;
-		    		},(valid) => {
+		    		},(valid3) => {
 		    			B2 = valid;
 		    		});
-					
+		    		
 	                if (valid) {
-	                	
 	                	if(A1 || A2){
 	                		
 							if(B1 && B2) {
@@ -202,7 +214,7 @@ export default {
 	            })
     			
     		}else if(this.userType == 1){//会计
-    			
+    			console.log('会计');
     			let [A1,B1,A2,B2] = [true,true,true,true];
 				
 				this.$refs.formsInstance1.verification((valid) => {
@@ -271,6 +283,8 @@ export default {
 						}
 					});
 					
+					this.formInline.money = response.data.money.toString();//公司金额
+					
 					this.formInline.companyId = response.data.company_id;//公司id
 					
 					this.companyFormsData = companyArr;//公司数据
@@ -301,7 +315,29 @@ export default {
     	
     },
     computed: {//计算属性
+        
+        showType(){
         	
+        	let txt = '';
+        	
+        	if(this.userType == 1){
+        		
+        		txt = 'show';
+        		
+        	}else if(this.userType == 2 && this.type == 'edit'){
+        		
+        		txt = 'edit2';
+        		
+        	}else{
+        		
+        		txt = 'show';
+        		
+        	}
+        	
+        	return txt;
+        	
+        },
+        
     },
     watch: {//监测数据变化
 		

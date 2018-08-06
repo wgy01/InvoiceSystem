@@ -27,7 +27,7 @@
 				</Col>
 				
 				<!--详情显示-->
-				<Col span="4" v-if="showType == 'show'" style="font-size: 12px;line-height: 22px;text-align: right;padding: 6px 0;">
+				<Col span="4" v-if="showType == 'show'" style="font-size: 12px;line-height: 20px;text-align: right;padding: 6px 0;">
 					{{item.name}}：
 				</Col>
 				
