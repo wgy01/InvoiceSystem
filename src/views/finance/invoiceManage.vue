@@ -275,7 +275,8 @@ export default {
     		if(this.tf){
     			
 	    		(async() => {
-	    				this.tableData = await companyInvoiceList(val);
+	    			
+	    			this.tableData = await companyInvoiceList(val);
 	    			
 	    		})();
 	    		
