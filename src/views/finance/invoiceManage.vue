@@ -268,7 +268,7 @@ export default {
     },
     methods: {//方法
     	
-    	companyChange(val){//选择公司改变时
+    	companyChange(val){//表格选择公司改变时
     		
     		(async() => {
     			this.tableData = await companyInvoiceList(val);
