@@ -264,6 +264,8 @@ export default {
             
             tableData: [],
         	
+        	tf: false,
+        	
         }
     },
     methods: {//方法
@@ -271,8 +273,12 @@ export default {
     	companyChange(val){//表格选择公司改变时
     		
     		(async() => {
-    			this.tableData = await companyInvoiceList(val);
+    			if(this.tf){
+    				this.tableData = await companyInvoiceList(val);
+    			}
     		})();
+    		
+    		this.tf = true;
     		
     	},
     	submitSucceed(companyId){//提交发票成功时触发
