@@ -26,6 +26,7 @@
 	        	:type="btnType"
 	        	:dataID="dataID"
 	        	:invoiceLink="invoiceLink"
+	        	:status="status"
 	        	>
 	        	</invoice-s-e>
 	        	
@@ -87,6 +88,8 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	status: null,//发票状态
         	
         	companyName: '',//公司名称
         	
@@ -177,6 +180,8 @@ export default {
                     				
 						    		if(params.row.link){
                     					
+                    					_this.status = Number(params.row.status);
+                    					
                         				let getUrlParams = (url,name) => {
 							    			let startIndex = url.indexOf('?');
 								    		let parameter = url.substr(startIndex);
@@ -197,18 +202,26 @@ export default {
                     			}
                     		}
                     	},'详情');
-    				
-    					item.handle.forEach(item => {
+    					
+    					if(params.row.status && params.row.status == 1 && params.row.link){
     						
-	    					if(item == 'edit'){//编辑按钮
-	    						btnArr.push(edit);
-	    					}
-	    					
-	    					if(item == 'show'){//详情按钮
-	    						btnArr.push(show);
-	    					}
-	    					
-	    				});
+		    				btnArr.push(show);
+		    					
+    					}else{
+    						
+	    					item.handle.forEach(item => {
+	    						
+		    					if(item == 'edit'){//编辑按钮
+		    						btnArr.push(edit);
+		    					}
+		    					
+		    					if(item == 'show'){//详情按钮
+		    						btnArr.push(show);
+		    					}
+		    					
+		    				});
+    						
+    					}
                         
                     	return h('div',btnArr)
                     	

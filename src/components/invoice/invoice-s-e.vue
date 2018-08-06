@@ -45,7 +45,7 @@
     		
     	</Card>
     	
-    	<Card v-show="userType == 1 || (userType == 2 && type == 'show')">
+    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
     		
     		<h2 slot="title">{{type == 'show' ? '会计字段' : '会计填写'}}</h2>
     		
@@ -97,6 +97,8 @@ export default {
 		},
 		
 		invoiceLink: String,
+		
+		status: Number,
 		
 	},
     data () {//数据
@@ -214,7 +216,7 @@ export default {
 	            })
     			
     		}else if(this.userType == 1){//会计
-    			console.log('会计');
+    			
     			let [A1,B1,A2,B2] = [true,true,true,true];
 				
 				this.$refs.formsInstance1.verification((valid) => {
@@ -237,7 +239,9 @@ export default {
 	    					id: this.dataID,
 	    					conf: JSON.stringify(this.formsList),
 	    					url: '',
+	    					company_id: this.formInline.companyId,
 	    					user_id: sessionStorage.getItem('userId'),
+	    					money: this.formInline.money,
 						})
 						.then(response => {
 							

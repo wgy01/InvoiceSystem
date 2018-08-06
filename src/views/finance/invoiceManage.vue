@@ -219,13 +219,38 @@ export default {
                     }
                 },
                 {
+                	width: 120,
+                    title: '发票状态',
+                    render: (h, params) => {
+                    	
+                    	let txt = '';
+                    	
+                    	if(params.row.status == 0){
+                    		
+                    		txt = '进行中';
+                    		
+                    	}else{
+                    		
+                    		txt = '已完成';
+                    		
+                    	}
+                    	
+                    	return h('span',{
+                    		style: {
+                    			color: params.row.status == 0 ? '#2d8cf0' : '#19be6b',
+                    		}
+                    	},txt)
+                    	
+                    }
+                },
+                {
                 	width: 100,
                     title: '金额',
                     key: 'money'
                 },
                 {
                 	width: 160,
-                    title: '创建时间',
+                    title: '开票时间',
                     key: 'create_time'
                 },
                 {
@@ -264,28 +289,22 @@ export default {
             
             tableData: [],
         	
-        	tf: false,
-        	
         }
     },
     methods: {//方法
     	
     	companyChange(val){//表格选择公司改变时
-    		
-    		if(this.tf){
     			
-	    		(async() => {
-	    			
-	    			this.tableData = await companyInvoiceList(val);
-	    			
-	    		})();
-	    		
-    		}
-    		
-    		this.tf = true;
+    		(async() => {
+    			
+    			this.tableData = await companyInvoiceList(val);
+    			
+    		})();
     		
     	},
     	submitSucceed(companyId){//提交发票成功时触发
+    		
+    		this.invoiceID = null;
     		
     		if(this.companyId == companyId){
     			
@@ -391,8 +410,9 @@ export default {
 				}
 				
 				
-				if(sessionStorage.getItem('params')){
+				if(sessionStorage.getItem('params')){//是否存在本地存储
 					templateForms = await templateShow();//模板表单
+					sessionStorage.removeItem('params');
 				}
 				
 				next(vm => {//回调

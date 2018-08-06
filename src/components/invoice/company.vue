@@ -43,14 +43,6 @@
 			        
 			    </Form>
 			    
-		    	<!--<Card style="margin-bottom: 16px;">
-		    	
-			    	<h2 slot="title">模板说明</h2>
-			    	
-			    	<div>{{remark}}</div>
-			    	
-			    </Card>-->
-		    	
 		    	<Card style="margin-bottom: 16px;">
 		    		
 		    		<h2 slot="title">公司填写</h2>
@@ -67,7 +59,7 @@
 		    		
 		    	</Card>
 		    	
-		    	<Card>
+		    	<Card v-show="userType != 2">
 		    		
 		    		<h2 slot="title">会计填写</h2>
 		    		
@@ -142,7 +134,8 @@ export default {
         	},
         	
         	formInline2: {
-        		invoiceURL: sessionStorage.getItem('params') ? 'http://'+ window.location.host +'/#/'+ sessionStorage.getItem('params') : '',
+        		//invoiceURL: sessionStorage.getItem('params') ? 'http://'+ window.location.host +'/#/'+ sessionStorage.getItem('params') : '',
+        		invoiceURL: '',
         	},
         	ruleInline2: {
         		invoiceURL: [
@@ -152,23 +145,12 @@ export default {
         	
         	formsList: [],//发生改变后的表单数据
         	
+        	userType: sessionStorage.getItem('userType'),//用户类型
+        	
         }
     },
     methods: {//方法
     	
-    	ajax () {
-    		
-    		this.$axios.post('接口路径', {
-    			
-			})
-			.then(response => {
-				
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-			
-    	},
     	handleSubmit(name) {//提交发票
     		
             this.$refs[name].validate((valid) => {
@@ -273,7 +255,9 @@ export default {
 							
 							this.$parent.companyFormsData = companyArr;//公司数据
 							
-							sessionStorage.setItem('params',params);
+							//sessionStorage.setItem('params',params);//存到本地存储里
+							
+							this.formInline2.invoiceURL = '';
 							
 							this.$Message.success('获取成功');
 							
