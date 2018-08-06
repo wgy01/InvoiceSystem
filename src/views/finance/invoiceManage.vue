@@ -111,7 +111,7 @@ let accountantInvoiceList = () => {//会计发票列表
 			account_id: sessionStorage.getItem('userId'),
 		})
 		.then(response => {
-			resolve(response.data);
+			resolve(response.data || []);
 		})
 		.catch(function(error) {
 			console.log(error);
