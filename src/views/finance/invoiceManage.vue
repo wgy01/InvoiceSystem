@@ -272,11 +272,14 @@ export default {
     	
     	companyChange(val){//表格选择公司改变时
     		
-    		(async() => {
-    			if(this.tf){
-    				this.tableData = await companyInvoiceList(val);
-    			}
-    		})();
+    		if(this.tf){
+    			
+	    		(async() => {
+	    				this.tableData = await companyInvoiceList(val);
+	    			
+	    		})();
+	    		
+    		}
     		
     		this.tf = true;
     		
