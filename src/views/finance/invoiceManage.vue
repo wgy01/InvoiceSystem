@@ -67,7 +67,7 @@ let template = () => {//模板列表
 
 }
 
-let templateShow = () => {//模板表单显示
+let templateShow = () => {//公司发票模板表单显示
 
 	return new Promise(resolve => {
 

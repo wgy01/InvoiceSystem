@@ -45,7 +45,7 @@
     		
     	</Card>
     	
-    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
+    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)" style="margin-bottom: 16px;">
     		
     		<h2 slot="title">{{type == 'show' ? '会计字段' : '会计填写'}}</h2>
     		
@@ -61,6 +61,14 @@
     		
     	</Card>
     	
+    	<Card>
+			    	
+	    	<h2 slot="title">图片上传</h2>
+	    	
+	    	<upload :img-list="imgList" @on-success="uploadSuccess" @on-del="del"></upload>
+	    	
+	    </Card>
+    	
     	<div v-if="type == 'edit'" style="text-align: center;padding-top: 16px;">
 	    	<Button type="primary" @click="handleSubmit">保存发票</Button>
 	    </div>
@@ -73,9 +81,12 @@
 
 import formsTemplate from '@/components/forms-template.vue';
 
+import upload from '@/components/upload.vue';
+
 export default {
 	components:{//组件模板
 		formsTemplate,
+		upload,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -131,10 +142,28 @@ export default {
         	
         	companyDataList: [],//公司列表数据
         	
+        	imgData: {},//上传图片数据
+        	
+        	imgList: [],//图片列表
+        	
         }
     },
     methods: {//方法
     	
+    	uploadSuccess(data){//上传成功后触发
+    		
+    		this.imgData = data;
+    		
+    		//this.imgList.push(...data.imgShowData);
+    		
+    	},
+    	del(data){//删除时触发
+    		
+    		this.imgData = data;
+    		
+    		//this.imgList.push(...data.imgShowData);
+    		
+    	},
     	companyList(){//公司列表
     		
     		this.$axios.post('Service/Company/index', {
@@ -187,7 +216,7 @@ export default {
 								this.$axios.post('Service/Order/edit', {
 			    					id: this.dataID,
 			    					conf: JSON.stringify(this.formsList),
-			    					url: '',
+			    					url: this.imgData.imgSubmitData.join('|'),
 			    					company_id: this.formInline.companyId,
 			    					user_id: sessionStorage.getItem('userId'),
 			    					money: this.formInline.money,
@@ -238,7 +267,7 @@ export default {
 						this.$axios.post('Service/Order/edit', {
 	    					id: this.dataID,
 	    					conf: JSON.stringify(this.formsList),
-	    					url: '',
+	    					url: this.imgData.imgSubmitData.join('|'),
 	    					company_id: this.formInline.companyId,
 	    					user_id: sessionStorage.getItem('userId'),
 	    					money: this.formInline.money,
@@ -264,6 +293,36 @@ export default {
     			
     		}
             
+       	},
+       	imgShow(id){//图片显示
+       		
+       		this.$axios.post('Service/Uploadfile/index', {
+    			order_id: id,
+			})
+			.then(response => {
+				
+				if(response.status == 200){
+					
+					let arr = [];
+					
+					response.data.forEach(item => {
+						
+						arr.push({
+							name: '',
+							url: item.url
+						});
+						
+					});
+					
+					this.imgList = arr;
+					
+				}
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+       		
        	},
     	show(){//详情
     		
@@ -352,6 +411,7 @@ export default {
     created () {//实例被创建完毕之后执行
     	this.companyList();//公司列表
     	this.show();//详情
+    	this.imgShow(this.dataID);//图片显示
 	},
     mounted () {//模板被渲染完毕之后执行
     	

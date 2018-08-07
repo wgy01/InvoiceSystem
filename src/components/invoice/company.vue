@@ -74,7 +74,15 @@
 		            </forms-template>
 		    		
 		    	</Card>
+			    
+			    <Card>
 			    	
+			    	<h2 slot="title">图片上传</h2>
+			    	
+			    	<upload :img-list="imgData.imgShowData" @on-success="uploadSuccess" @on-del="del"></upload>
+			    	
+			    </Card>
+			    
 			    <div style="text-align: center;padding-top: 16px;">
 			    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
 			    </div>
@@ -91,9 +99,12 @@
 
 import formsTemplate from '@/components/forms-template.vue';
 
+import upload from '@/components/upload.vue';
+
 export default {
 	components:{//组件模板
-		formsTemplate
+		formsTemplate,
+		upload,
 	},
 	props:{//组件道具（参数）
 		/* ****属性用法*****
@@ -147,10 +158,24 @@ export default {
         	
         	userType: sessionStorage.getItem('userType'),//用户类型
         	
+        	imgData: {},//上传图片数据
+        	
+        	imgList: [],//图片列表
+        	
         }
     },
     methods: {//方法
     	
+    	uploadSuccess(data){//上传成功后触发
+    		
+    		this.imgData = data;
+    		
+    	},
+    	del(data){//删除时触发
+    		
+    		this.imgData = data;
+    		
+    	},
     	handleSubmit(name) {//提交发票
     		
             this.$refs[name].validate((valid) => {
@@ -178,7 +203,7 @@ export default {
 							this.$axios.post('Service/Order/edit', {
 		    					id: this.invoiceID,
 		    					conf: JSON.stringify(this.formsList),
-		    					url: '',
+		    					url: this.imgData.imgSubmitData.join('|'),
 		    					company_id: this.formInline.companyId,
 		    					user_id: sessionStorage.getItem('userId'),
 		    					money: this.formInline.money,
@@ -230,7 +255,9 @@ export default {
 					})
 					.then(response => {
 						
-						if(response.status == 200){
+						if(response.status == 200 && response.data.status != 1){
+							
+							console.log();
 							
 							let accountantArr = [];
 							
@@ -247,6 +274,8 @@ export default {
 							
 							this.$parent.invoiceID = response.data.id;//发票ID
 							
+							this.formInline.money = response.data.money.toString();//金额
+							
 							this.$parent.allFormsData = response.data.conf;//所有表单数据
 							
 							this.$parent.companyName = response.data.mixture.data.account.title;//会计公司名称
@@ -260,6 +289,10 @@ export default {
 							this.formInline2.invoiceURL = '';
 							
 							this.$Message.success('获取成功');
+							
+						}else{
+							
+							this.$Message.error('已完成的发票不能再编辑!');
 							
 						}
 						
