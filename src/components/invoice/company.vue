@@ -79,7 +79,11 @@
 			    	
 			    	<h2 slot="title">图片上传</h2>
 			    	
-			    	<upload :img-list="imgData.imgShowData" @on-success="uploadSuccess" @on-del="del"></upload>
+			    	<upload
+		    		:img-list="imgList"
+		    		@on-success="uploadSuccess"
+		    		@on-del="del">
+			    	</upload>
 			    	
 			    </Card>
 			    
@@ -158,7 +162,13 @@ export default {
         	
         	userType: sessionStorage.getItem('userType'),//用户类型
         	
-        	imgData: {},//上传图片数据
+        	imgData: {//上传的图片数据
+        		
+        		imgShowData: [],//需要显示的图片
+        		
+        		imgSubmitData: [],//需要提交的图片数据
+        		
+        	},
         	
         	imgList: [],//图片列表
         	
@@ -212,6 +222,14 @@ export default {
 								
 								if(response.status == 200){
 									
+									this.imgData = {//上传的图片数据
+        		
+						        		imgShowData: [],//需要显示的图片
+        		
+        								imgSubmitData: [],//需要提交的图片数据
+						        		
+						        	};
+									
 									this.$emit('on-submit',this.formInline.companyId);
 									
 									this.$Message.success('提交成功');
@@ -231,8 +249,38 @@ export default {
                 
             })
             
-       },
-       handleSubmit2(name) {//获取发票
+       	},
+       	imgShow(id){//图片显示
+       		
+       		this.$axios.post('Service/Uploadfile/index', {
+    			order_id: id,
+			})
+			.then(response => {
+				
+				if(response.status == 200){
+					
+					let arr = [];
+					
+					response.data.forEach(item => {
+						
+						arr.push({
+							name: '',
+							url: item.url
+						});
+						
+					});
+					
+					this.imgList = arr;
+					
+				}
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+       		
+       	},
+       	handleSubmit2(name) {//获取发票
     		
             this.$refs[name].validate((valid) => {
             	
@@ -272,6 +320,8 @@ export default {
 								}
 							});
 							
+							this.imgShow(response.data.id);//图片显示
+							
 							this.$parent.invoiceID = response.data.id;//发票ID
 							
 							this.formInline.money = response.data.money.toString();//金额
@@ -306,8 +356,8 @@ export default {
                 
             })
             
-       },
-       formsChange(){//模板表单发生改变时
+       	},
+       	formsChange(){//模板表单发生改变时
     		
     		let A = this.$refs.formsInstance1.formsList.data;
     		

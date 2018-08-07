@@ -10,19 +10,27 @@
 				<div class="box img-bg" :style='{backgroundImage: "url("+item.url+")"}'></div>
 				<div class="box mask">
 					<Icon type="eye" size="26" @click.native="show(item.url,item.name)"></Icon>
-					<Icon type="trash-a" size="24" @click.native="del(i,item.state)"></Icon>
+					<!--<Icon type="trash-a" size="24" @click.native="del(i)"></Icon>-->
 				</div>
 			</li>
 			
-			<li v-if="imgData.imgShowData.length < 5 && imgList.length < 5">
-				
+			<li class="img-box" v-for="(item,i) in imgData.imgShowData">
+				<div class="box bottom">
+				</div>
+				<div class="box img-bg" :style='{backgroundImage: "url("+item.url+")"}'></div>
+				<div class="box mask">
+					<Icon type="eye" size="26" @click.native="show(item.url,item.name)"></Icon>
+					<Icon type="trash-a" size="24" @click.native="del(i)"></Icon>
+				</div>
+			</li>
+			
+			<li v-if="(imgList.length + imgData.imgShowData.length) < 5 && showType == 'edit'">
 				<div class="upload-box">
 					<input v-if="tf" ref="inputInstance" @change="inputChange" type="file" accept="image/*" />
 					<Button style="width: 100%;height: 100%;" type="dashed" @click="upload">
 						<Icon type="plus-round" size="30"></Icon>
 					</Button>
 				</div>
-				
 			</li>
 			
 		</ul>
@@ -59,6 +67,12 @@ export default {
 			type: Array,
 			default: () => {return []}
 		},
+		
+		showType: {//显示类型
+			type: String,
+			default: 'edit'
+		},
+		
 	},
     data () {//数据
         return {
@@ -70,10 +84,6 @@ export default {
         	imgSrc: '',
         	
         	imgName: '',
-        	
-        	imgListData: [],
-        	
-        	submitData: [],
         	
         	imgData: {
         		
@@ -87,7 +97,7 @@ export default {
     },
     methods: {//方法
     	
-    	upload(){
+    	upload(){//
     		
     		this.tf = true;
     		
@@ -115,7 +125,7 @@ export default {
     		
     			
     	},
-    	inputChange(){
+    	inputChange(){//上传
     		
     		let files = this.$refs.inputInstance.files[0];
     		
@@ -132,7 +142,6 @@ export default {
 						
 						this.imgData.imgShowData.push({
 							name: files.name,
-							state: 1,
 							url: window.__var.imgUrl + response.data,
 						});
 						
@@ -166,8 +175,6 @@ export default {
     		
     	},
     	del(index,state){//删除
-    		
-    		console.log(state);
     		
     		this.imgData.imgShowData.splice(index,1);
     		

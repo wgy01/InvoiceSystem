@@ -65,7 +65,12 @@
 			    	
 	    	<h2 slot="title">图片上传</h2>
 	    	
-	    	<upload :img-list="imgList" @on-success="uploadSuccess" @on-del="del"></upload>
+	    	<upload
+	    	:showType="type"
+    		:img-list="imgList"
+    		@on-success="uploadSuccess"
+    		@on-del="del">
+	    	</upload>
 	    	
 	    </Card>
     	
@@ -142,7 +147,13 @@ export default {
         	
         	companyDataList: [],//公司列表数据
         	
-        	imgData: {},//上传图片数据
+        	imgData: {//上传的图片数据
+        		
+        		imgShowData: [],//需要显示的图片
+        		
+        		imgSubmitData: [],//需要提交的图片数据
+        		
+        	},
         	
         	imgList: [],//图片列表
         	
@@ -154,14 +165,10 @@ export default {
     		
     		this.imgData = data;
     		
-    		//this.imgList.push(...data.imgShowData);
-    		
     	},
     	del(data){//删除时触发
     		
     		this.imgData = data;
-    		
-    		//this.imgList.push(...data.imgShowData);
     		
     	},
     	companyList(){//公司列表
@@ -224,6 +231,13 @@ export default {
 								.then(response => {
 									
 									if(response.status == 200){
+										this.imgData = {//上传的图片数据
+        		
+							        		imgShowData: [],//需要显示的图片
+	        		
+	        								imgSubmitData: [],//需要提交的图片数据
+							        		
+							        	};
 										this.$parent.$parent.$parent.$parent.updateData();
 										this.$parent.$parent.modalShow = false;
 										this.$Message.success('保存成功');
@@ -275,6 +289,13 @@ export default {
 						.then(response => {
 							
 							if(response.status == 200){
+								this.imgData = {//上传的图片数据
+        		
+					        		imgShowData: [],//需要显示的图片
+    		
+    								imgSubmitData: [],//需要提交的图片数据
+					        		
+					        	};
 								this.$parent.$parent.$parent.$parent.updateData();
 								this.$parent.$parent.modalShow = false;
 								this.$Message.success('保存成功');

@@ -5,7 +5,7 @@
 	    <accountant v-if="userType == 1" :templateList="templateList" style="margin-bottom: 16px;"></accountant>
 		
 		<company
-		style="margin-bottom: 16px;"
+		ref="companyInstance"
 		v-else-if="userType == 2"
 		:invoiceID="invoiceID"
 		:allFormsData="allFormsData"
@@ -14,6 +14,7 @@
 		:companyFormsData="companyFormsData"
 		:companyDataList="companyDataList"
 		@on-submit="submitSucceed"
+		style="margin-bottom: 16px;"
 		>
 		</company>
 		
@@ -294,7 +295,9 @@ export default {
     methods: {//方法
     	
     	companyChange(val){//表格选择公司改变时
-    			
+    		
+    		console.log(123);
+    		
     		(async() => {
     			
     			this.tableData = await companyInvoiceList(val);
@@ -304,19 +307,18 @@ export default {
     	},
     	submitSucceed(companyId){//提交发票成功时触发
     		
-    		this.invoiceID = null;
+    		console.log(456);
     		
-    		if(this.companyId == companyId){
+    		this.invoiceID = null;
     			
-    			(async() => {
-    				this.tableData = await companyInvoiceList(companyId);
-    			})();
+			(async() => {
+				
+				this.companyId = companyId;
+				
+				this.tableData = await companyInvoiceList(companyId);
+				
+			})();
     			
-    		}else{
-    			
-    			this.companyId = companyId;
-    			
-    		}
     		
     	},
     	updateData(){//更新表格数据
@@ -324,9 +326,25 @@ export default {
 			(async() => { //es7异步函数
 				
 				if(this.userType == 1){
-					this.tableData = await accountantInvoiceList();
+					
+					let tableData = await accountantInvoiceList();
+					
+					let tableArr = [];
+					
+					tableData.forEach(item => {
+						
+						if(item.company_id != 0){
+							tableArr.push(item);
+						}
+						
+					})
+					
+					this.tableData = tableArr;
+					
 				}else if(this.userType == 2){
+					
 					this.tableData = await companyInvoiceList(this.companyId);
+					
 				}
 				
 			})();
@@ -418,6 +436,7 @@ export default {
 				next(vm => {//回调
 					
 					if(templateForms){
+						
 						let accountantArr = [];
     					let companyArr = [];
 						templateForms.conf.forEach(item => {
@@ -433,6 +452,7 @@ export default {
 						vm.companyFormsData = companyArr;//公司表单数据
 						vm.invoiceID = templateForms.id;//发票ID
 						vm.companyName = templateForms.mixture.data.account.title;//公司名称
+						vm.$refs.companyInstance.imgShow(templateForms.id);//显示图片
 					}
 					
 					if(companyDataList){
