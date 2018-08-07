@@ -10,7 +10,7 @@
 				<div class="box img-bg" :style='{backgroundImage: "url("+item.url+")"}'></div>
 				<div class="box mask">
 					<Icon type="eye" size="26" @click.native="show(item.url,item.name)"></Icon>
-					<Icon type="trash-a" size="24" @click.native="del(i,item.url)"></Icon>
+					<Icon type="trash-a" size="24" @click.native="del(i,item.state)"></Icon>
 				</div>
 			</li>
 			
@@ -132,6 +132,7 @@ export default {
 						
 						this.imgData.imgShowData.push({
 							name: files.name,
+							state: 1,
 							url: window.__var.imgUrl + response.data,
 						});
 						
@@ -164,7 +165,9 @@ export default {
     		this.modal = true;
     		
     	},
-    	del(index,url){//删除
+    	del(index,state){//删除
+    		
+    		console.log(state);
     		
     		this.imgData.imgShowData.splice(index,1);
     		
