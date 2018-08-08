@@ -3,24 +3,34 @@
 	<div>
 		
 		<!--发票获取-->
-		<Card style="margin-bottom: 16px;">
+		<Collapse style="margin-bottom: 16px;">
 			
-			<h1 slot="title">获取发票</h1>
-			
-			<div>
-				
-				<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
+	        <Panel>
+	        	<h1 style="display: inline-block;">获取其他链接发票</h1>
+	        	<div slot="content">
+	        	
+					<!--<Card style="margin-bottom: 16px;">-->
+						
+						<!--<div>-->
+							
+							<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
+								
+						        <FormItem label="发票链接" prop="invoiceURL">
+						            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接" style="max-width: 500px;"></Input>
+						            <Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
+						        </FormItem>
+						        
+						    </Form>
+							
+						<!--</div>-->
+						
+					<!--</Card>-->
 					
-			        <FormItem label="发票链接" prop="invoiceURL">
-			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接" style="max-width: 500px;"></Input>
-			            <Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
-			        </FormItem>
-			        
-			    </Form>
-				
-			</div>
-			
-		</Card>
+	        	</div>
+	        	
+	        </Panel>
+	        
+	    </Collapse>
 		
 		<!--操作发票-->
 		<Card v-if="invoiceID">
@@ -29,7 +39,7 @@
 			
 			<div>
 				
-				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
+				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="90">
 					
 					<FormItem label="选择公司" prop="companyId">
 			        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="width: 200px;">
@@ -37,7 +47,7 @@
 			            </Select>
 			        </FormItem>
 					
-			        <FormItem label="金额" prop="money">
+			        <FormItem label="申请金额(元)" prop="money">
 			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 200px;"></Input>
 			        </FormItem>
 			        

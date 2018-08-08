@@ -9,7 +9,7 @@
             		<!--logo-->
             		<div class="logo" :style="!isCollapsed && themeType == 'light' ? { borderRight:'1px solid #DDDEE1' } : ''">
             			
-            			<div>发票系统</div>
+            			<div>申票系统</div>
             			
             		</div>
             		

@@ -21,7 +21,7 @@
 		<Card>
 			
 			<div slot="title" style="display: flex;align-items: center;">
-				<h1>发票列表</h1>
+				<h1>发票申请列表</h1>
 	        	<Select v-if="userType == 2" v-model="companyId" filterable placeholder="选择公司" @on-change="companyChange" style="width: 200px;margin-left: 16px;">
 	                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 	            </Select>
@@ -221,7 +221,7 @@ export default {
                 },
                 {
                 	width: 120,
-                    title: '发票状态',
+                    title: '申请状态',
                     render: (h, params) => {
                     	
                     	let txt = '';
@@ -245,18 +245,18 @@ export default {
                     }
                 },
                 {
-                	width: 100,
-                    title: '金额',
+                	width: 110,
+                    title: '申请金额 (元)',
                     key: 'money'
                 },
                 {
                 	width: 160,
-                    title: '开票时间',
+                    title: '创建时间',
                     key: 'create_time'
                 },
                 {
                 	width: 160,
-                    title: '更新时间',
+                    title: '最后更新时间',
                     key: 'update_time'
                 },
                 {

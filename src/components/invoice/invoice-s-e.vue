@@ -2,7 +2,7 @@
 
 	<div>
 		
-		<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
+		<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="90">
 					
 			<FormItem label="选择公司" prop="companyId">
 	        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="width: 200px;">
@@ -10,7 +10,7 @@
 	            </Select>
 	        </FormItem>
 			
-	        <FormItem label="金额(元)" prop="money">
+	        <FormItem label="申请金额(元)" prop="money">
 	            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 200px;"></Input>
 	        </FormItem>
 	        
@@ -24,7 +24,7 @@
     		<Row style="padding: 6px 0;">
     			
     			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;">金额：</label>
+    				<label style="width: 182px;text-align: right;font-size: 12px;">申请金额：</label>
     			</Col>
     			
     			<Col span="20">
@@ -366,6 +366,8 @@ export default {
 							companyArr.push(item);
 						}
 					});
+					
+					this.$parent.$parent.status = response.data.status;//发票状态
 					
 					this.formInline.money = response.data.money.toString();//公司金额
 					
