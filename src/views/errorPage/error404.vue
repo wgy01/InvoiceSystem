@@ -4,8 +4,8 @@
 		
 		<h1 v-show="!tf">页面不存在-404</h1>
 		
-		<Spin fix v-if="tf">
-            <Icon type="load-c" size=18 class="demo-spin-icon-load"></Icon>
+		<Spin v-if="tf" fix>
+            <Icon type="load-c" size=26 class="demo-spin-icon-load"></Icon>
             <div>Loading</div>
         </Spin>
 		
