@@ -15,6 +15,26 @@
 
 <script>
 
+import axios from 'axios';
+
+let templateShow = () => {//公司发票模板表单显示
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Order/detail', {
+			id: sessionStorage.getItem('params')
+		})
+		.then(response => {
+			resolve(response.status);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
 export default {
 	components:{//组件模板
 		
@@ -58,29 +78,70 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
-		let tf = false;
+		let status = '';
 		
 		if(localStorage.getItem('userName') && sessionStorage.getItem('params') && localStorage.getItem('userType') == 2){//已登录并且是公司类型
+
+			(async() => {
 			
-			tf = true;
+				status = await templateShow();
+				
+				next(vm => {
+					
+					vm.tf = true;
+					
+					if(status == 200){
+						
+						next({
+							name: 'invoicePages'
+						});
+						
+					}else{
+						
+						vm.tf = false;
+						
+					}
+					
+				});
+				
+			})();
 			
-		}else{//未登录
+		}else{
+			
+			next();
 			
 		}
 		
-		next(vm => {
+	},
+	beforeRouteUpdate (to, from, next) {// 在当前路由改变，但是该组件被复用时调用
+		
+		let status = '';
+		
+		if(localStorage.getItem('userName') && sessionStorage.getItem('params') && localStorage.getItem('userType') == 2){//已登录并且是公司类型
+
+			this.tf = true;
 			
-			vm.tf = tf;
+			(async() => {
 			
-			if(tf){
+				status = await templateShow();
 				
-				next({
-					name: 'invoicePages'
-				});
+				if(status == 200){
+					
+					next({
+						name: 'invoicePages'
+					});
+					
+				}else{
+					
+					this.tf = false;
+					
+				}
 				
-			}
+			})();
 			
-		});
+		}
+		
+		next();
 		
 	},
 	
