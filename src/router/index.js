@@ -21,27 +21,9 @@ export const router = new Router({
 
 router.beforeEach((to, from, next) => {
 	
-	console.log(to);
-	
 	if(to.name == 'error-404' && to.params[0]){
 		
 		sessionStorage.setItem('params',to.params[0]);
-		
-		if(localStorage.getItem('userName') && localStorage.getItem('userType') == 2){//已登录并且是用户类型
-			
-		setTimeout(() => {
-			
-			next({
-				name: 'invoicePages'
-			});
-			
-		},200);
-			
-		}else{//未登录
-			
-			
-			
-		}
 		
 	}
 	
