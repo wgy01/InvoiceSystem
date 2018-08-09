@@ -56,7 +56,7 @@ let companyList = () => {
 	return new Promise(resolve => {
 
 		axios.post('Service/Company/index', {
-			user_id: sessionStorage.getItem('userId')
+			user_id: localStorage.getItem('userId')
 		})
 		.then(response => {
 			resolve(response.data);
@@ -131,7 +131,7 @@ export default {
                 if (valid) {
                 	
                 	this.$axios.post('Service/Company/add', {
-		    			user_id: sessionStorage.getItem('userId'),
+		    			user_id: localStorage.getItem('userId'),
 		    			title: this.formInline.name,
 		    			remark: this.formInline.remark,
 					})

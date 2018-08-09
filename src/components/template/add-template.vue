@@ -139,7 +139,7 @@ export default {
     			title: this.formInline.name,
     			remark: this.formInline.remark,
     			setting: JSON.stringify(this.formsList),
-    			user_id: sessionStorage.getItem('userId')
+    			user_id: localStorage.getItem('userId')
 			})
 			.then(response => {
 				if(response.status == 200){

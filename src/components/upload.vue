@@ -9,7 +9,7 @@
 				</div>
 				<div class="box img-bg" :style='{backgroundImage: "url("+item.url+")"}'></div>
 				<div class="box mask">
-					<Icon type="eye" size="26" @click.native="show(item.url,item.name)"></Icon>
+					<Icon type="eye" size="24" @click.native="show(item.url,item.name)"></Icon>
 					<!--<Icon type="trash-a" size="24" @click.native="del(i)"></Icon>-->
 				</div>
 			</li>
@@ -19,8 +19,8 @@
 				</div>
 				<div class="box img-bg" :style='{backgroundImage: "url("+item.url+")"}'></div>
 				<div class="box mask">
-					<Icon type="eye" size="26" @click.native="show(item.url,item.name)"></Icon>
-					<Icon type="trash-a" size="24" @click.native="del(i)"></Icon>
+					<Icon type="eye" size="24" @click.native="show(item.url,item.name)"></Icon>
+					<Icon type="trash-a" size="22" @click.native="del(i)"></Icon>
 				</div>
 			</li>
 			
@@ -217,9 +217,10 @@ export default {
 		display: flex;
 		flex-wrap: wrap;
 		li{
-			width: 100px;
-			height: 100px;
-			margin: 6px;
+			width: 70px;
+			height: 70px;
+			margin: 4px;
+			flex-shrink: 0;
 		}
 		.img-box{
 			position: relative;
@@ -258,7 +259,7 @@ export default {
 				background: rgba(0,0,0,0.6);
 				i{
 					color: #fff;
-					margin: 10px;
+					margin: 6px;
 					cursor: pointer;
 				}
 			}

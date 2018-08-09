@@ -14,7 +14,7 @@
 	    </Row>
 	    
 	    <!--表单-->
-	    <Form ref="formsList" :model="formsList" :label-width="showType == 'edit2' ? 200 : 0">
+	    <Form ref="formsList" :model="formsList" :label-width="showType == 'edit2' ? 120 : 0">
 	    
 			<Row type="flex" :gutter="6" v-for="(item,index) in formsList.data" :key="index"  style="margin-top:10px;">
 				

@@ -9,7 +9,7 @@
             		<!--logo-->
             		<div class="logo" :style="!isCollapsed && themeType == 'light' ? { borderRight:'1px solid #DDDEE1' } : ''">
             			
-            			<div>申票系统</div>
+            			<div>发票系统</div>
             			
             		</div>
             		
@@ -251,7 +251,7 @@
             	
                 isCollapsed: false,
                 
-                userName:sessionStorage.getItem('userName'),//用户名
+                userName:localStorage.getItem('userName'),//用户名
                 
                 menuList:this.$store.state.mainFrame.menuList,//菜单列表
                 
@@ -435,6 +435,8 @@
 						
 						if(response.status == 200){
 							
+							localStorage.clear();// 从localStorage删除所有保存的数据
+							
 							sessionStorage.clear();// 从sessionStorage删除所有保存的数据
 					
 							this.$store.commit('clearOpenedSubmenu');//恢复默认状态
@@ -522,7 +524,7 @@
         		let themeType = name.slice(2);
         		
         		let themeData = {
-        			user: sessionStorage.getItem('userName'),
+        			user: localStorage.getItem('userName'),
         			type: themeType,
         			color: color,
         		};

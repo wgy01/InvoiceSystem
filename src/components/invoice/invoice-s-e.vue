@@ -2,15 +2,15 @@
 
 	<div>
 		
-		<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="90">
+		<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="110">
 					
-			<FormItem label="选择公司" prop="companyId">
+			<FormItem label="需要开票的公司" prop="companyId">
 	        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="width: 200px;">
 	                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 	            </Select>
 	        </FormItem>
 			
-	        <FormItem label="申请金额(元)" prop="money">
+	        <FormItem label="开票金额(元)" prop="money">
 	            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 200px;"></Input>
 	        </FormItem>
 	        
@@ -19,12 +19,12 @@
 		
 		<Card style="margin-bottom: 16px;">
 		    		
-    		<h2 slot="title">{{type == 'show' ? '公司字段' : '公司填写'}}</h2>
+    		<h2 slot="title">{{Info.ticketName}}（用户）</h2>
     		
     		<Row style="padding: 6px 0;">
     			
     			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;">申请金额：</label>
+    				<label style="width: 182px;text-align: right;font-size: 12px;">开票金额：</label>
     			</Col>
     			
     			<Col span="20">
@@ -47,7 +47,7 @@
     	
     	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)" style="margin-bottom: 16px;">
     		
-    		<h2 slot="title">{{type == 'show' ? '会计字段' : '会计填写'}}</h2>
+    		<h2 slot="title">{{Info.accountName}}（会计）</h2>
     		
     		<forms-template
             ref="formsInstance2"
@@ -133,11 +133,16 @@ export default {
                 ],
         	},
         	
-        	userType: sessionStorage.getItem('userType'),//用户类型
+        	Info: {//信息
+        		accountName: '',
+        		ticketName: '',
+        	},
         	
-        	handle1: sessionStorage.getItem('userType') != 1,//会计
+        	userType: localStorage.getItem('userType'),//用户类型
         	
-        	handle2: sessionStorage.getItem('userType') != 2,//用户
+        	handle1: localStorage.getItem('userType') != 1,//会计
+        	
+        	handle2: localStorage.getItem('userType') != 2,//用户
         	
         	companyFormsData: [],//公司数据
         	
@@ -174,7 +179,7 @@ export default {
     	companyList(){//公司列表
     		
     		this.$axios.post('Service/Company/index', {
-				user_id: sessionStorage.getItem('userId')
+				user_id: localStorage.getItem('userId')
 			})
 			.then(response => {
 				
@@ -225,7 +230,7 @@ export default {
 			    					conf: JSON.stringify(this.formsList),
 			    					url: this.imgData.imgSubmitData.join('|'),
 			    					company_id: this.formInline.companyId,
-			    					user_id: sessionStorage.getItem('userId'),
+			    					user_id: localStorage.getItem('userId'),
 			    					money: this.formInline.money,
 								})
 								.then(response => {
@@ -283,7 +288,7 @@ export default {
 	    					conf: JSON.stringify(this.formsList),
 	    					url: this.imgData.imgSubmitData.join('|'),
 	    					company_id: this.formInline.companyId,
-	    					user_id: sessionStorage.getItem('userId'),
+	    					user_id: localStorage.getItem('userId'),
 	    					money: this.formInline.money,
 						})
 						.then(response => {
@@ -366,6 +371,10 @@ export default {
 							companyArr.push(item);
 						}
 					});
+					
+					this.Info.accountName = response.data.mixture.data.account.title;
+					
+					this.Info.ticketName = response.data.mixture.data.ticket.title;
 					
 					this.$parent.$parent.status = response.data.status;//发票状态
 					

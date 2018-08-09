@@ -67,11 +67,15 @@ import axios from 'axios';
 			
 			if(_res.data.status == 200){//获取数据成功
 				
-			}
-			
-			if(_res.data.status == 300){//获取数据失败
 				
-				vm.$Message.error(_res.data.message);
+				
+			}else{
+				
+				if(_res.data.message.indexOf('没有查找到相关数据') == -1 && _res.data.message.indexOf('找不到相关数据') == -1){
+					
+					vm.$Message.error(_res.data.message);
+					
+				}
 				
 			}
 			

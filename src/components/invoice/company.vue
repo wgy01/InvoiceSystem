@@ -3,75 +3,92 @@
 	<div>
 		
 		<!--发票获取-->
-		<Collapse style="margin-bottom: 16px;">
-			
-	        <Panel>
-	        	<h1 style="display: inline-block;">获取其他链接发票</h1>
-	        	<div slot="content">
+		<Modal v-model="modal" width="70%">
+	        <p slot="header">获取发票</p>
+	        <div>
+	        	<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
+			        <FormItem label="发票链接" prop="invoiceURL">
+			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接"></Input>
+			        </FormItem>
+			    </Form>
+	        </div>
+	        <div slot="footer">
+	        	<Button @click="modal = false">关闭</Button>
+	        	<Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
+	        </div>
+	    </Modal>
+	    
+	    <Card style="margin-bottom: 16px;">
+	    	
+	    	<Button type="primary" @click="modal = true">获取发票</Button>
+	    	
+	    </Card>
+	    
 	        	
-					<!--<Card style="margin-bottom: 16px;">-->
-						
-						<!--<div>-->
-							
-							<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
-								
-						        <FormItem label="发票链接" prop="invoiceURL">
-						            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接" style="max-width: 500px;"></Input>
-						            <Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
-						        </FormItem>
-						        
-						    </Form>
-							
-						<!--</div>-->
-						
-					<!--</Card>-->
-					
-	        	</div>
-	        	
-	        </Panel>
-	        
-	    </Collapse>
-		
 		<!--操作发票-->
 		<Card v-if="invoiceID">
 			
-			<h1 slot="title">{{companyName}}</h1>
+			<h1 slot="title">{{Info.accountName}}（创建发票链接公司）</h1>
 			
 			<div>
 				
-				<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="90">
-					
-					<FormItem label="选择公司" prop="companyId">
-			        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="width: 200px;">
+    			<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
+		
+					<FormItem label="需要开票的公司" prop="companyId">
+			        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="max-width: 200px;">
 			                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 			            </Select>
 			        </FormItem>
 					
-			        <FormItem label="申请金额(元)" prop="money">
-			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 200px;"></Input>
+			        <FormItem label="开票金额(元)" prop="money">
+			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+			        </FormItem>
+			        
+			        <!--<FormItem label="转款时间" prop="money">
+			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+			        </FormItem>
+			        
+			        <FormItem label="联系人" prop="money">
+			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+			        </FormItem>
+			        
+			        <FormItem label="手机号码" prop="money">
+			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+			        </FormItem>-->
+			        
+			        <!--这里是模板的字段-->
+			        <div>
+			        	
+				        <forms-template
+			            ref="formsInstance1"
+			            @on-change="formsChange"
+			            :NoHandle="false"
+			            :user-type="2"
+			            :out-forms-data="companyFormsData"
+			            show-type="edit2"
+			            >
+			            </forms-template>
+			        	
+			        </div>
+			        
+			        <FormItem label="上传图片文件">
+			        	<upload
+			        	ref="uploadInstance"
+			    		:img-list="imgList"
+			    		@on-success="uploadSuccess"
+			    		@on-del="del">
+				    	</upload>
 			        </FormItem>
 			        
 			    </Form>
+	    			
+			    <div style="text-align: center;padding-top: 16px;">
+			    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
+			    </div>
 			    
-		    	<Card style="margin-bottom: 16px;">
-		    		
-		    		<h2 slot="title">公司填写</h2>
-		    		
-		    		<forms-template
-		            ref="formsInstance1"
-		            @on-change="formsChange"
-		            :NoHandle="false"
-		            :user-type="2"
-		            :out-forms-data="companyFormsData"
-		            show-type="edit2"
-		            >
-		            </forms-template>
-		    		
-		    	</Card>
-		    	
 		    	<Card v-show="userType != 2">
 		    		
-		    		<h2 slot="title">会计填写</h2>
+		    		<h2 slot="title">{{Info.accountName}}（会计公司）</h2>
 		    		
 		    		<forms-template
 		            ref="formsInstance2"
@@ -85,22 +102,6 @@
 		    		
 		    	</Card>
 			    
-			    <Card>
-			    	
-			    	<h2 slot="title">图片上传</h2>
-			    	
-			    	<upload
-		    		:img-list="imgList"
-		    		@on-success="uploadSuccess"
-		    		@on-del="del">
-			    	</upload>
-			    	
-			    </Card>
-			    
-			    <div style="text-align: center;padding-top: 16px;">
-			    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
-			    </div>
-				
 			</div>
 			
 		</Card>
@@ -133,7 +134,7 @@ export default {
 		
 		allFormsData: Array,//所有表单数据
 		
-		companyName: String,//会计公司名称
+		Info: Object,//信息
         	
     	accountantFormsData: Array,//会计数据
     	
@@ -144,6 +145,8 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	modal: false,
         	
         	formInline: {
         		money: '',
@@ -170,7 +173,7 @@ export default {
         	
         	formsList: [],//发生改变后的表单数据
         	
-        	userType: sessionStorage.getItem('userType'),//用户类型
+        	userType: localStorage.getItem('userType'),//用户类型
         	
         	imgData: {//上传的图片数据
         		
@@ -225,7 +228,7 @@ export default {
 		    					conf: JSON.stringify(this.formsList),
 		    					url: this.imgData.imgSubmitData.join('|'),
 		    					company_id: this.formInline.companyId,
-		    					user_id: sessionStorage.getItem('userId'),
+		    					user_id: localStorage.getItem('userId'),
 		    					money: this.formInline.money,
 							})
 							.then(response => {
@@ -261,6 +264,20 @@ export default {
             
        	},
        	imgShow(id){//图片显示
+       		
+			if(this.$refs.uploadInstance){
+				
+				this.$refs.uploadInstance.imgData = {//上传的图片数据
+        		
+	        		imgShowData: [],//需要显示的图片
+	        		
+	        		imgSubmitData: [],//需要提交的图片数据
+	        		
+	        	};
+	        	
+			}
+       		
+       		this.imgList = [],//图片列表
        		
        		this.$axios.post('Service/Uploadfile/index', {
     			order_id: id,
@@ -313,46 +330,52 @@ export default {
 					})
 					.then(response => {
 						
-						if(response.status == 200 && response.data.status != 1){
+						if(response.status == 200){
 							
-							console.log();
+							if(response.data.status != 1){
+								
+								let accountantArr = [];
 							
-							let accountantArr = [];
-							
-	    					let companyArr = [];
-							
-							response.data.conf.forEach(item => {
-								if(item.user_type == 1){//会计
-									accountantArr.push(item);
-								}
-								if(item.user_type == 2){//公司
-									companyArr.push(item);
-								}
-							});
-							
-							this.imgShow(response.data.id);//图片显示
-							
-							this.$parent.invoiceID = response.data.id;//发票ID
-							
-							this.formInline.money = response.data.money.toString();//金额
-							
-							this.$parent.allFormsData = response.data.conf;//所有表单数据
-							
-							this.$parent.companyName = response.data.mixture.data.account.title;//会计公司名称
-							
-							this.$parent.accountantFormsData = accountantArr;//会计数据
-							
-							this.$parent.companyFormsData = companyArr;//公司数据
-							
-							//sessionStorage.setItem('params',params);//存到本地存储里
-							
-							this.formInline2.invoiceURL = '';
-							
-							this.$Message.success('获取成功');
-							
-						}else{
-							
-							this.$Message.error('已完成的发票不能再编辑!');
+		    					let companyArr = [];
+								
+								response.data.conf.forEach(item => {
+									if(item.user_type == 1){//会计
+										accountantArr.push(item);
+									}
+									if(item.user_type == 2){//公司
+										companyArr.push(item);
+									}
+								});
+								
+								this.imgShow(response.data.id);//图片显示
+								
+								this.$parent.Info.accountName = response.data.mixture.data.account.title;
+					
+								this.$parent.Info.ticketName = response.data.mixture.data.ticket.title;
+								
+								this.$parent.invoiceID = response.data.id;//发票ID
+								
+								this.formInline.money = response.data.money.toString() != 0 ? response.data.money.toString() : '';//金额
+								
+								this.$parent.allFormsData = response.data.conf;//所有表单数据
+								
+								this.$parent.accountantFormsData = accountantArr;//会计数据
+								
+								this.$parent.companyFormsData = companyArr;//公司数据
+								
+								//sessionStorage.setItem('params',params);//存到本地存储里
+								
+								this.formInline2.invoiceURL = '';
+								
+								this.modal = false;
+								
+								this.$Message.success('获取成功');
+								
+							}else{
+								
+								this.$Message.error('已完成的发票不能再编辑!');
+								
+							}
 							
 						}
 						

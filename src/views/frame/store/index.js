@@ -28,9 +28,9 @@ const mainFrame = {
 
 		updateMenulist(state) { //更新菜单列表（根据路由表生成侧边菜单数组）
 			
-			let accessCode = sessionStorage.getItem('access'); //用户权限
+			let accessCode = localStorage.getItem('access'); //用户权限
 			
-			let isadmin = sessionStorage.getItem('isadmin'); //是否为管理员
+			let isadmin = localStorage.getItem('isadmin'); //是否为管理员
 			
 			let menuList = [];
 			

@@ -154,14 +154,14 @@ export default {
                 if (valid) {
                 	
                 	this.$axios.post('Service/Company/index', {
-		    			user_id: sessionStorage.getItem('userId'),
+		    			user_id: localStorage.getItem('userId'),
 					})
 					.then(response => {
 						
 						if(response.status == 200){
 							
 							this.$axios.post('Service/Order/add', {
-				    			user_account: sessionStorage.getItem('userId'),
+				    			user_account: localStorage.getItem('userId'),
 				    			template_id: this.formInline.templateID,
 							})
 							.then(response => {

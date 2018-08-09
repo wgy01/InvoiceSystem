@@ -85,15 +85,15 @@ export default {
 					.then(function (response) {
 					    if(response.status == 200){//登陆成功
 					    	
-							sessionStorage.setItem('userName',response.data.username);//把用户名存起来
+							localStorage.setItem('userName',response.data.username);//把用户名存起来
 							
-							sessionStorage.setItem('userId',response.data.id);//把用户ID存起来
+							localStorage.setItem('userId',response.data.id);//把用户ID存起来
 							
-							sessionStorage.setItem('userType',response.data.user_type);//把用户类型存起来
+							localStorage.setItem('userType',response.data.user_type);//把用户类型存起来
 							
-							sessionStorage.setItem('access','['+response.data.user_type+']');//把用户权限存起来
+							localStorage.setItem('access','['+response.data.user_type+']');//把用户权限存起来
 							
-							//sessionStorage.setItem('isadmin',response.data.user_type);//管理员权限
+							//localStorage.setItem('isadmin',response.data.user_type);//管理员权限
 							
 							if(sessionStorage.getItem('params') && response.data.user_type == 2){
 								
@@ -104,6 +104,10 @@ export default {
 							}else{
 								
 								if(response.data.user_type == 1){
+									
+									if(sessionStorage.removeItem('params')){
+										sessionStorage.removeItem('params')
+									}
 									
 									this.$router.replace({
 										name: 'invoicePages'

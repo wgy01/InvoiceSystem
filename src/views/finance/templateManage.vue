@@ -40,7 +40,7 @@ let ajax = () => {
 	return new Promise(resolve => {
 
 		axios.post('Service/Template/index', {
-			user_id: sessionStorage.getItem('userId')
+			user_id: localStorage.getItem('userId')
 		})
 		.then(response => {
 			resolve(response.data);

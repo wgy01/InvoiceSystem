@@ -21,8 +21,28 @@ export const router = new Router({
 
 router.beforeEach((to, from, next) => {
 	
-	if(to.params[0]){
+	console.log(to);
+	
+	if(to.name == 'error-404' && to.params[0]){
+		
 		sessionStorage.setItem('params',to.params[0]);
+		
+		if(localStorage.getItem('userName') && localStorage.getItem('userType') == 2){//已登录并且是用户类型
+			
+		setTimeout(() => {
+			
+			next({
+				name: 'invoicePages'
+			});
+			
+		},200);
+			
+		}else{//未登录
+			
+			
+			
+		}
+		
 	}
 	
 //	router.app.$Loading.start();//全局创建一个显示页面加载
@@ -46,14 +66,14 @@ router.beforeEach((to, from, next) => {
 	
 	else {
 		
-		if(!sessionStorage.getItem('userName') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
+		if(!localStorage.getItem('userName') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
 			
 			//console.log('未登录，而且当前页面不是登录页');
 			next({
 				name: 'login'//这里表示要跳转到name值为'login'的路由(通过name来显示页面)
 			});
 			
-		}else if(sessionStorage.getItem('userName') && to.name === 'login') { // 判断是否已经登录且前往的是登录页
+		}else if(localStorage.getItem('userName') && to.name === 'login') { // 判断是否已经登录且前往的是登录页
 			
 			//console.log('已经登录，而且当前页面是登录页');
 			next({
@@ -65,15 +85,15 @@ router.beforeEach((to, from, next) => {
 			const curRouterObj = plant.getRouterObjByName([otherRouter, ...appRouter], to.name);//获取到当前路由对象
 			
 			//在这里加多一个超级管理员的权限
-			let isadmin = sessionStorage.getItem('isadmin'); //是否为管理员
+			let isadmin = localStorage.getItem('isadmin'); //是否为管理员
 			
 			if(curRouterObj && curRouterObj.access !== undefined && isadmin != 1) { // 需要判断权限的路由走这里
 				
 				//console.log('有要判断权限的路由');
 				
-				const whetherPass = plant.oneOf(curRouterObj.access,sessionStorage.getItem('access'));//'plant.oneOf()'多个权限的判断方法
+				const whetherPass = plant.oneOf(curRouterObj.access,localStorage.getItem('access'));//'plant.oneOf()'多个权限的判断方法
 				
-				if(curRouterObj.access === parseInt(sessionStorage.getItem('access'))) {//（单个权限判断）路由权限和用户权限的判断
+				if(curRouterObj.access === parseInt(localStorage.getItem('access'))) {//（单个权限判断）路由权限和用户权限的判断
 					
 					//console.log('权限通过');
 					plant.toDefaultPage([otherRouter, ...appRouter], to.name, router, next); // 如果在地址栏输入的是一级菜单则默认打开其第一个二级菜单的页面
