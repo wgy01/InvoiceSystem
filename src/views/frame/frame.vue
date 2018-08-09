@@ -142,7 +142,7 @@
             						<div class="dropdown-box">
             							<Dropdown placement="bottom-end" trigger="click" @on-click="userFunction">
 									        <a>
-									        	<span>{{userName}}</span>
+									        	<span>{{userNameType}}</span>
 									            <Icon type="arrow-down-b"></Icon>
 									        </a>
 									        <DropdownMenu slot="list">
@@ -317,12 +317,31 @@
             }
         },
 		computed:{
+			
 			rotateIcon () {
                 return [
                     'menu-icon',
                     this.isCollapsed ? 'rotate-icon' : ''
                 ];
-           }
+          	},
+          	userNameType(){
+          		
+          		let name = localStorage.getItem('userName');
+          		
+          		if(localStorage.getItem('userType') == 1){
+          			
+          			name += '(会计)';
+          			
+          		}else if(localStorage.getItem('userType') == 2){
+          			
+          			name += '(用户)';
+          			
+          		}
+          		
+          		return name;
+          		
+          	},
+          	
 		},
 		methods: {
 			init () {//初始化

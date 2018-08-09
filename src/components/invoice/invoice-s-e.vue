@@ -2,7 +2,8 @@
 
 	<div>
 		
-		<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="110">
+		<!--用户编辑显示-->
+		<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
 					
 			<FormItem label="需要开票的公司" prop="companyId">
 	        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="width: 200px;">
@@ -14,11 +15,45 @@
 	            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 200px;"></Input>
 	        </FormItem>
 	        
+	        <!--<FormItem label="转款时间" prop="money">
+	            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+	        </FormItem>
+	        
+	        <FormItem label="联系人" prop="money">
+	            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+	        </FormItem>
+	        
+	        <FormItem label="手机号码" prop="money">
+	            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+	        </FormItem>-->
+	        
+	        <!--这里是模板的字段-->
+	        <div>
+	        	<forms-template
+	            ref="formsInstance1"
+	            @on-change="formsChange"
+	            :NoHandle="handle2"
+	            :user-type="2"
+	            :out-forms-data="companyFormsData"
+	            :show-type="showType"
+	            >
+	            </forms-template>
+	        </div>
+	        
+	        <FormItem label="上传图片文件">
+	        	<upload
+		    	:showType="type"
+	    		:img-list="companyImgList"
+	    		@on-success="uploadSuccess"
+	    		@on-del="del">
+		    	</upload>
+	        </FormItem>
+	        
 	    </Form>
 		
-		
-		<Card style="margin-bottom: 16px;">
-		    		
+		<!--会计显示-->
+		<Card v-if="userType == 1 || type == 'show'" style="margin-bottom: 16px;">
+		    	
     		<h2 slot="title">{{Info.ticketName}}（用户）</h2>
     		
     		<Row style="padding: 6px 0;">
@@ -33,6 +68,7 @@
     			
     		</Row>
     		
+    		<!--这里是模板的字段-->
     		<forms-template
             ref="formsInstance1"
             @on-change="formsChange"
@@ -42,10 +78,27 @@
             :show-type="showType"
             >
             </forms-template>
-    		
+            
+            <Row style="padding: 6px 0;margin-top: 26px;border-top: 1px solid #e9eaec;">
+    			
+    			<Col span="4" style="text-align: right;">
+    				<label style="width: 182px;text-align: right;font-size: 12px;">图片文件：</label>
+    			</Col>
+    			
+    			<Col span="20">
+    				<upload
+			    	showType="show"
+		    		:img-list="companyImgList"
+		    		@on-success="uploadSuccess"
+		    		@on-del="del">
+			    	</upload>
+    			</Col>
+    			
+    		</Row>
+            
     	</Card>
     	
-    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)" style="margin-bottom: 16px;">
+    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
     		
     		<h2 slot="title">{{Info.accountName}}（会计）</h2>
     		
@@ -59,22 +112,26 @@
             >
             </forms-template>
     		
+    		<Row style="padding: 6px 0;margin-top: 20px;border-top: 1px solid #e9eaec;">
+    			
+    			<Col span="4" style="text-align: right;">
+    				<label style="width: 182px;text-align: right;font-size: 12px;">图片文件：</label>
+    			</Col>
+    			
+    			<Col span="20">
+    				<upload
+			    	:showType="type"
+		    		:img-list="accountantImgList"
+		    		@on-success="uploadSuccess"
+		    		@on-del="del">
+			    	</upload>
+    			</Col>
+    			
+    		</Row>
+    		
     	</Card>
     	
-    	<Card>
-			    	
-	    	<h2 slot="title">图片上传</h2>
-	    	
-	    	<upload
-	    	:showType="type"
-    		:img-list="imgList"
-    		@on-success="uploadSuccess"
-    		@on-del="del">
-	    	</upload>
-	    	
-	    </Card>
-    	
-    	<div v-if="type == 'edit'" style="text-align: center;padding-top: 16px;">
+    	<div v-if="type == 'edit'" style="text-align: center;margin-top: 16px;">
 	    	<Button type="primary" @click="handleSubmit">保存发票</Button>
 	    </div>
 		
@@ -160,7 +217,9 @@ export default {
         		
         	},
         	
-        	imgList: [],//图片列表
+        	companyImgList: [],//公司图片列表
+        	
+        	accountantImgList: [],//会计图片列表
         	
         }
     },
@@ -329,18 +388,33 @@ export default {
 				
 				if(response.status == 200){
 					
-					let arr = [];
+					let companyImgList = [];
+					
+					let accountantImgList = [];
 					
 					response.data.forEach(item => {
 						
-						arr.push({
-							name: '',
-							url: item.url
-						});
+						if(item.user.user_type == 1){//会计
+							
+							accountantImgList.push({
+								name: '',
+								url: item.url
+							});
+							
+						}else if(item.user.user_type == 2){//公司
+							
+							companyImgList.push({
+								name: '',
+								url: item.url
+							});
+							
+						}
 						
 					});
 					
-					this.imgList = arr;
+					this.companyImgList = companyImgList;
+					
+					this.accountantImgList = accountantImgList;
 					
 				}
 				

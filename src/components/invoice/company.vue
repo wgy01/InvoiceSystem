@@ -23,7 +23,6 @@
 	    	<Button type="primary" @click="modal = true">获取发票</Button>
 	    	
 	    </Card>
-	    
 	        	
 		<!--操作发票-->
 		<Card v-if="invoiceID">
@@ -74,7 +73,7 @@
 			        <FormItem label="上传图片文件">
 			        	<upload
 			        	ref="uploadInstance"
-			    		:img-list="imgList"
+			    		:img-list="companyImgList"
 			    		@on-success="uploadSuccess"
 			    		@on-del="del">
 				    	</upload>
@@ -183,7 +182,7 @@ export default {
         		
         	},
         	
-        	imgList: [],//图片列表
+        	companyImgList: [],//公司图片列表
         	
         }
     },
@@ -277,7 +276,7 @@ export default {
 	        	
 			}
        		
-       		this.imgList = [],//图片列表
+       		this.companyImgList = [],//图片列表
        		
        		this.$axios.post('Service/Uploadfile/index', {
     			order_id: id,
@@ -286,18 +285,22 @@ export default {
 				
 				if(response.status == 200){
 					
-					let arr = [];
+					let companyImgList = [];
 					
 					response.data.forEach(item => {
 						
-						arr.push({
-							name: '',
-							url: item.url
-						});
+						if(item.user.user_type == 2){//公司
+							
+							companyImgList.push({
+								name: '',
+								url: item.url
+							});
+							
+						}
 						
 					});
 					
-					this.imgList = arr;
+					this.companyImgList = companyImgList;
 					
 				}
 				
