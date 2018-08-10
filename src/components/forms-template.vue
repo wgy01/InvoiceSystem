@@ -52,7 +52,7 @@
 				
 				<!-------------------------------描述------------------------------>
 				<!--编辑时显示-->
-				<Col span="12" v-if="showType == 'edit'">
+				<Col span="12" v-if="showType == 'edit' && !item.del && item.del != 0">
 					<div style="display: flex;align-items: center;">
 						<Input placeholder="请输入描述" clearable  v-model="item.remark"></Input>
 						<Button style="margin-left: 4px;color: #ed3f14;" type="text" icon="minus-circled" size="small" @click="formsList.data.splice(index,1)">删除</Button>

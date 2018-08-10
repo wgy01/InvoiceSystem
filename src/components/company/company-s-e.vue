@@ -67,6 +67,9 @@ export default {
     },
     methods: {//方法
     	
+    	getFormsField(){//获取表单字段
+    		
+    	},
     	handleSubmit(name) {//保存数据
     		
             this.$refs[name].validate((valid) => {

@@ -27,7 +27,33 @@ h3 {
 	font-size: 12px;
 }
 
-/*打印执行*/
+/*--------------------滚动条样式-----------------------*/
+
+/*滚动条整体部分，可以设置宽度啥的*/ 
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	background: rgba(73,80,96,0.2);
+	/* 整个滚条背景 */
+}
+
+/*拖动条，滑块*/ 
+::-webkit-scrollbar-thumb {
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	background: rgba(0,0,0,0.2);
+	/* 滚条内嵌颜色 */
+}
+
+/*滚动条两端的按钮*/ 
+::-webkit-scrollbar-button {
+	display: none;
+	/* 两边端按钮颜色 */
+}
+
+/*------------------------打印执行---------------------------*/
 @media print {
 	/*表格*/
 	.ivu-table-wrapper {

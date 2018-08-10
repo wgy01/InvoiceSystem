@@ -184,12 +184,16 @@ export default {
         	
         	tableColumns: [
                 {
+                	fixed: 'left',
                 	align: 'center',
-                	width: 80,
+                	width: 70,
                     title: 'ID',
                     key: 'id'
                 },
                 {
+                	ellipsis: true,
+                	fixed: 'left',
+                	minWidth: 150,
                     renderHeader: (h, params) => {
                     	
                     	let title = '';
@@ -257,36 +261,37 @@ export default {
                 },
                 {
                 	width: 160,
-                    title: '创建发票时间',
+                    title: '发票创建时间',
                     key: 'create_time'
                 },
                 {
                 	width: 160,
-                    title: '完成开票时间',
+                    title: '开票完成时间',
                     key: 'update_time'
                 },
+//              {
+//                  title: '链接',
+//                  render: (h, params) => {
+//                  	
+//                  	let invoiceUrl = '';
+//  		
+//			    		let getUrlParams = (url,name) => {
+//			    			let startIndex = url.indexOf('?');
+//				    		let parameter = url.substr(startIndex);
+//						    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+//						    let r = parameter.substr(1).match(reg);  
+//						    if (r != null) return unescape(r[2]);
+//						  	return null;
+//			    		}
+//			    		
+//			    		invoiceUrl = 'http://'+ window.location.host +'/#/'+ getUrlParams(params.row.link,'orderID');
+//                  	
+//                  	return h('span',invoiceUrl)
+//                  	
+//                  }
+//              },
                 {
-                    title: '链接',
-                    render: (h, params) => {
-                    	
-                    	let invoiceUrl = '';
-    		
-			    		let getUrlParams = (url,name) => {
-			    			let startIndex = url.indexOf('?');
-				    		let parameter = url.substr(startIndex);
-						    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
-						    let r = parameter.substr(1).match(reg);  
-						    if (r != null) return unescape(r[2]);
-						  	return null;
-			    		}
-			    		
-			    		invoiceUrl = 'http://'+ window.location.host +'/#/'+ getUrlParams(params.row.link,'orderID');
-                    	
-                    	return h('span',invoiceUrl)
-                    	
-                    }
-                },
-                {
+                	fixed: 'right',
                 	align: 'center',
                 	width: 130,
                     title: '操作',

@@ -20,6 +20,7 @@
 	    	
             <forms-template
             ref="formsInstance1"
+            :outFormsData="companyDefault"
             @on-change="formsChange"
             :NoHandle="true"
             :user-type="2"
@@ -35,6 +36,7 @@
 	    	
             <forms-template
         	ref="formsInstance2"
+        	:outFormsData="accountantDefault"
         	@on-change="formsChange"
         	:NoHandle="true"
         	:user-type="1"
@@ -71,6 +73,40 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	companyDefault: [
+        		{
+        			name: '转款时间',
+	    			value: '',
+					user_type: 2,
+					remark: '',
+					del: 0,
+        		},
+        		{
+        			name: '联系人',
+	    			value: '',
+					user_type: 2,
+					remark: '',
+					del: 0,
+        		},
+        		{
+        			name: '手机号码',
+	    			value: '',
+					user_type: 2,
+					remark: '',
+					del: 0,
+        		},
+        	],
+        	
+        	accountantDefault: [
+        		{
+        			name: '邮寄地址',
+	    			value: '',
+					user_type: 1,
+					remark: '',
+					del: 0,
+        		}
+        	],
         	
         	formInline: {
         		name: '',
@@ -168,6 +204,8 @@ export default {
     //===================组件钩子===========================
     
     created () {//实例被创建完毕之后执行
+    	
+    	this.formsList = [...this.companyDefault,...this.accountantDefault];
     	
 	},
     mounted () {//模板被渲染完毕之后执行
