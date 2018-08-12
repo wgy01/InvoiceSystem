@@ -2,16 +2,17 @@
 
 	<div>
 		
-	    <accountant v-if="userType == 1" :templateList="templateList" style="margin-bottom: 16px;"></accountant>
+	    <accountant
+    	v-if="userType == 1"
+    	:templateList="templateList"
+    	style="margin-bottom: 16px;"
+    	>
+	    </accountant>
 		
 		<company
 		ref="companyInstance"
 		v-else-if="userType == 2"
-		:invoiceID="invoiceID"
-		:allFormsData="allFormsData"
-		:Info="Info"
-		:accountantFormsData="accountantFormsData"
-		:companyFormsData="companyFormsData"
+		:invoiceAllData="invoiceAllData"
 		:companyDataList="companyDataList"
 		@on-submit="submitSucceed"
 		style="margin-bottom: 16px;"
@@ -25,6 +26,7 @@
 				<div v-if="userType == 2" style="margin-left: auto;">
 					<label style="font-size: 12px;">查看公司发票</label>
 		        	<Select v-model="companyId" filterable placeholder="选择公司" @on-change="companyChange" style="width: 200px;margin-left: 6px;">
+		                <Option :value="0">全部数据</Option>
 		                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		            </Select>
 				</div>
@@ -79,7 +81,7 @@ let templateShow = () => {//公司发票模板表单显示
 			id: sessionStorage.getItem('params')
 		})
 		.then(response => {
-			resolve(response.data);
+			resolve(response.data || {});
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -97,7 +99,7 @@ let companyList = () => {//公司列表
 			user_id: localStorage.getItem('userId')
 		})
 		.then(response => {
-			resolve(response.data);
+			resolve(response.data || []);
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -143,6 +145,24 @@ let companyInvoiceList = (companyID) => {//公司发票列表
 
 }
 
+let AllcompanyInvoiceList = (userID) => {//所有公司发票列表
+
+	return new Promise(resolve => {
+
+		axios.post('Service/Order/index', {
+			user_id: userID,
+		})
+		.then(response => {
+			resolve(response.data || []);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
 export default {
 	components:{//组件模板
 		accountant,
@@ -161,26 +181,15 @@ export default {
     data () {//数据
         return {
         	
-        	companyId: '',
+        	companyId: 0,
         	
         	templateList: [],
         	
         	userType: localStorage.getItem('userType'),
         	
-        	invoiceID: null,//发票id
-        	
-        	allFormsData: [],//所有表单数据
-        	
-        	accountantFormsData: [],//会计数据
-        	
-        	companyFormsData: [],//公司数据
+        	invoiceAllData: {},//发票所有数据
         	
         	companyDataList: [],//公司列表
-        	
-        	Info: {//信息
-        		accountName: '',
-        		ticketName: '',
-        	},
         	
         	tableColumns: [
                 {
@@ -305,19 +314,28 @@ export default {
     },
     methods: {//方法
     	
-    	companyChange(val){//表格选择公司改变时
+    	companyChange(val){//表格筛选公司改变时
     		
     		(async() => {
     			
-    			this.tableData = await companyInvoiceList(val);
-    			
+	    		if(val == 0){
+	    			
+	    			this.tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));//所有公司发票列表
+	    			
+	    		}else{
+	    			
+	    			this.tableData = await companyInvoiceList(val);
+	    			
+	    		}
+	    			
     		})();
+    		
     		
     	},
     	submitSucceed(companyId){//提交发票成功时触发
     		
-    		this.invoiceID = null;
-    			
+    		this.invoiceAllData = {};//发票所有数据
+    		
 			(async() => {
 				
 				this.companyId = companyId;
@@ -325,7 +343,6 @@ export default {
 				this.tableData = await companyInvoiceList(companyId);
 				
 			})();
-    			
     		
     	},
     	updateData(){//更新表格数据
@@ -428,43 +445,23 @@ export default {
 				
 				companyDataList = await companyList();//公司列表
 				
-				if(companyDataList && companyDataList.length > 0){
-					
-					tableData = await companyInvoiceList(companyDataList[0].id);//发票列表
-					
-				}
-				
+				tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));//所有公司发票列表
 				
 				if(sessionStorage.getItem('params')){
-					templateForms = await templateShow();//模板表单
+					
+					templateForms = await templateShow();//发票模板表单数据
+					
 					sessionStorage.removeItem('params');
+					
 				}
 				
-				next(vm => {//回调
+				next(vm => {
 					
 					if(templateForms){
-						
-						let accountantArr = [];
-    					let companyArr = [];
-						templateForms.conf.forEach(item => {
-							if(item.user_type == 1){//会计
-								accountantArr.push(item);
-							}
-							if(item.user_type == 2){//公司
-								companyArr.push(item);
-							}
-						});
-						
-						vm.Info.accountName = templateForms.mixture.data.account.title;
-						vm.Info.ticketName = templateForms.mixture.data.ticket.title;
-						vm.allFormsData = templateForms.conf;//所有表单数据
-						vm.accountantFormsData = accountantArr;//会计表单数据
-						vm.companyFormsData = companyArr;//公司表单数据
-						vm.invoiceID = templateForms.id;//发票ID
-						vm.$refs.companyInstance.imgShow(templateForms.id);//显示图片
+						vm.invoiceAllData = templateForms;//发票模板表单数据
 					}
 					
-					if(companyDataList){
+					if(companyDataList){//公司列表
 						let arr = [];
 						companyDataList.forEach(item => {
 							arr.push({
@@ -473,10 +470,6 @@ export default {
 							});
 						})
 						vm.companyDataList = arr;
-					}
-					
-					if(companyDataList && companyDataList.length > 0){
-						vm.companyId = companyDataList[0].id;//默认公司ID
 					}
 					
 					vm.tableData = tableData;

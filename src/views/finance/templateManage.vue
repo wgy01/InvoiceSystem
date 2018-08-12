@@ -6,7 +6,11 @@
 			
 			<h1 slot="title">创建模板</h1>
 			
-			<add-template></add-template>
+			<add-template
+			:companyDefault="companyDefault"
+			:accountantDefault="accountantDefault"
+			>
+			</add-template>
 			
 		</Card>
 		
@@ -53,6 +57,24 @@ let ajax = () => {
 
 }
 
+let getDefaultForms = () => {
+
+	return new Promise(resolve => {
+
+		axios.post('Service/ModelField/index', {
+			
+		})
+		.then(response => {
+			resolve(response.data);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
 export default {
 	components:{//组件模板
 		addTemplate,
@@ -69,6 +91,10 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	companyDefault: [],//默认表单数据
+        	
+        	accountantDefault: [],//默认表单数据
         	
         	tableColumns: [
                 {
@@ -130,12 +156,44 @@ export default {
 		
 		let tableData = [];//模板列表
 		
+		let formsData = [];
+		
+		let company = [];
+		
+		let accountant = [];
+		
 		(async() => { //es7异步函数
 			
 			tableData = await ajax();
 			
+			formsData = await getDefaultForms();
+			
 			next(vm => {//回调
+				
+				formsData.forEach(item => {
+					
+					if(item.is_base == 0){
+						
+						if(item.user_type == 1){
+							
+							accountant.push(item);
+							
+						}else if(item.user_type == 2){
+							
+							company.push(item);
+							
+						}
+						
+					}
+					
+				});
+				
+				vm.companyDefault = company;
+        	
+        		vm.accountantDefault = accountant;
+				
 				vm.tableData = tableData;
+				
 			})
 			
 		})();

@@ -13,8 +13,8 @@
 			        <Row :gutter="16">
 			        	
 			        	<Col span="12">
-					        <FormItem label="公司名称" prop="companyName" :rules="companyName">
-					            <Input v-model="companyFormsList.companyName" clearable placeholder="输入公司名称"></Input>
+					        <FormItem label="单位名称" prop="companyName" :rules="companyName">
+					            <Input v-model="companyFormsList.companyName" clearable placeholder="单位名称"></Input>
 					        </FormItem>
 			        	</Col>
 			        	
@@ -124,7 +124,7 @@ export default {
 			},
         	
     		companyName: [
-                { required: true, message: '请输入公司名称', trigger: 'blur' }
+                { required: true, message: '请输入单位名称', trigger: 'blur' }
             ],
         	
         	tableColumns: [
@@ -158,14 +158,7 @@ export default {
     	
     	rules(item){//验证
     		
-    		if(item.field == 'company'){
-    			
-    			return [
-                    { required: true, message: '请输入单位名称', trigger: 'blur' }
-                ];
-        		
-    			
-    		}else if(item.field == 'organizer_code'){
+    		if(item.field == 'organizer_code'){
     			
     			return [
                     { required: true, message: '请输入识别号', trigger: 'blur' }
@@ -197,6 +190,16 @@ export default {
 							(async() => {
 								this.tableData = await companyList();
 							})();
+							
+							this.companyFormsList.companyName = '';
+							
+							this.companyFormsList.remark = '';
+							
+							this.companyFormsList.data.forEach(item => {
+								
+								item.value = '';
+								
+							});
 							
 							this.$Message.success('创建成功');
 							
@@ -246,23 +249,28 @@ export default {
 		
 		let field = [];
 		
-		let companyFieldList = [];//公司字段列表
+		let companyFieldList = [];//公司基本字段列表
 		
 		(async() => {
 			
 			companyDataList = await companyList();
 			
-			field = await companyField();
+			if(localStorage.getItem('userType') == 2){
+				
+				field = await companyField();
 			
-			field.forEach(item => {
+				field.forEach(item => {
 				
-				if(item.user_type == 2){
+					if(item.user_type == 2 && item.is_base == 1){
 					
-					companyFieldList.push(item);
+						companyFieldList.push(item);
 					
-				}
+					}
 				
-			});
+				});
+				
+			}
+			
 			
 			next(vm => {
 				

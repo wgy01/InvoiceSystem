@@ -2,7 +2,7 @@
 
 	<div>
 		
-		<!--发票获取-->
+		<!--发票获取弹窗-->
 		<Modal v-model="modal" width="70%">
 	        <p slot="header">获取发票</p>
 	        <div>
@@ -23,18 +23,18 @@
 	    	<Button type="primary" @click="modal = true">获取发票</Button>
 	    	
 	    </Card>
-	        	
-		<!--操作发票-->
-		<Card v-if="invoiceID">
+	    
+		<!--显示操作发票模块-->
+		<Card v-if="invoiceAllData.id">
 			
-			<h1 slot="title">{{Info.accountName}}（创建发票链接公司）</h1>
+			<h1 slot="title">{{invoiceAllData.mixture.data.account.title}}（创建发票链接公司）</h1>
 			
 			<div>
 				
     			<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
 		
 					<FormItem label="需要开票的公司" prop="companyId">
-			        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="max-width: 200px;">
+			        	<Select v-model="formInline.companyId" @on-change="companyChange" filterable placeholder="选择公司" style="max-width: 200px;">
 			                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 			            </Select>
 			        </FormItem>
@@ -55,21 +55,19 @@
 			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
 			        </FormItem>-->
 			        
-			        <!--这里是模板的字段-->
-			        <div>
-			        	
-				        <forms-template
-			            ref="formsInstance1"
-			            @on-change="formsChange"
-			            :NoHandle="false"
-			            :user-type="2"
-			            :out-forms-data="companyFormsData"
-			            show-type="edit2"
-			            >
-			            </forms-template>
-			        	
-			        </div>
-			        
+			    </Form>
+			    
+			    <forms-template
+	            ref="formsInstance1"
+	            @on-change="formsChange"
+	            :NoHandle="false"
+	            :user-type="2"
+	            :out-forms-data="companyFormsData"
+	            show-type="edit2"
+	            >
+	            </forms-template>
+			    
+			    <Form :label-width="120">
 			        <FormItem label="上传图片文件">
 			        	<upload
 			        	ref="uploadInstance"
@@ -78,28 +76,11 @@
 			    		@on-del="del">
 				    	</upload>
 			        </FormItem>
-			        
 			    </Form>
 	    			
-			    <div style="text-align: center;padding-top: 16px;">
+			    <div style="text-align: center;">
 			    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
 			    </div>
-			    
-		    	<Card v-show="userType != 2">
-		    		
-		    		<h2 slot="title">{{Info.accountName}}（会计公司）</h2>
-		    		
-		    		<forms-template
-		            ref="formsInstance2"
-		            @on-change="formsChange"
-		            :NoHandle="true"
-		            :user-type="1"
-		            :out-forms-data="accountantFormsData"
-		            show-type="edit2"
-		            >
-		            </forms-template>
-		    		
-		    	</Card>
 			    
 			</div>
 			
@@ -129,21 +110,19 @@ export default {
 		 * 
 		 */
 		
-		invoiceID: Number,//发票ID
+		invoiceAllData: Object,//所有表单数据
 		
-		allFormsData: Array,//所有表单数据
-		
-		Info: Object,//信息
-        	
-    	accountantFormsData: Array,//会计数据
-    	
-    	companyFormsData: Array,//公司数据
-    	
     	companyDataList: Array,//公司列表
     	
 	},
     data () {//数据
         return {
+        	
+        	accountantFormsData: [],//会计表单数据
+    	
+    		companyFormsData: [],//公司表单数据
+    		
+    		companyBasicforms: [],//公司基本表单数据
         	
         	modal: false,
         	
@@ -161,7 +140,6 @@ export default {
         	},
         	
         	formInline2: {
-        		//invoiceURL: sessionStorage.getItem('params') ? 'http://'+ window.location.host +'/#/'+ sessionStorage.getItem('params') : '',
         		invoiceURL: '',
         	},
         	ruleInline2: {
@@ -170,7 +148,7 @@ export default {
                 ],
         	},
         	
-        	formsList: [],//发生改变后的表单数据
+        	formsList: [],//表单发生改变后的表单数据
         	
         	userType: localStorage.getItem('userType'),//用户类型
         	
@@ -193,16 +171,52 @@ export default {
     		this.imgData = data;
     		
     	},
-    	del(data){//删除时触发
+    	del(data){//删除图片时触发
     		
     		this.imgData = data;
+    		
+    	},
+    	companyChange(companyId){//选择公司时触发
+    		
+    		this.getCompanyBasicforms(companyId)//获取公司基本表单数据
+    		
+    	},
+    	getCompanyBasicforms(id){//获取公司基本表单数据
+    		
+    		this.$axios.post('Service/CompanyField/get_by_id', {
+				company_id: id,		
+			})
+			.then(response => {
+				
+				let arr = [];
+				
+				if(response.status == 200){
+					
+					response.data.setting.forEach(item => {
+						
+						if(item.value != ''){
+							
+							arr.push(item);
+							
+						}
+						
+					});
+					
+				}
+				
+				this.companyBasicforms = arr;
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
     		
     	},
     	handleSubmit(name) {//提交发票
     		
             this.$refs[name].validate((valid) => {
             	
-            	let [A1,B1,A2,B2] = [true,true,true,true];
+            	let [A1,B1] = [true,true];
 					
 				this.$refs.formsInstance1.verification((valid) => {
 					A1 = valid;
@@ -210,60 +224,55 @@ export default {
 	    			B1 = valid;
 	    		});
 	    		
-				this.$refs.formsInstance2.verification((valid) => {
-					A2 = valid;
-	    		},(valid3) => {
-	    			B2 = valid;
-	    		});
-            	
-                if (valid) {
+                if (valid && A1 && B1) {
                 	
-                	if(A1 || A2){
-	                		
-						if(B1 && B2) {
+					this.$axios.post('Service/Order/edit', {
+						
+    					id: this.invoiceAllData.id,
+    					
+    					conf: JSON.stringify([...this.formsList,...this.companyBasicforms]),
+    					
+    					url: this.imgData.imgSubmitData.join('|'),
+    					
+    					company_id: this.formInline.companyId,
+    					
+    					user_id: localStorage.getItem('userId'),
+    					
+    					money: this.formInline.money,
+    					
+					})
+					.then(response => {
+						
+						if(response.status == 200){
 							
-							this.$axios.post('Service/Order/edit', {
-		    					id: this.invoiceID,
-		    					conf: JSON.stringify(this.formsList),
-		    					url: this.imgData.imgSubmitData.join('|'),
-		    					company_id: this.formInline.companyId,
-		    					user_id: localStorage.getItem('userId'),
-		    					money: this.formInline.money,
-							})
-							.then(response => {
-								
-								if(response.status == 200){
-									
-									this.imgData = {//上传的图片数据
-        		
-						        		imgShowData: [],//需要显示的图片
-        		
-        								imgSubmitData: [],//需要提交的图片数据
-						        		
-						        	};
-									
-									this.$emit('on-submit',this.formInline.companyId);
-									
-									this.$Message.success('提交成功');
-									
-								}
-								
-							})
-							.catch(function (error) {
-								console.log(error);
-							});
+							this.imgData = {//上传的图片数据
+		
+				        		imgShowData: [],//需要显示的图片
+		
+								imgSubmitData: [],//需要提交的图片数据
+				        		
+				        	};
+				        	
+				        	this.companyImgList = [];//公司图片列表
+							
+							this.$emit('on-submit',this.formInline.companyId);
+							
+							this.$Message.success('提交成功');
 							
 						}
 						
-					}
-                	
+					})
+					.catch(function (error) {
+						console.log(error);
+					});
+							
                 }
                 
             })
             
        	},
        	imgShow(id){//图片显示
-       		
+       		console.log(123213123123123);
 			if(this.$refs.uploadInstance){
 				
 				this.$refs.uploadInstance.imgData = {//上传的图片数据
@@ -337,36 +346,7 @@ export default {
 							
 							if(response.data.status != 1){
 								
-								let accountantArr = [];
-							
-		    					let companyArr = [];
-								
-								response.data.conf.forEach(item => {
-									if(item.user_type == 1){//会计
-										accountantArr.push(item);
-									}
-									if(item.user_type == 2){//公司
-										companyArr.push(item);
-									}
-								});
-								
-								this.imgShow(response.data.id);//图片显示
-								
-								this.$parent.Info.accountName = response.data.mixture.data.account.title;
-					
-								this.$parent.Info.ticketName = response.data.mixture.data.ticket.title;
-								
-								this.$parent.invoiceID = response.data.id;//发票ID
-								
-								this.formInline.money = response.data.money.toString() != 0 ? response.data.money.toString() : '';//金额
-								
-								this.$parent.allFormsData = response.data.conf;//所有表单数据
-								
-								this.$parent.accountantFormsData = accountantArr;//会计数据
-								
-								this.$parent.companyFormsData = companyArr;//公司数据
-								
-								//sessionStorage.setItem('params',params);//存到本地存储里
+								this.$parent.invoiceAllData = response.data;//所有表单数据
 								
 								this.formInline2.invoiceURL = '';
 								
@@ -395,9 +375,9 @@ export default {
        	},
        	formsChange(){//模板表单发生改变时
     		
-    		let A = this.$refs.formsInstance1.formsList.data;
+    		let A = this.$refs.formsInstance1.formsList.data;//公司
     		
-    		let B = this.$refs.formsInstance2.formsList.data;
+    		let B = this.accountantFormsData;//会计
     		
     		let arr = [];
     		
@@ -413,13 +393,42 @@ export default {
     },
     watch: {//监测数据变化
 		
-		companyDataList(){//默认模板
-			if(this.companyDataList.length > 0){
-	    		this.formInline.companyId = this.companyDataList[0].value;
-	    	}
-		},
-		allFormsData(v){
-			this.formsList = v;
+		invoiceAllData(v){
+			
+			let accountantArr = [];
+			
+			let companyArr = [];
+			
+			v.conf.forEach(item => {
+				
+				if(item.user_type == 1){//会计
+					
+					accountantArr.push(item);
+					
+				}else if(item.user_type == 2){//公司
+					
+					companyArr.push(item);
+					
+				}
+				
+			});
+			
+    		if(v.company_id != 0){
+				this.getCompanyBasicforms(v.company_id)//获取公司基本表单数据
+			}
+    		
+    		this.formInline.companyId = v.company_id;//公司ID
+    		
+    		this.formInline.money = v.money.toString() != 0 ? v.money.toString() : '';//金额
+			
+			this.imgShow(v.id);//图片显示
+			
+			this.formsList = v.conf;//全部表单数据
+			
+			this.accountantFormsData = accountantArr;//会计表单数据
+    	
+    		this.companyFormsData = companyArr;//公司表单数据
+    		
 		},
 		
 	},

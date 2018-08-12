@@ -19,44 +19,73 @@
 			<Row type="flex" :gutter="6" v-for="(item,index) in formsList.data" :key="index"  style="margin-top:10px;">
 				
 				<!----------------------字段名---------------------------->
+				
 				<!--编辑显示-->
-				<Col span="4" v-if="showType == 'edit'">
+				<Col span="4" v-if="showType == 'edit' && item.is_add != 0">
 					<FormItem :prop="'data.' + index + '.name'" :rules="labelValidate">
 						<Input placeholder="输入名称" clearable v-model="item.name"></Input>
 					</FormItem>
 				</Col>
 				
 				<!--详情显示-->
-				<Col span="4" v-if="showType == 'show'" style="font-size: 12px;line-height: 20px;text-align: right;padding: 6px 0;">
+				<Col span="4" v-if="showType == 'show' && item.is_add != 0" style="font-size: 12px;line-height: 20px;text-align: right;padding: 6px 0;">
+					{{item.name}}：
+				</Col>
+				
+				<!--模板默认字段-->
+				<Col span="4" v-if="item.is_add == 0 && showType != 'edit2'" style="font-size: 12px;line-height: 20px;text-align: right;padding: 6px 0;">
 					{{item.name}}：
 				</Col>
 				
 				<!-----------------------字段值------------------------>
+				
 				<!--编辑显示-->
 				<Col v-if="showType == 'edit'" span="8">
-					<Input :disabled="NoHandle" :placeholder="placeholder(item.remark)" clearable  v-model="item.value"></Input>
+					
+					<!--模板默认字段-->
+					<div v-if="item.is_add == 0" style="height:100%;display: flex;align-items: center;font-size: 12px;color: #c5c8ce;">
+						<span>基础字段不可操作</span>
+					</div>
+					
+					<Input v-if="item.is_add != 0" :disabled="NoHandle" :placeholder="placeholder(item.remark)" clearable  v-model="item.value"></Input>
+					
 				</Col>
 				
-				<!--只编辑字段值时显示-->
-				<Col v-if="showType == 'edit2'" span="24">
+				<!--编辑显示-->
+				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') < 0" span="24">
 					<FormItem :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate2">
 						<Input :disabled="NoHandle" :placeholder="placeholder(item.remark)" :clearable="!NoHandle"  v-model="item.value" style="max-width: 400px;"></Input>
+					</FormItem>
+				</Col>
+				
+				<!--日期-->
+				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') >= 0" span="24">
+					<FormItem :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate3">
+						<DatePicker :disabled="NoHandle" type="date" :value="item.value" @on-change="dateChange(index,$event)" placeholder="选择日期" style="width: 200px"></DatePicker>
 					</FormItem>
 				</Col>
 				
 				<!--详情显示-->
 				<Col v-if="showType == 'show'" span="20" style="padding: 6px 0;">
 					{{item.value}}
-					<span v-if="item.value == ''" style="color: #bbbec4;">无内容</span>
+					<span v-if="item.value == ''" style="color: #bbbec4;">- -无内容- -</span>
 				</Col>
 				
 				<!-------------------------------描述------------------------------>
+				
 				<!--编辑时显示-->
-				<Col span="12" v-if="showType == 'edit' && !item.del && item.del != 0">
-					<div style="display: flex;align-items: center;">
+				<Col span="12" v-if="showType == 'edit'">
+					
+					<!--模板默认字段-->
+					<div v-if="item.is_add == 0" style="height:100%;display: flex;align-items: center;font-size: 12px;color: #c5c8ce;">
+						<span>基础字段不可操作</span>
+					</div>
+					
+					<div v-if="item.is_add != 0" style="display: flex;align-items: center;">
 						<Input placeholder="请输入描述" clearable  v-model="item.remark"></Input>
 						<Button style="margin-left: 4px;color: #ed3f14;" type="text" icon="minus-circled" size="small" @click="formsList.data.splice(index,1)">删除</Button>
 					</div>
+					
 				</Col>
 	
 		    </Row>
@@ -113,11 +142,19 @@ export default {
         	labelValidate2: [
                 { required: true, message: '必须输入内容', trigger: 'blur' }
             ],
+        	labelValidate3: [
+                { required: true, message: '请选择日期', trigger: 'change' }
+            ],
         	
         }
     },
     methods: {//方法
     	
+    	dateChange(index,date){//格式化时间
+    		
+    		this.formsList.data[index].value = date;
+    		
+    	},
     	add(){//添加
     		
     		this.formsList.data.push({

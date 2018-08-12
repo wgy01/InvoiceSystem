@@ -70,43 +70,14 @@ export default {
 		 * 默认值 default: ''
 		 * 
 		 */
+		
+		companyDefault: Array,
+        	
+        accountantDefault: Array,
+		
 	},
     data () {//数据
         return {
-        	
-        	companyDefault: [
-        		{
-        			name: '转款时间',
-	    			value: '',
-					user_type: 2,
-					remark: '',
-					del: 0,
-        		},
-        		{
-        			name: '联系人',
-	    			value: '',
-					user_type: 2,
-					remark: '',
-					del: 0,
-        		},
-        		{
-        			name: '手机号码',
-	    			value: '',
-					user_type: 2,
-					remark: '',
-					del: 0,
-        		},
-        	],
-        	
-        	accountantDefault: [
-        		{
-        			name: '邮寄地址',
-	    			value: '',
-					user_type: 1,
-					remark: '',
-					del: 0,
-        		}
-        	],
         	
         	formInline: {
         		name: '',
@@ -210,12 +181,6 @@ export default {
 	},
     mounted () {//模板被渲染完毕之后执行
 	},
-	
-	//=================组件路由勾子==============================
-	
-//	beforeRouteEnter (to, from, next) {//在组件创建之前调用
-//		
-//	},
 	
 }
 </script>
