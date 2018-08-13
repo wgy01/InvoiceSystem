@@ -26,7 +26,7 @@
 				<div v-if="userType == 2" style="margin-left: auto;">
 					<label style="font-size: 12px;">查看公司发票</label>
 		        	<Select v-model="companyId" filterable placeholder="选择公司" @on-change="companyChange" style="width: 200px;margin-left: 6px;">
-		                <Option :value="0">全部数据</Option>
+		                <Option :value="0">所有公司发票</Option>
 		                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		            </Select>
 				</div>

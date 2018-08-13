@@ -61,7 +61,8 @@
 		</Card>
 		
     	<!--会计部分-->
-    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
+    	<!--v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)"-->
+    	<Card>
     		
     		<h2 slot="title">{{Info.accountName}}（会计）</h2>
     		
@@ -163,7 +164,7 @@ export default {
         	formInline: {
         		money: '',//金额
         		companyId: '',//公司id
-        		invoiceNum: '',//发票编号
+        		invoiceNum: null,//发票编号
         	},
         	ruleInline: {
         		money: [

@@ -181,7 +181,7 @@ export default {
     		this.getCompanyBasicforms(companyId)//获取公司基本表单数据
     		
     	},
-    	getCompanyBasicforms(id){//获取公司基本表单数据
+    	getCompanyBasicforms(id,companyArr = []){//获取公司基本表单数据
     		
     		this.$axios.post('Service/CompanyField/get_by_id', {
 				company_id: id,		
@@ -192,11 +192,27 @@ export default {
 				
 				if(response.status == 200){
 					
+					let index = 0;
+					
 					response.data.setting.forEach(item => {
 						
 						if(item.value != ''){
 							
+							index++;
+							
 							arr.push(item);
+							
+							companyArr.forEach(item2 => {
+								
+								if(item.field.indexOf(item2.field) >= 0){
+									
+									arr.splice(index,1)
+									
+									index = -1;
+									
+								}
+								
+							})
 							
 						}
 						
@@ -206,6 +222,8 @@ export default {
 				
 				this.companyBasicforms = arr;
 				
+				console.log(this.companyBasicforms);
+				
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -213,6 +231,8 @@ export default {
     		
     	},
     	handleSubmit(name) {//提交发票
+    		
+    		console.log(this.companyBasicforms);
     		
             this.$refs[name].validate((valid) => {
             	
@@ -239,6 +259,8 @@ export default {
     					user_id: localStorage.getItem('userId'),
     					
     					money: this.formInline.money,
+    					
+    					invoice_number: null,
     					
 					})
 					.then(response => {
@@ -272,7 +294,7 @@ export default {
             
        	},
        	imgShow(id){//图片显示
-       		console.log(123213123123123);
+       		
 			if(this.$refs.uploadInstance){
 				
 				this.$refs.uploadInstance.imgData = {//上传的图片数据
@@ -395,6 +417,14 @@ export default {
 		
 		invoiceAllData(v){
 			
+			let vLength = 0;
+			
+			for(let item in v){
+				vLength++;
+			}
+			
+			if(vLength <= 0) return false;
+			
 			let accountantArr = [];
 			
 			let companyArr = [];
@@ -414,7 +444,7 @@ export default {
 			});
 			
     		if(v.company_id != 0){
-				this.getCompanyBasicforms(v.company_id)//获取公司基本表单数据
+				this.getCompanyBasicforms(v.company_id,companyArr)//获取公司基本表单数据
 			}
     		
     		this.formInline.companyId = v.company_id;//公司ID
