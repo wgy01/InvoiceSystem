@@ -73,8 +73,7 @@
 		</Card>
 		
     	<!--会计部分-->
-    	<!--v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)"-->
-    	<Card>
+    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
     		
     		<h2 slot="title">{{Info.accountName}}（会计）</h2>
     		

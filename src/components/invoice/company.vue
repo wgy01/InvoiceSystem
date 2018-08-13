@@ -128,7 +128,7 @@ export default {
         	
         	formInline: {
         		money: '',
-        		companyId: '',
+        		companyId: null,
         	},
         	ruleInline: {
         		money: [
@@ -190,29 +190,54 @@ export default {
 				
 				let arr = [];
 				
+				let arr2 = [];
+				
 				if(response.status == 200){
 					
-					let index = 0;
+					arr2 = response.data.setting;
+					
+					for (let i=0;i<arr2.length;i++){
+						
+						for (let j=0;j<companyArr.length;j++){
+							
+							if(arr2[i].field == companyArr[j].field){
+								
+								arr2.splice(i,1);
+								
+								i = 0;
+								
+							}
+							
+						}
+						
+					}
+					
+					console.log(arr2);
 					
 					response.data.setting.forEach(item => {
 						
 						if(item.value != ''){
 							
-							index++;
-							
 							arr.push(item);
 							
-							companyArr.forEach(item2 => {
+							this.formsList.forEach(item2 => {
 								
-								if(item.field.indexOf(item2.field) >= 0){
+								if(item2.field == item.field){
 									
-									arr.splice(index,1)
-									
-									index = -1;
+									item2.value = item.value;
 									
 								}
 								
-							})
+							});
+							
+//							companyArr.forEach(item3 => {
+//								
+//								if(item.field != item3.field){
+//									
+//								}
+//								
+//								
+//							})
 							
 						}
 						
@@ -232,7 +257,7 @@ export default {
     	},
     	handleSubmit(name) {//提交发票
     		
-    		console.log(this.companyBasicforms);
+    		console.log([...this.formsList,...this.companyBasicforms]);
     		
             this.$refs[name].validate((valid) => {
             	
@@ -368,13 +393,21 @@ export default {
 							
 							if(response.data.status != 1){
 								
-								this.$parent.invoiceAllData = response.data;//所有表单数据
+								//if(response.data.company_id == 0){
 								
-								this.formInline2.invoiceURL = '';
-								
-								this.modal = false;
-								
-								this.$Message.success('获取成功');
+									this.$parent.invoiceAllData = response.data;//所有表单数据
+									
+									this.formInline2.invoiceURL = '';
+									
+									this.modal = false;
+									
+									this.$Message.success('获取成功');
+									
+								//}else{
+									
+									//this.$Message.error('编辑后的链接已失效，请从发票列表进行编辑!');
+									
+								//}
 								
 							}else{
 								
@@ -447,7 +480,7 @@ export default {
 				this.getCompanyBasicforms(v.company_id,companyArr)//获取公司基本表单数据
 			}
     		
-    		this.formInline.companyId = v.company_id;//公司ID
+    		this.formInline.companyId = v.company_id != 0 ? v.company_id : null;//公司ID
     		
     		this.formInline.money = v.money.toString() != 0 ? v.money.toString() : '';//金额
 			

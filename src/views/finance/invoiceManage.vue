@@ -276,7 +276,11 @@ export default {
                 {
                 	width: 160,
                     title: '开票完成时间',
-                    key: 'update_time'
+                    render: (h, params) => {
+                    	
+                    	return h('span',params.row.invoice_time || '- -')
+                    	
+                    }
                 },
 //              {
 //                  title: '链接',
@@ -338,9 +342,9 @@ export default {
     		
 			(async() => {
 				
-				this.companyId = companyId;
+				this.companyId = 0;
 				
-				this.tableData = await companyInvoiceList(companyId);
+				this.tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));
 				
 			})();
     		
@@ -458,7 +462,27 @@ export default {
 				next(vm => {
 					
 					if(templateForms){
-						vm.invoiceAllData = templateForms;//发票模板表单数据
+						
+						if(templateForms.status != 1){
+								
+							if(templateForms.company_id == 0){
+							
+								vm.invoiceAllData = templateForms;//发票模板表单数据
+								
+								vm.$Message.success('获取成功');
+								
+							}else{
+								
+								vm.$Message.error('编辑后的链接已失效，请从发票列表进行编辑!');
+								
+							}
+							
+						}else{
+							
+							vm.$Message.error('已开票的链接不能再编辑!');
+							
+						}
+						
 					}
 					
 					if(companyDataList){//公司列表
