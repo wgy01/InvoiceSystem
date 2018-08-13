@@ -21,6 +21,18 @@
 		        
 		    </Form>
 		    
+		    <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;">
+    			
+    			<Col span="4" style="text-align: right;">
+    				<label style="width: 182px;text-align: right;font-size: 12px;">开票金额(元)：</label>
+    			</Col>
+    			
+    			<Col span="20">
+    				{{formInline.money}}
+    			</Col>
+    			
+    		</Row>
+		    
 		    <forms-template
             ref="formsInstance1"
             @on-change="formsChange"
@@ -73,6 +85,18 @@
 		        </FormItem>
 		        
 		    </Form>
+    		
+    		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;">
+    			
+    			<Col span="4" style="text-align: right;">
+    				<label style="width: 182px;text-align: right;font-size: 12px;">发票编号：</label>
+    			</Col>
+    			
+    			<Col span="20">
+    				{{formInline.invoiceNum}}
+    			</Col>
+    			
+    		</Row>
     		
     		<forms-template
             ref="formsInstance2"
@@ -392,6 +416,8 @@ export default {
         			this.accountantFormsData = accountantArr;//会计数据
 					
 					this.formInline.money = response.data.money.toString();//开票金额
+					
+					this.formInline.invoiceNum = response.data.invoice_number;//发票编号
 					
 					this.formInline.companyId = response.data.company_id;//公司id
 					
