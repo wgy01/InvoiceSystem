@@ -54,7 +54,7 @@
 				<!--编辑显示-->
 				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') < 0" span="24">
 					<FormItem :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate2">
-						<Input :disabled="NoHandle" :placeholder="placeholder(item.remark)" :clearable="!NoHandle"  v-model="item.value" style="max-width: 400px;"></Input>
+						<Input :disabled="NoHandle || noEdit(item.field)" :placeholder="placeholder(item.remark)" :clearable="!NoHandle && !noEdit(item.field)"  v-model="item.value" style="max-width: 400px;"></Input>
 					</FormItem>
 				</Col>
 				
@@ -186,6 +186,19 @@ export default {
         		if(remark) txt = remark;
         	}
         	return txt;
+        },
+        noEdit(field){
+        	
+        	let tf = false;
+        	
+        	if(field == 'organizer_code' || field == 'telphone' || field == 'address' || field == 'bank_name' || field == 'account'){
+        		
+        		tf = true;
+        		
+        	}
+        	
+        	return tf
+        	
         },
 		
     },

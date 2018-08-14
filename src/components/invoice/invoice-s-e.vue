@@ -9,8 +9,8 @@
     		
 			<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
 				
-				<FormItem label="需要开票的公司" prop="companyId">
-		        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="max-width: 200px;">
+				<FormItem label="需要开票的单位" prop="companyId">
+		        	<Select v-model="formInline.companyId" @on-change="companyChange" filterable placeholder="选择公司" style="max-width: 200px;">
 		                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		            </Select>
 		        </FormItem>
@@ -208,6 +208,10 @@ export default {
         	
         	userType: localStorage.getItem('userType'),//用户类型
         	
+        	companyBasicforms: [],//公司基本表单数据
+        	
+        	invoiceAllData: [],//所有字段数据
+        	
         	companyFormsData: [],//公司数据
         	
         	accountantFormsData: [],//会计数据
@@ -227,6 +231,8 @@ export default {
         	companyImgList: [],//公司图片列表
         	
         	accountantImgList: [],//会计图片列表
+        	
+        	tf: true,
         	
         }
     },
@@ -266,22 +272,138 @@ export default {
 			});
     		
     	},
+    	companyChange(companyId){//选择公司时触发
+    		
+    		if(!this.tf){
+    			
+	    		let companyArr = [];
+	    		
+	    		this.invoiceAllData.forEach(item => {
+					
+					if(item.user_type == 2){//公司
+						
+						companyArr.push(item);
+						
+					}
+					
+				});
+	    		
+	    		this.companyFormsData = companyArr;
+	    		
+	    		this.getCompanyBasicforms(companyId,this.companyFormsData)//获取公司基本表单数据
+	    		
+    		}
+    		
+    		this.tf = false;
+    		
+    	},
+    	getCompanyBasicforms(id,companyArr){//获取公司基本表单数据
+    		
+    		this.$axios.post('Service/CompanyField/get_by_id', {
+				company_id: id,		
+			})
+			.then(response => {
+				
+				let arr = [];
+				
+				let arr2 = [];
+				
+				if(response.status == 200){
+					
+					arr = response.data.setting;
+					
+					response.data.setting.forEach(item => {
+						
+						if(item.value != ''){//替换已存在并且value有值的数据
+							
+							this.formsList.forEach(item2 => {
+								
+								if(item2.field == item.field){
+									
+									item2.value = item.value;
+									
+								}
+								
+							});
+							
+						}else{//删除已存在的空数据
+							
+							for(let i=0;i<companyArr.length;i++){
+								
+								if(companyArr[i].field == item.field){
+									
+									companyArr.splice(i,1);
+									
+									i = 0;
+									
+								}
+								
+							}
+							
+						}
+						
+					});
+					
+					//数组去重
+					for (let i=0;i<arr.length;i++){
+						
+						let j = 0;
+						
+						while(j<companyArr.length){
+							
+							if(arr[i].field == companyArr[j].field){
+								
+								arr.splice(i,1);
+								
+								i = -1;
+								
+								break;
+								
+							}
+							
+							j++;
+							
+						}
+						
+					}
+					
+					//筛选value值不为空的数据
+					arr.forEach(item => {
+						
+						if(item.value != ''){
+							
+							arr2.push(item);
+							
+						}
+						
+					})
+					
+				}
+				
+				this.companyBasicforms = arr2;
+				
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+    		
+    	},
     	handleSubmit() {//保存发票
     		
 			this.$refs['formInline'].validate((valid) => {
 				
             	let [A1,B1,A2,B2] = [true,true,true,true];
 				
-				this.$refs.formsInstance1.verification((valid) => {
-					A1 = valid;
-	    		},(valid) => {
-	    			B1 = valid;
+				this.$refs.formsInstance1.verification((valid2) => {
+					A1 = valid2;
+	    		},(valid3) => {
+	    			B1 = valid3;
 	    		});
 	    		
-				this.$refs.formsInstance2.verification((valid) => {
-					A2 = valid;
-	    		},(valid3) => {
-	    			B2 = valid;
+				this.$refs.formsInstance2.verification((valid4) => {
+					A2 = valid4;
+	    		},(valid5) => {
+	    			B2 = valid5;
 	    		});
 	    		
                 if (valid) {
@@ -294,7 +416,7 @@ export default {
 								
 		    					id: this.dataID,
 		    					
-		    					conf: JSON.stringify(this.formsList),
+		    					conf: JSON.stringify([...this.formsList,...this.companyBasicforms]),
 		    					
 		    					url: this.imgData.imgSubmitData.join('|'),
 		    					
@@ -410,9 +532,13 @@ export default {
 						}
 					});
 					
+					this.invoiceAllData = response.data.conf;//所有字段数据
+					
 					this.companyFormsData = companyArr;//公司数据
         	
         			this.accountantFormsData = accountantArr;//会计数据
+					
+					this.getCompanyBasicforms(response.data.company_id,this.companyFormsData)//获取公司基本表单数据
 					
 					this.formInline.money = response.data.money.toString();//开票金额
 					

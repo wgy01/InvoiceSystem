@@ -200,6 +200,16 @@ export default {
                     key: 'id'
                 },
                 {
+                	fixed: 'left',
+                	minWidth: 150,
+                    title: '发票编号',
+                    render: (h, params) => {
+                   	
+                   		return h('span',params.row.invoice_number || '- -')
+                   	
+                   	}
+                },
+                {
                 	ellipsis: true,
                 	fixed: 'left',
                 	minWidth: 150,
@@ -275,7 +285,7 @@ export default {
                 },
                 {
                 	width: 160,
-                    title: '开票完成时间',
+                    title: '开票时间',
                     render: (h, params) => {
                     	
                     	return h('span',params.row.invoice_time || '- -')
@@ -353,7 +363,7 @@ export default {
     		
 			(async() => { //es7异步函数
 				
-				if(this.userType == 1){
+				if(this.userType == 1){//会计
 					
 					let tableData = await accountantInvoiceList();
 					
@@ -369,9 +379,19 @@ export default {
 					
 					this.tableData = tableArr;
 					
-				}else if(this.userType == 2){
+				}else if(this.userType == 2){//用户
 					
-					this.tableData = await companyInvoiceList(this.companyId);
+					console.log(this.companyId);
+					
+					if(this.companyId == 0){
+	    			
+		    			this.tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));//所有公司发票列表
+		    			
+		    		}else{
+		    			
+		    			this.tableData = await companyInvoiceList(this.companyId);
+		    			
+		    		}
 					
 				}
 				
