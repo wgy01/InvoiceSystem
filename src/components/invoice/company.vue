@@ -292,7 +292,24 @@ export default {
     	},
     	handleSubmit(name) {//提交发票
     		
-    		console.log([...this.formsList,...this.companyBasicforms]);
+    		let allArrData = [...this.formsList,...this.companyBasicforms];
+    		
+    		
+    		function sortNumber(a,b){//排序
+				return b - a
+			}
+    		
+    		let arr = [];
+    		
+    		allArrData.forEach(item => {
+    			
+    			arr.push(item.sort);
+    			
+    		});
+    		console.log(arr.sort(sortNumber));
+    		
+    		
+    		//console.log([...this.formsList,...this.companyBasicforms]);
     		
             this.$refs[name].validate((valid) => {
             	

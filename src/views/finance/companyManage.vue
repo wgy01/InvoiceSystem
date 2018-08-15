@@ -55,6 +55,9 @@
 			
 		</Card>
 		
+		<input type="file" accept=".xlsx,.xls" @change="importf" />
+		<div id="demo"></div>
+		
 	</div>
 	
 </template>
@@ -64,6 +67,8 @@
 import listComponent from '@/components/list-component.vue';
 
 import axios from 'axios';
+
+import XLSX from 'xlsx';
 
 let companyList = () => {
 
@@ -156,6 +161,64 @@ export default {
     },
     methods: {//方法
     	
+    	
+    	importf(ev) {//导入
+    			
+    			let el = ev.target;
+    			
+    			var wb;//读取完成的数据
+    			
+            	var rABS = false; //是否将文件读取为二进制字符串
+    			
+                if(!el.files) {
+                    return;
+                }
+                
+                console.log(el.files);
+                
+                var f = el.files[0];
+                
+                var reader = new FileReader();
+                
+                reader.onload = function(e) {
+                	
+                	
+                    var data = e.target.result;
+                    
+                    console.log(e.target);
+                    
+                    if(rABS) {
+                    	
+                        wb = XLSX.read(btoa(fixdata(data)), {//手动转化
+                            type: 'base64'
+                        });
+                        
+                    } else {
+                    	
+                        wb = XLSX.read(data, {
+                            type: 'binary'
+                        });
+                        
+                    }
+                    
+                    //wb.SheetNames[0]是获取Sheets中第一个Sheet的名字
+                    //wb.Sheets[Sheet名]获取第一个Sheet的数据
+                    
+                    //console.log(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]));
+                    
+                    document.getElementById("demo").innerHTML= JSON.stringify( XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) );
+                };
+                
+                if(rABS) {
+                    reader.readAsArrayBuffer(f);
+                } else {
+                	console.log(123123123);
+                    reader.readAsBinaryString(f);
+                }
+                
+            },
+
+    	
     	rules(item){//验证
     		
     		if(item.field == 'organizer_code'){
@@ -174,6 +237,8 @@ export default {
     	handleSubmit(name) {//创建公司
     		
             this.$refs[name].validate((valid) => {
+            	
+            	console.log(this.companyFormsList.data);
             	
                 if (valid) {
                 	
@@ -264,7 +329,7 @@ export default {
 					if(item.user_type == 2 && item.is_base == 1){
 					
 						companyFieldList.push(item);
-					
+						
 					}
 				
 				});

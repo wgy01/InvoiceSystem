@@ -15,11 +15,11 @@
 					
 					<div style="text-align: center;margin-bottom:24px;">
 						<RadioGroup v-model="accountType">
-					        <Radio :label="1">
-					            <span>会计账户</span>
-					        </Radio>
 					        <Radio :label="2">
-					            <span>公司账户</span>
+					            <span>申请开票</span>
+					        </Radio>
+					        <Radio :label="1">
+					            <span>开票</span>
 					        </Radio>
 				        </RadioGroup>
 					</div>
