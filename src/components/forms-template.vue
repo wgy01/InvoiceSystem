@@ -162,6 +162,7 @@ export default {
     			value: '',
 				user_type: this.userType,
 				remark: '',
+				sort: 1,
     		});
     		
 		},

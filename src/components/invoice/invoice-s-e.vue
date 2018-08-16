@@ -232,8 +232,6 @@ export default {
         	
         	accountantImgList: [],//会计图片列表
         	
-        	tf: true,
-        	
         }
     },
     methods: {//方法
@@ -274,7 +272,7 @@ export default {
     	},
     	companyChange(companyId){//选择公司时触发
     		
-    		if(!this.tf){
+    		if(this.userType == 2 && this.type == 'edit'){
     			
 	    		let companyArr = [];
 	    		
@@ -293,8 +291,6 @@ export default {
 	    		this.getCompanyBasicforms(companyId,this.companyFormsData)//获取公司基本表单数据
 	    		
     		}
-    		
-    		this.tf = false;
     		
     	},
     	getCompanyBasicforms(id,companyArr){//获取公司基本表单数据
@@ -382,6 +378,10 @@ export default {
 				
 				this.companyBasicforms = arr2;
 				
+				this.companyBasicforms.forEach(item => {
+					console.log(item.name);
+				})
+				
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -389,6 +389,16 @@ export default {
     		
     	},
     	handleSubmit() {//保存发票
+    		
+    		let allArrData = [...this.formsList,...this.companyBasicforms];
+    		
+    		let sortArr = [];
+    		
+    		function sortNumber(a,b) {//排序函数
+				return b.sort - a.sort;
+			}
+    		
+    		sortArr = allArrData.sort(sortNumber);
     		
 			this.$refs['formInline'].validate((valid) => {
 				
@@ -416,7 +426,7 @@ export default {
 								
 		    					id: this.dataID,
 		    					
-		    					conf: JSON.stringify([...this.formsList,...this.companyBasicforms]),
+		    					conf: JSON.stringify(sortArr),
 		    					
 		    					url: this.imgData.imgSubmitData.join('|'),
 		    					
@@ -538,7 +548,9 @@ export default {
         	
         			this.accountantFormsData = accountantArr;//会计数据
 					
-					this.getCompanyBasicforms(response.data.company_id,this.companyFormsData)//获取公司基本表单数据
+					if(this.userType == 2 && this.type == 'edit'){
+						this.getCompanyBasicforms(response.data.company_id,this.companyFormsData)//获取公司基本表单数据
+					}
 					
 					this.formInline.money = response.data.money.toString();//开票金额
 					

@@ -294,22 +294,13 @@ export default {
     		
     		let allArrData = [...this.formsList,...this.companyBasicforms];
     		
+    		let sortArr = [];
     		
-    		function sortNumber(a,b){//排序
-				return b - a
+    		function sortNumber(a,b) {//排序函数
+				return b.sort - a.sort;
 			}
     		
-    		let arr = [];
-    		
-    		allArrData.forEach(item => {
-    			
-    			arr.push(item.sort);
-    			
-    		});
-    		console.log(arr.sort(sortNumber));
-    		
-    		
-    		//console.log([...this.formsList,...this.companyBasicforms]);
+    		sortArr = allArrData.sort(sortNumber);
     		
             this.$refs[name].validate((valid) => {
             	
@@ -327,7 +318,7 @@ export default {
 						
     					id: this.invoiceAllData.id,
     					
-    					conf: JSON.stringify([...this.formsList,...this.companyBasicforms]),
+    					conf: JSON.stringify(sortArr),
     					
     					url: this.imgData.imgSubmitData.join('|'),
     					
