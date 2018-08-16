@@ -12,16 +12,23 @@
 					
 					<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
 						
+						<FormItem label="开票公司" prop="companyId">
+				        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="max-width: 250px;">
+				                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+				            </Select>
+				        </FormItem>
+						
 				        <FormItem label="选择模板" prop="templateID">
-				        	<Select v-model="formInline.templateID" filterable placeholder="选择模板" @on-change="selectChange" style="width: 200px;">
+				        	<Select v-model="formInline.templateID" filterable placeholder="选择模板" @on-change="selectChange" style="width: 250px;">
 				                <Option v-for="item in templateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 				            </Select>
-				            <Button type="primary" @click="onClickUrl('formInline')">点击生成链接</Button>
 				        </FormItem>
+				        
+				        <Button type="primary" @click="onClickUrl('formInline')">点击生成链接</Button>
 				        
 				    </Form>
 					
-					<div style="display: flex;padding: 16px 0;">
+					<div style="display: flex;padding: 26px 0 16px;">
 						
 						<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
 							<Icon type="link"></Icon>
@@ -82,17 +89,23 @@ export default {
 			default: () => {return []}
 		},
 		
+		companyDataList: Array,
+		
 	},
     data () {//数据
         return {
         	
         	formInline: {
         		templateID: '',
+        		companyId: '',
         	},
         	
         	ruleInline: {
                 templateID: [
                     { type: 'number', required: true, message: '请选择模板', trigger: 'change' }
+                ],
+                companyId: [
+                    { type: 'number', required: true, message: '请选择公司', trigger: 'change' }
                 ],
         	},
         	
@@ -161,7 +174,7 @@ export default {
 						if(response.status == 200){
 							
 							this.$axios.post('Service/Order/add', {
-				    			user_account: localStorage.getItem('userId'),
+				    			company_account: this.formInline.companyId,
 				    			template_id: this.formInline.templateID,
 							})
 							.then(response => {
@@ -202,6 +215,11 @@ export default {
 		templateList(){//默认模板
 			if(this.templateList && this.templateList.length > 0){
 	    		this.formInline.templateID = this.templateList[0].value;
+	    	}
+		},
+		companyDataList(){//默认模板
+			if(this.companyDataList && this.companyDataList.length > 0){
+	    		this.formInline.companyId = this.companyDataList[0].value;
 	    	}
 		},
 		

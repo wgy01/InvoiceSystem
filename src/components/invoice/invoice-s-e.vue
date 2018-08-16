@@ -558,9 +558,9 @@ export default {
 					
 					this.formInline.companyId = response.data.company_id;//公司id
 					
-					this.Info.accountName = response.data.mixture.data.account.title;//获取会计公司名称
+					this.Info.accountName = response.data.mixture.account.title;//获取会计公司名称
 					
-					this.Info.ticketName = response.data.mixture.data.ticket.title;//获取用户公司名称
+					this.Info.ticketName = response.data.mixture.ticket.title;//获取用户公司名称
 					
 					this.$parent.$parent.status = response.data.status;//发票状态
 					

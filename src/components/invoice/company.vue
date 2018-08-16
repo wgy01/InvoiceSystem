@@ -27,7 +27,7 @@
 		<!--显示操作发票模块-->
 		<Card v-if="invoiceAllData.id">
 			
-			<h1 slot="title">{{invoiceAllData.mixture.data.account.title}}（创建发票链接公司）</h1>
+			<h1 slot="title">{{invoiceAllData.mixture.account.title}}（创建发票链接公司）</h1>
 			
 			<div>
 				
@@ -42,18 +42,6 @@
 			        <FormItem label="开票金额(元)" prop="money">
 			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
 			        </FormItem>
-			        
-			        <!--<FormItem label="转款时间" prop="money">
-			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
-			        </FormItem>
-			        
-			        <FormItem label="联系人" prop="money">
-			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
-			        </FormItem>
-			        
-			        <FormItem label="手机号码" prop="money">
-			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
-			        </FormItem>-->
 			        
 			    </Form>
 			    

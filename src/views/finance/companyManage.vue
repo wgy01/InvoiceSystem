@@ -238,8 +238,6 @@ export default {
     		
             this.$refs[name].validate((valid) => {
             	
-            	console.log(this.companyFormsList.data);
-            	
                 if (valid) {
                 	
                 	this.$axios.post('Service/Company/add', {

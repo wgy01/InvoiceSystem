@@ -5,6 +5,7 @@
 	    <accountant
     	v-if="userType == 1"
     	:templateList="templateList"
+    	:companyDataList="companyDataList"
     	style="margin-bottom: 16px;"
     	>
 	    </accountant>
@@ -23,9 +24,9 @@
 			
 			<div slot="title" style="display: flex;align-items: center;">
 				<h1>发票列表</h1>
-				<div v-if="userType == 2" style="margin-left: auto;">
+				<div style="margin-left: auto;">
 					<label style="font-size: 12px;">查看公司发票</label>
-		        	<Select v-model="companyId" filterable placeholder="选择公司" @on-change="companyChange" style="width: 200px;margin-left: 6px;">
+		        	<Select v-model="companyId" filterable placeholder="选择公司" @on-change="companyChange" style="width: 250px;margin-left: 6px;">
 		                <Option :value="0">所有公司发票</Option>
 		                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
 		            </Select>
@@ -55,7 +56,7 @@ import listComponent from '@/components/list-component.vue';
 
 import axios from 'axios';
 
-let template = () => {//模板列表
+let template = () => {//模板列表（会计接口）
 
 	return new Promise(resolve => {
 
@@ -73,7 +74,7 @@ let template = () => {//模板列表
 
 }
 
-let templateShow = () => {//公司发票模板表单显示
+let templateShow = () => {//公司发票模板表单显示（用户接口）
 
 	return new Promise(resolve => {
 
@@ -91,7 +92,7 @@ let templateShow = () => {//公司发票模板表单显示
 
 }
 
-let companyList = () => {//公司列表
+let companyList = () => {//公司列表（公共接口）
 
 	return new Promise(resolve => {
 
@@ -109,12 +110,12 @@ let companyList = () => {//公司列表
 
 }
 
-let accountantInvoiceList = () => {//会计发票列表
+let companyInvoiceList = (companyID) => {//根据公司ID获取发票列表
 
 	return new Promise(resolve => {
 
-		axios.post('Service/Order/account_list', {
-			account_id: localStorage.getItem('userId'),
+		axios.post('Service/Order/get_by_company', {
+			cid: companyID,
 		})
 		.then(response => {
 			resolve(response.data || []);
@@ -127,30 +128,12 @@ let accountantInvoiceList = () => {//会计发票列表
 
 }
 
-let companyInvoiceList = (companyID) => {//公司发票列表
-
-	return new Promise(resolve => {
-
-		axios.post('Service/Order/ticket_list', {
-			company_id: companyID,
-		})
-		.then(response => {
-			resolve(response.data);
-		})
-		.catch(function(error) {
-			console.log(error);
-		});
-
-	});
-
-}
-
-let AllcompanyInvoiceList = (userID) => {//所有公司发票列表
+let AllcompanyInvoiceList = () => {//所有公司发票列表（公共接口）
 
 	return new Promise(resolve => {
 
 		axios.post('Service/Order/index', {
-			user_id: userID,
+			user_id: localStorage.getItem('userId'),
 		})
 		.then(response => {
 			resolve(response.data || []);
@@ -236,11 +219,11 @@ export default {
                     	
                     	if(this.userType == 1){
                     		
-                    		txt = params.row.mixture.data.ticket.title;
+                    		txt = params.row.mixture.ticket.title;
                     		
                     	}else if(this.userType == 2){
                     		
-                    		txt = params.row.mixture.data.account.title;
+                    		txt = params.row.mixture.account.title;
                     		
                     	}
                     	
@@ -332,16 +315,46 @@ export default {
     		
     		(async() => {
     			
-	    		if(val == 0){
+    			if(this.userType == 1){//会计
+					
+					let tableData = [];
+					
+					if(val == 0){
 	    			
-	    			this.tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));//所有公司发票列表
+		    			tableData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			
+		    		}else{
+		    			
+		    			tableData = await companyInvoiceList(val);//单个公司发票列表
+		    			
+		    		}
+					
+					let tableArr = [];
+					
+					tableData.forEach(item => {
+						
+						if(item.company_id != 0){
+							tableArr.push(item);
+						}
+						
+					})
+					
+					this.tableData = tableArr;
+					
+				}else if(this.userType == 2){//用户
+					
+					if(val == 0){
 	    			
-	    		}else{
-	    			
-	    			this.tableData = await companyInvoiceList(val);
-	    			
-	    		}
-	    			
+		    			this.tableData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			
+		    		}else{
+		    			
+		    			this.tableData = await companyInvoiceList(val);//单个公司发票列表
+		    			
+		    		}
+					
+				}
+    			
     		})();
     		
     		
@@ -365,7 +378,17 @@ export default {
 				
 				if(this.userType == 1){//会计
 					
-					let tableData = await accountantInvoiceList();
+					let tableData = [];
+					
+					if(this.companyId == 0){
+	    			
+		    			tableData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			
+		    		}else{
+		    			
+		    			tableData = await companyInvoiceList(this.companyId);//单个公司发票列表
+		    			
+		    		}
 					
 					let tableArr = [];
 					
@@ -381,15 +404,13 @@ export default {
 					
 				}else if(this.userType == 2){//用户
 					
-					console.log(this.companyId);
-					
 					if(this.companyId == 0){
 	    			
-		    			this.tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));//所有公司发票列表
+		    			this.tableData = await AllcompanyInvoiceList();//所有公司发票列表
 		    			
 		    		}else{
 		    			
-		    			this.tableData = await companyInvoiceList(this.companyId);
+		    			this.tableData = await companyInvoiceList(this.companyId);//单个公司发票列表
 		    			
 		    		}
 					
@@ -430,11 +451,14 @@ export default {
 		
 		(async() => { //es7异步函数
 			
+			//-------------公用--------------------------------------------------
+			tableData = await AllcompanyInvoiceList();//所有公司发票列表
+			
+			companyDataList = await companyList();//公司列表
+			
 			if(localStorage.getItem('userType') == 1){//会计
 				
 				templateList = await template();//模板列表
-				
-				tableData = await accountantInvoiceList();//发票列表
 				
 				next(vm => {//回调
 					
@@ -451,6 +475,18 @@ export default {
 						vm.templateList = arr;
 					}
 					
+					if(companyDataList){//公司列表
+						let arr = [];
+						companyDataList.forEach(item => {
+							arr.push({
+								label: item.title,
+								value: item.id,
+							});
+						})
+						vm.companyDataList = arr;
+					}
+					
+					//列出用户已编辑的发票列表数据
 					let tableArr = [];
 					
 					tableData.forEach(item => {
@@ -466,10 +502,6 @@ export default {
 				})
 				
 			}else if(localStorage.getItem('userType') == 2){//用户
-				
-				companyDataList = await companyList();//公司列表
-				
-				tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));//所有公司发票列表
 				
 				if(sessionStorage.getItem('params')){
 					
