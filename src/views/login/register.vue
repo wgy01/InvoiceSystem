@@ -26,15 +26,17 @@
 					
 					<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="100">
 						
-				        <FormItem label="邮箱" prop="email">
+				        <FormItem label="手机号码" prop="mobileNumber">
 				        	
-				        	<AutoComplete
-						        v-model="formInline.email"
+				        	<!--<AutoComplete
+						        v-model="formInline.mobileNumber"
 						        @on-search="handleSearch"
-						        placeholder="邮箱"
+						        placeholder="手机号码"
 						    >
 						        <Option v-for="item in hintList" :value="item" :key="item">{{ item }}</Option>
-						    </AutoComplete>
+						    </AutoComplete>-->
+						    
+						    <Input v-model="formInline.mobileNumber" placeholder="手机号码"></Input>
 				        	
 				        </FormItem>
 				        
@@ -110,7 +112,7 @@ export default {
         	hintList: [],
         	
         	formInline: {
-        		email: '',
+        		mobileNumber: '',
                 password: '',
                 passwdCheck: '',
             },
@@ -121,8 +123,9 @@ export default {
                 passwdCheck: [
                     { required: true, validator: validatePassCheck, trigger: 'blur' }
                 ],
-                email: [
-                    { required: true, message: '请输入邮箱', trigger: 'blur' }
+                mobileNumber: [
+                    { required: true, message: '请输入手机号码', trigger: 'blur' },
+                    { type: 'string', min: 11, max: 11, message: '手机号码格式错误', trigger: 'blur' }
                 ],
             },
         	
@@ -168,7 +171,7 @@ export default {
             })
             
         },
-        handleSearch (value) {
+        handleSearch (value) {//自动完成
             this.hintList = !value || value.indexOf('@') >= 0 ? [] : [
                 value + '@qq.com',
                 value + '@sina.com',

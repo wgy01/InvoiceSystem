@@ -15,7 +15,7 @@
 					
 					<Form ref="formInline" :model="formInline" :rules="ruleInline">
 						<FormItem prop="user">
-							<Input type="text" @on-enter="handleSubmit('formInline')" v-model="formInline.user" placeholder="账号">
+							<Input type="text" @on-enter="handleSubmit('formInline')" v-model="formInline.user" placeholder="手机号码">
 								<Icon type="ios-person-outline" slot="prepend"></Icon>
 							</Input>
 						</FormItem>
@@ -55,7 +55,7 @@ export default {
 			ruleInline: {
 				user: [{
 					required: true,
-					message: '账号不能为空',
+					message: '手机号不能为空',
 					trigger: 'blur'
 				}],
 				password: [{
