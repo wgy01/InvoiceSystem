@@ -24,7 +24,7 @@
 		    <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;">
     			
     			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;">开票金额(元)：</label>
+    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">开票金额(元)：</label>
     			</Col>
     			
     			<Col span="20">
@@ -56,7 +56,7 @@
 	        <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;margin-top: 26px;border-top: 1px solid #e9eaec;">
     			
     			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;">图片文件：</label>
+    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
     			</Col>
     			
     			<Col span="20">
@@ -88,7 +88,7 @@
     		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;">
     			
     			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;">发票编号：</label>
+    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">发票编号：</label>
     			</Col>
     			
     			<Col span="20">
@@ -122,7 +122,7 @@
     		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;margin-top: 20px;border-top: 1px solid #e9eaec;">
     			
     			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;">图片文件：</label>
+    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
     			</Col>
     			
     			<Col span="20">

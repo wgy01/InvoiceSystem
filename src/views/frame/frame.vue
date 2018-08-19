@@ -722,11 +722,11 @@
 	.Content{
 		width:100%;
 		background:#f8f8f9;
-		padding:15px;
 		position: absolute;
 		top:0;
 		bottom:0;
 		overflow: auto;
+		padding: 26px 16px 200px;
 	}
 	.hCard .box{
 		position: relative;

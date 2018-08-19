@@ -8,15 +8,17 @@
 	        </FormItem>
 	    </Form>
 	    
-	    <Card dis-hover v-if="type == 'show'" style="margin-bottom: 16px;">
+	    <Card :bordered="false" dis-hover style="margin-bottom: 16px;">
 	    	
-	    	<h2 slot="title">模板说明</h2>
+	    	<h2 slot="title">模板说明：</h2>
 	    	
-	    	<div>{{remark}}</div>
+	    	<p style="padding-left: 26px;">
+	    		{{remark}}
+	    	</p>
 	    	
 	    </Card>
 	    
-	    <Card dis-hover style="margin-bottom: 16px;">
+	    <Card :bordered="false" dis-hover style="margin-bottom: 16px;">
 	    	
 	    	<h2 slot="title">公司字段</h2>
 	    	
@@ -32,7 +34,7 @@
 	    	
 	    </Card>
 	    
-	    <Card dis-hover>
+	    <Card :bordered="false" dis-hover>
 	    	
 	    	<h2 slot="title">会计字段</h2>
 	    	

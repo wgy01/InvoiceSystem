@@ -28,12 +28,12 @@
 				</Col>
 				
 				<!--详情显示-->
-				<Col span="4" v-if="showType == 'show' && item.is_add != 0" style="font-size: 12px;line-height: 20px;text-align: right;padding: 6px 0;">
+				<Col span="4" v-if="showType == 'show' && item.is_add != 0" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;padding: 6px 0;">
 					{{item.name}}：
 				</Col>
 				
 				<!--模板默认字段-->
-				<Col span="4" v-if="item.is_add == 0 && showType != 'edit2'" style="font-size: 12px;line-height: 20px;text-align: right;padding: 6px 0;">
+				<Col span="4" v-if="item.is_add == 0 && showType != 'edit2'" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;padding: 6px 0;">
 					{{item.name}}：
 				</Col>
 				
