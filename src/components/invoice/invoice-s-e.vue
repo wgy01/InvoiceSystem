@@ -310,7 +310,7 @@ export default {
     			
     		}else{
     			
-    			this.$Message.error('信息不全！');
+    			this.$Message.error('信息不全，查询失败！');
     			
     		}
     		
