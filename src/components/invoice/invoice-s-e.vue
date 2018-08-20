@@ -2,8 +2,58 @@
 
 	<div>
 		
+		<Card v-if="type == 'show' && status == 1" :bordered="false" dis-hover style="margin-bottom: 16px;">
+			
+			<h2 slot="title">物流信息</h2>
+			
+			<div>
+				
+				<Row>
+					
+					<Col span="10">
+						
+						<Row style="padding: 6px 0;">
+    			
+			    			<Col span="8" style="text-align: right;">
+			    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">快递公司：</label>
+			    			</Col>
+			    			
+			    			<Col span="16">
+			    				{{expressInfo.company}}
+			    			</Col>
+			    			
+			    		</Row>
+						
+					</Col>
+					
+					<Col span="10">
+						
+						<Row style="padding: 6px 0;">
+    			
+			    			<Col span="8" style="text-align: right;">
+			    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">快递单号：</label>
+			    			</Col>
+			    			
+			    			<Col span="16">
+			    				{{expressInfo.odd}}
+			    			</Col>
+			    			
+			    		</Row>
+						
+					</Col>
+					
+					<Col span="4">
+						<Button type="primary" @click="expressQuery">快递查询</Button>
+					</Col>
+					
+				</Row>
+	    		
+			</div>
+			
+		</Card>
+		
 		<!--用户部分-->
-		<Card style="margin-bottom: 16px;">
+		<Card :bordered="false" dis-hover style="margin-bottom: 16px;">
 			
     		<h2 slot="title">{{Info.ticketName}}（用户）</h2>
     		
@@ -53,7 +103,7 @@
 		        </FormItem>
 		    </Form>
 		    
-	        <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;margin-top: 26px;border-top: 1px solid #e9eaec;">
+	        <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;margin-top: 12px;">
     			
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
@@ -73,7 +123,7 @@
 		</Card>
 		
     	<!--会计部分-->
-    	<Card v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
+    	<Card :bordered="false" dis-hover v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
     		
     		<h2 slot="title">{{Info.accountName}}（会计）</h2>
     		
@@ -119,7 +169,7 @@
     			
     		</Form>
     		
-    		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;margin-top: 20px;border-top: 1px solid #e9eaec;">
+    		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;margin-top: 12px;">
     			
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
@@ -187,7 +237,7 @@ export default {
         	formInline: {
         		money: '',//金额
         		companyId: '',//公司id
-        		invoiceNum: null,//发票编号
+        		invoiceNum: '',//发票编号
         	},
         	ruleInline: {
         		money: [
@@ -232,6 +282,12 @@ export default {
         	
         	accountantImgList: [],//会计图片列表
         	
+        	expressInfo: {//快递信息
+        		company: '',
+        		coding: '',
+        		odd: '',
+        	},
+        	
         }
     },
     methods: {//方法
@@ -244,6 +300,20 @@ export default {
     	del(data){//删除时触发
     		
     		this.imgData = data;
+    		
+    	},
+    	expressQuery(){//快递查询
+    		
+    		if(this.expressInfo.coding && this.expressInfo.odd){
+    			
+    			window.open("https://www.kuaidi100.com/chaxun?com="+ this.expressInfo.coding +"&nu="+ this.expressInfo.odd);
+    			
+    		}else{
+    			
+    			this.$Message.error('信息不全！');
+    			
+    		}
+    		
     		
     	},
     	companyList(){//公司列表
@@ -529,17 +599,49 @@ export default {
 				
 				if(response.status == 200){
 					
+					if(this.type == 'edit' && response.data.status == 1){
+						
+						this.$parent.$parent.modalShow = false;
+						
+						this.$parent.$parent.$parent.$parent.updateData();
+						
+						return false;
+						
+					}
+					
 					let accountantArr = [];
 							
 					let companyArr = [];
 					
 					response.data.conf.forEach(item => {
+						
 						if(item.user_type == 1){//会计
 							accountantArr.push(item);
 						}
+						
 						if(item.user_type == 2){//公司
 							companyArr.push(item);
 						}
+						
+						if(this.type == 'show' && response.data.status == 1){
+							
+							if(item.field == "express_company"){
+							
+								this.expressInfo.company = item.value;//快递公司名称
+							
+								this.expressInfo.coding = item.coding;//快递公司代码
+							
+							}
+						
+							if(item.field == "express_number"){
+							
+								this.expressInfo.odd = item.value;//快递单号
+							
+							}
+							
+						}
+						
+						
 					});
 					
 					this.invoiceAllData = response.data.conf;//所有字段数据

@@ -6,7 +6,7 @@
     	v-if="userType == 1"
     	:templateList="templateList"
     	:companyDataList="companyDataList"
-    	style="margin-bottom: 16px;"
+    	style="margin-bottom: 4px;"
     	>
 	    </accountant>
 		
@@ -16,7 +16,7 @@
 		:invoiceAllData="invoiceAllData"
 		:companyDataList="companyDataList"
 		@on-submit="submitSucceed"
-		style="margin-bottom: 16px;"
+		style="margin-bottom: 4px;"
 		>
 		</company>
 		
@@ -194,40 +194,21 @@ export default {
                 },
                 {
                 	ellipsis: true,
-                	fixed: 'left',
                 	minWidth: 150,
-                    renderHeader: (h, params) => {
-                    	
-                    	let title = '';
-                    	
-                    	if(this.userType == 1){
-                    		
-                    		title = '需要开票公司 (用户)';
-                    		
-                    	}else if(this.userType == 2){
-                    		
-                    		title = '开票公司 (会计)';
-                    		
-                    	}
-                    	
-                    	return h('span',title)
-                    	
-                    },
+                	title: '开票公司 (会计)',
                     render: (h, params) => {
                     	
-                    	let txt = '';
+                    	return h('span',params.row.mixture.account.title)
                     	
-                    	if(this.userType == 1){
-                    		
-                    		txt = params.row.mixture.ticket.title;
-                    		
-                    	}else if(this.userType == 2){
-                    		
-                    		txt = params.row.mixture.account.title;
-                    		
-                    	}
+                    }
+                },
+                {
+                	ellipsis: true,
+                	minWidth: 150,
+                	title: '需要开票公司 (用户)',
+                    render: (h, params) => {
                     	
-                    	return h('span',txt)
+                    	return h('span',params.row.mixture.ticket.title)
                     	
                     }
                 },
@@ -520,6 +501,8 @@ export default {
 							if(templateForms.company_id == 0){
 							
 								vm.invoiceAllData = templateForms;//发票模板表单数据
+								
+								vm.$refs.companyInstance.modal = true;
 								
 								vm.$Message.success('获取成功');
 								

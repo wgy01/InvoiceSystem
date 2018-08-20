@@ -1,0 +1,13 @@
+
+{
+	"express_company": [
+		{
+			"label": "圆通速递",
+			"value": "yuantong"
+		},
+		{
+			"label": "韵达快运",
+			"value": "yunda"
+		}
+	]
+}

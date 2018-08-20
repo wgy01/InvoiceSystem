@@ -52,7 +52,7 @@
 				</Col>
 				
 				<!--编辑显示-->
-				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') < 0" span="24">
+				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') < 0 && item.field.indexOf('express_company') < 0" span="24">
 					<FormItem :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate2">
 						<Input :disabled="NoHandle || noEdit(item.field)" :placeholder="placeholder(item.remark)" :clearable="!NoHandle && !noEdit(item.field)"  v-model="item.value" style="max-width: 400px;"></Input>
 					</FormItem>
@@ -62,6 +62,15 @@
 				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') >= 0" span="24">
 					<FormItem :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate3">
 						<DatePicker :disabled="NoHandle" type="date" :value="item.value" @on-change="dateChange(index,$event)" placeholder="选择日期" style="width: 200px"></DatePicker>
+					</FormItem>
+				</Col>
+				
+				<!--下拉-->
+				<Col v-if="showType == 'edit2' && item.field.indexOf('express_company') >= 0" span="24">
+					<FormItem :label="item.name" :prop="'data.' + index + '.coding'" :rules="NoHandle ? [] : labelValidate4">
+						<Select :label-in-value="true" filterable :value="item.coding" @on-change="selectExpressC(index,$event)" style="width:200px">
+					        <Option v-for="item2 in expressCompanyList" :value="item2.value" :key="item2.value">{{ item2.label }}</Option>
+					    </Select>
 					</FormItem>
 				</Col>
 				
@@ -101,6 +110,9 @@
 </template>
 
 <script>
+	
+const expressData = require('../../static/public/express_company.json')
+	
 export default {
 	components:{//组件模板
 		
@@ -139,13 +151,21 @@ export default {
         	labelValidate: [
                 { required: true, message: '必须输入名称', trigger: 'blur' }
             ],
+            
         	labelValidate2: [
                 { required: true, message: '必须输入内容', trigger: 'blur' }
             ],
+            
         	labelValidate3: [
                 { required: true, message: '请选择日期', trigger: 'change' }
             ],
-        	
+            
+        	labelValidate4: [
+                { required: true, message: '请选择快递公司', trigger: 'change' }
+            ],
+            
+            expressCompanyList: expressData.express_company,//快递公司列表
+            	
         }
     },
     methods: {//方法
@@ -153,6 +173,13 @@ export default {
     	dateChange(index,date){//格式化时间
     		
     		this.formsList.data[index].value = date;
+    		
+    	},
+    	selectExpressC(index,arr){//选择快递公司
+    		
+    		this.formsList.data[index].value = arr.label;
+    		
+    		this.formsList.data[index].coding = arr.value;
     		
     	},
     	add(){//添加
@@ -163,6 +190,7 @@ export default {
 				user_type: this.userType,
 				remark: '',
 				sort: 1,
+				coding: '',
     		});
     		
 		},
@@ -224,6 +252,7 @@ export default {
     	
 	},
     mounted () {//模板被渲染完毕之后执行
+    	
 	},
 	
 }

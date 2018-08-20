@@ -2,17 +2,29 @@
 
 	<div>
 		
-		<Card style="margin-bottom:16px;">
-			
-			<h1 slot="title">创建模板</h1>
-			
-			<add-template
-			:companyDefault="companyDefault"
-			:accountantDefault="accountantDefault"
-			>
-			</add-template>
-			
+		<Card shadow style="margin-bottom:4px;">
+			<Button type="primary" @click="modal = true;">创建模板</Button>
 		</Card>
+		
+		<Modal v-model="modal" width="80%">
+			
+	        <p slot="header">创建模板</p>
+	        
+	        <div>
+	        	
+	        	<add-template
+				:companyDefault="companyDefault"
+				:accountantDefault="accountantDefault"
+				>
+				</add-template>
+	        	
+	        </div>
+	        
+	        <div slot="footer">
+	        	<Button @click="modal = false;">关闭</Button>
+	        </div>
+	        
+	    </Modal>
 		
 		<Card>
 			
@@ -92,6 +104,8 @@ export default {
     data () {//数据
         return {
         	
+        	modal: false,
+        	
         	companyDefault: [],//默认表单数据
         	
         	accountantDefault: [],//默认表单数据
@@ -125,9 +139,39 @@ export default {
     	
     	updateData(){//更新表格数据
     		
+    		let formsData = [];
+		
+			let company = [];
+			
+			let accountant = [];
+    		
 			(async() => { //es7异步函数
 			
 				this.tableData = await ajax();
+				
+				formsData = await getDefaultForms();
+				
+				formsData.forEach(item => {
+					
+					if(item.is_base == 0){
+						
+						if(item.user_type == 1){
+							
+							accountant.push(item);
+							
+						}else if(item.user_type == 2){
+							
+							company.push(item);
+							
+						}
+						
+					}
+					
+				});
+				
+				this.companyDefault = company;
+        	
+        		this.accountantDefault = accountant;
 				
 			})();
 			

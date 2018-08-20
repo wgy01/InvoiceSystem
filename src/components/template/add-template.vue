@@ -14,7 +14,7 @@
 	        
 	    </Form>
 	    
-	    <Card dis-hover style="margin-bottom: 16px;">
+	    <Card :bordered="false" dis-hover style="margin-bottom: 16px;">
 	    	
 	    	<h2 slot="title">公司字段</h2>
 	    	
@@ -30,7 +30,7 @@
 	    	
 	    </Card>
 	    
-	    <Card dis-hover>
+	    <Card :bordered="false" dis-hover>
 	    	
 	    	<h2 slot="title">会计字段</h2>
 	    	
@@ -150,12 +150,18 @@ export default {
 			})
 			.then(response => {
 				if(response.status == 200){
+					
 					this.$parent.$parent.updateData();
+					
 					this.formInline = {
 		        		name: '',
 		        		remark: '',
 		        	};
+		        	
+		        	this.$parent.$parent.modal = false;
+		        	
 					this.$Message.success('创建成功');
+					
 				}
 			})
 			.catch(function (error) {

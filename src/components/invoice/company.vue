@@ -2,78 +2,94 @@
 
 	<div>
 		
-		<!--发票获取弹窗-->
-		<Modal v-model="modal" width="70%">
-	        <p slot="header">获取发票</p>
-	        <div>
-	        	<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="70">
-			        <FormItem label="发票链接" prop="invoiceURL">
-			            <Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接"></Input>
-			        </FormItem>
-			    </Form>
-	        </div>
-	        <div slot="footer">
-	        	<Button @click="modal = false">关闭</Button>
-	        	<Button type="primary" @click="handleSubmit2('formInline2')">获取发票</Button>
-	        </div>
-	    </Modal>
-	    
-	    <Card style="margin-bottom: 16px;">
-	    	
-	    	<Button type="primary" @click="modal = true">获取发票</Button>
-	    	
-	    </Card>
-	    
-		<!--显示操作发票模块-->
-		<Card v-if="invoiceAllData.id">
-			
-			<h1 slot="title">{{invoiceAllData.mixture.account.title}}（创建发票链接公司）</h1>
-			
-			<div>
-				
-    			<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
-		
-					<FormItem label="需要开票的单位" prop="companyId">
-			        	<Select v-model="formInline.companyId" @on-change="companyChange" filterable placeholder="选择公司" style="max-width: 200px;">
-			                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-			            </Select>
-			        </FormItem>
-					
-			        <FormItem label="开票金额(元)" prop="money">
-			            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
-			        </FormItem>
-			        
-			    </Form>
-			    
-			    <forms-template
-	            ref="formsInstance1"
-	            @on-change="formsChange"
-	            :NoHandle="false"
-	            :user-type="2"
-	            :out-forms-data="companyFormsData"
-	            show-type="edit2"
-	            >
-	            </forms-template>
-			    
-			    <Form :label-width="120">
-			        <FormItem label="上传图片文件">
-			        	<upload
-			        	ref="uploadInstance"
-			    		:img-list="companyImgList"
-			    		@on-success="uploadSuccess"
-			    		@on-del="del">
-				    	</upload>
-			        </FormItem>
-			    </Form>
-	    			
-			    <div style="text-align: center;">
-			    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
-			    </div>
-			    
-			</div>
-			
+		<Card shadow>
+			<Button type="primary" @click="modal = true">获取发票</Button>
 		</Card>
 		
+		<Modal v-model="modal" width="70%">
+			
+	        <p slot="header">获取发票</p>
+	        
+	        <div>
+	        	
+	        	<div style="margin-bottom: 36px;">
+	        		
+		        	<Form ref="formInline2" :model="formInline2" :rules="ruleInline2" :label-width="80">
+		        		
+				        <FormItem label="发票链接" prop="invoiceURL">
+				        	
+				        	<div style="display: flex;align-items: center;">
+				        		
+				        		<Input v-model="formInline2.invoiceURL" clearable placeholder="输入链接"></Input>
+				        		
+				        		<Button type="primary" @click="handleSubmit2('formInline2')" style="margin-left: 10px;flex-shrink: 0;">获取发票</Button>
+				        		
+				        	</div>
+				        	
+				        </FormItem>
+				        
+				    </Form>
+				    
+	        	</div>
+			    
+			    <!--显示操作发票模块-->
+				<Card :bordered="false" dis-hover v-if="invoiceAllData.id">
+					
+					<h1 slot="title">{{invoiceAllData.mixture.account.title}}（--创建发票链接的公司--）</h1>
+					
+					<div>
+						
+		    			<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
+				
+							<FormItem label="需要开票的单位" prop="companyId">
+					        	<Select v-model="formInline.companyId" @on-change="companyChange" filterable placeholder="选择公司" style="max-width: 200px;">
+					                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+					            </Select>
+					        </FormItem>
+							
+					        <FormItem label="开票金额(元)" prop="money">
+					            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
+					        </FormItem>
+					        
+					    </Form>
+					    
+					    <forms-template
+			            ref="formsInstance1"
+			            @on-change="formsChange"
+			            :NoHandle="false"
+			            :user-type="2"
+			            :out-forms-data="companyFormsData"
+			            show-type="edit2"
+			            >
+			            </forms-template>
+					    
+					    <Form :label-width="120">
+					        <FormItem label="上传图片文件">
+					        	<upload
+					        	ref="uploadInstance"
+					    		:img-list="companyImgList"
+					    		@on-success="uploadSuccess"
+					    		@on-del="del">
+						    	</upload>
+					        </FormItem>
+					    </Form>
+			    			
+					    <div style="text-align: center;">
+					    	<Button type="primary" @click="handleSubmit('formInline')">提交发票</Button>
+					    </div>
+					    
+					</div>
+					
+				</Card>
+			    
+	        </div>
+	        
+	        <div slot="footer">
+	        	<Button @click="modal = false">关闭</Button>
+	        </div>
+	        
+	    </Modal>
+	    
 	</div>
 	
 </template>
@@ -335,6 +351,8 @@ export default {
 							
 							this.$emit('on-submit',this.formInline.companyId);
 							
+							this.modal = false;
+							
 							this.$Message.success('提交成功');
 							
 						}
@@ -424,21 +442,19 @@ export default {
 							
 							if(response.data.status != 1){
 								
-								//if(response.data.company_id == 0){
+								if(response.data.company_id == 0){
 								
 									this.$parent.invoiceAllData = response.data;//所有表单数据
 									
 									this.formInline2.invoiceURL = '';
 									
-									this.modal = false;
-									
 									this.$Message.success('获取成功');
 									
-								//}else{
+								}else{
 									
-									//this.$Message.error('编辑后的链接已失效，请从发票列表进行编辑!');
+									this.$Message.error('编辑后的链接已失效，请从发票列表进行编辑!');
 									
-								//}
+								}
 								
 							}else{
 								

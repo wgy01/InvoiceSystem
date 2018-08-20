@@ -2,66 +2,75 @@
 
 	<div>
 		
-		<Collapse>
+		<Card shadow>
+			<Button type="primary" @click="modal = true;">创建发票链接</Button>
+		</Card>
+		
+		<Modal v-model="modal" width="80%">
 			
-	        <Panel>
+	        <p slot="header">创建发票链接</p>
+	        
+	        <div>
 	        	
-	        	<span>创建发票链接</span>
-	        	
-				<div slot="content">
+	        	<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
+						
+					<FormItem label="开票公司" prop="companyId">
+			        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="max-width: 250px;">
+			                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+			            </Select>
+			        </FormItem>
 					
-					<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
-						
-						<FormItem label="开票公司" prop="companyId">
-				        	<Select v-model="formInline.companyId" filterable placeholder="选择公司" style="max-width: 250px;">
-				                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-				            </Select>
-				        </FormItem>
-						
-				        <FormItem label="选择模板" prop="templateID">
-				        	<Select v-model="formInline.templateID" filterable placeholder="选择模板" @on-change="selectChange" style="width: 250px;">
-				                <Option v-for="item in templateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-				            </Select>
-				        </FormItem>
-				        
-				        <Button type="primary" @click="onClickUrl('formInline')">点击生成链接</Button>
-				        
-				    </Form>
+			        <FormItem label="选择模板" prop="templateID">
+			        	<Select v-model="formInline.templateID" filterable placeholder="选择模板" @on-change="selectChange" style="width: 250px;">
+			                <Option v-for="item in templateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+			            </Select>
+			        </FormItem>
+			        
+			        <Button type="primary" @click="onClickUrl('formInline')">点击生成链接</Button>
+			        
+			    </Form>
+				
+				<div style="display: flex;padding: 26px 0 16px;">
 					
-					<div style="display: flex;padding: 26px 0 16px;">
+					<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
+						<Icon type="link"></Icon>
+						<span>点击链接进行复制：</span>
+					</label>
+					
+					<div class="Masked-box">
 						
-						<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
-							<Icon type="link"></Icon>
-							<span>点击链接进行复制：</span>
-						</label>
-						
-						<div class="Masked-box">
-							<div class="Masked" v-show="masked">
-								<Icon type="information-circled"></Icon>
-								<span>链接已更新，请重新生成</span>
-							</div>
-							<a v-clipboard:copy="invoiceUrl" v-clipboard:success="onCopy">{{invoiceUrl}}</a>
+						<div class="Masked" v-show="masked">
+							<Icon type="information-circled"></Icon>
+							<span>链接已更新，请重新生成</span>
 						</div>
 						
-				    </div>
-				    
-				    <Card style="margin-top: 16px">
-						
-						<h1 slot="title">模板预览</h1>
-						
-						<template-s-e
-			        	type="show"
-			        	:dataID="Number(formInline.templateID)"
-			        	>
-			        	</template-s-e>
-						
-					</Card>
+						<Tooltip content="点击链接进行复制" placement="top">
+							<a v-clipboard:copy="invoiceUrl" v-clipboard:success="onCopy">{{invoiceUrl}}</a>
+				        </Tooltip>
+				        
+					</div>
 					
-				</div>
-						
-	        </Panel>
+			    </div>
+			    
+			    <Card style="margin-top: 16px">
+					
+					<h1 slot="title">模板预览</h1>
+					
+					<template-s-e
+		        	type="show"
+		        	:dataID="Number(formInline.templateID)"
+		        	>
+		        	</template-s-e>
+					
+				</Card>
+	        	
+	        </div>
 	        
-	    </Collapse>
+	        <div slot="footer">
+	        	<Button @click="modal = false;">关闭</Button>
+	        </div>
+	        
+	    </Modal>
 		
 	</div>
 	
@@ -94,6 +103,8 @@ export default {
 	},
     data () {//数据
         return {
+        	
+        	modal: false,
         	
         	formInline: {
         		templateID: '',
