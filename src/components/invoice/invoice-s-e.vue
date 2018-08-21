@@ -71,7 +71,7 @@
 		        
 		    </Form>
 		    
-		    <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;">
+		    <Row v-if="userType == 1 || type == 'show'" style="padding: 16px 0 6px;">
     			
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">开票金额(元)：</label>
@@ -103,7 +103,7 @@
 		        </FormItem>
 		    </Form>
 		    
-	        <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;margin-top: 12px;">
+	        <Row v-if="userType == 1 || type == 'show'" style="padding: 16px 0 6px;">
     			
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
@@ -129,20 +129,36 @@
     		
     		<Form v-if="userType == 1 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
     			
+				<FormItem label="发票代码" prop="invoiceCode">
+		            <Input v-model="formInline.invoiceCode" clearable placeholder="输入发票代码" style="max-width: 200px;"></Input>
+		        </FormItem>
+		        
 				<FormItem label="发票编号" prop="invoiceNum">
 		            <Input v-model="formInline.invoiceNum" clearable placeholder="输入发票编号" style="max-width: 200px;"></Input>
 		        </FormItem>
 		        
 		    </Form>
     		
-    		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;">
+    		<Row v-if="userType == 2 || type == 'show'" style="padding: 16px 0 6px;">
+    			
+    			<Col span="4" style="text-align: right;">
+    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">发票代码：</label>
+    			</Col>
+    			
+    			<Col span="20" :style="{color: formInline.invoiceCode ? '' : '#bbbec4'}">
+    				{{formInline.invoiceCode || '- -无内容- -'}}
+    			</Col>
+    			
+    		</Row>
+    		
+    		<Row v-if="userType == 2 || type == 'show'" style="padding: 16px 0 6px;">
     			
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">发票编号：</label>
     			</Col>
     			
-    			<Col span="20">
-    				{{formInline.invoiceNum}}
+    			<Col span="20" :style="{color: formInline.invoiceNum ? '' : '#bbbec4'}">
+    				{{formInline.invoiceNum || '- -无内容- -'}}
     			</Col>
     			
     		</Row>
@@ -169,7 +185,7 @@
     			
     		</Form>
     		
-    		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;margin-top: 12px;">
+    		<Row v-if="userType == 2 || type == 'show'" style="padding: 16px 0 6px;">
     			
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
@@ -238,6 +254,7 @@ export default {
         		money: '',//金额
         		companyId: '',//公司id
         		invoiceNum: '',//发票编号
+        		invoiceCode: '',//发票代码
         	},
         	ruleInline: {
         		money: [
@@ -248,6 +265,9 @@ export default {
                 ],
                 invoiceNum: [
                     { required: true, message: '请输入发票编号', trigger: 'blur' }
+                ],
+                invoiceCode: [
+                    { required: true, message: '请输入发票代码', trigger: 'blur' }
                 ],
         	},
         	
@@ -508,6 +528,8 @@ export default {
 		    					
 		    					invoice_number: this.formInline.invoiceNum,
 		    					
+		    					ticket_code: this.formInline.invoiceCode,
+		    					
 							})
 							.then(response => {
 								
@@ -657,6 +679,8 @@ export default {
 					this.formInline.money = response.data.money.toString();//开票金额
 					
 					this.formInline.invoiceNum = response.data.invoice_number;//发票编号
+					
+					this.formInline.invoiceCode = response.data.ticket_code;//发票代码
 					
 					this.formInline.companyId = response.data.company_id;//公司id
 					

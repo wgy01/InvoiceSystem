@@ -185,6 +185,16 @@ export default {
                 {
                 	fixed: 'left',
                 	minWidth: 150,
+                    title: '发票代码',
+                    render: (h, params) => {
+                   	
+                   		return h('span',params.row.ticket_code || '- -')
+                   	
+                   	}
+                },
+                {
+                	fixed: 'left',
+                	minWidth: 150,
                     title: '发票编号',
                     render: (h, params) => {
                    	

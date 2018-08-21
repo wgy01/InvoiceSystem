@@ -334,6 +334,8 @@ export default {
     					
     					invoice_number: '',
     					
+    					ticket_code: '',
+    					
 					})
 					.then(response => {
 						
