@@ -125,7 +125,7 @@ export default {
                 ],
                 mobileNumber: [
                     { required: true, message: '请输入手机号码', trigger: 'blur' },
-                    { type: 'string', min: 11, max: 11, message: '手机号码格式错误', trigger: 'blur' }
+//                  { type: 'string', min: 11, max: 11, message: '手机号码格式错误', trigger: 'blur' }
                 ],
             },
         	
@@ -140,7 +140,7 @@ export default {
                 if (valid) {
                 	
                     this.$axios.post('Service/User/register', {
-                    	username: this.formInline.email,
+                    	username: this.formInline.mobileNumber,
                     	password: this.formInline.password,
                     	user_type: this.accountType,
 					})
@@ -148,10 +148,10 @@ export default {
 						
 						if(response.status == 200){
 							
-							sessionStorage.setItem('loginUserName',this.formInline.email);
+							sessionStorage.setItem('loginUserName',this.formInline.mobileNumber);
 							
 							this.formInline = {
-				        		email: '',
+				        		mobileNumber: '',
 				                password: '',
 				                passwdCheck: '',
 				           	};

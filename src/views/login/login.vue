@@ -59,7 +59,8 @@ export default {
 
 <style scoped>
 	.box{
-		background:url(../../../static/public/images/bg.jpg) center center / cover no-repeat;
+		/*background:url(../../../static/public/images/bg.jpg) center center / cover no-repeat;*/
+		background: #ccc;
 		width:100%;
 		height:100%;
 	}
