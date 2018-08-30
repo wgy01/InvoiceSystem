@@ -125,7 +125,7 @@ export default {
                 ],
                 mobileNumber: [
                     { required: true, message: '请输入手机号码', trigger: 'blur' },
-//                  { type: 'string', min: 11, max: 11, message: '手机号码格式错误', trigger: 'blur' }
+                    { type: 'string', min: 11, max: 11, message: '手机号码格式错误', trigger: 'blur' }
                 ],
             },
         	

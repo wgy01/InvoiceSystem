@@ -6,8 +6,48 @@
 			"value": "yuantong"
 		},
 		{
-			"label": "韵达快运",
+			"label": "韵达快递",
 			"value": "yunda"
+		},
+		{
+			"label": "百世汇通",
+			"value": "huitongkuaidi"
+		},
+		{
+			"label": "百世快运",
+			"value": "baishiwuliu"
+		},
+		{
+			"label": "顺丰速运",
+			"value": "shunfeng"
+		},
+		{
+			"label": "申通快递",
+			"value": "shentong"
+		},
+		{
+			"label": "中通快递",
+			"value": "zhongtong"
+		},
+		{
+			"label": "德邦物流",
+			"value": "debangwuliu"
+		},
+		{
+			"label": "天天快递",
+			"value": "tiantian"
+		},
+		{
+			"label": "宅急送",
+			"value": "zhaijisong"
+		},
+		{
+			"label": "中国邮政EMS-速递",
+			"value": "ems"
+		},
+		{
+			"label": "中国邮政",
+			"value": "youzhengguonei"
 		}
 	]
 }

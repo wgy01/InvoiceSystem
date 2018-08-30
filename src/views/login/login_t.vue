@@ -49,7 +49,7 @@ export default {
 	data() {
 		return {
 			formInline: {
-				user: sessionStorage.getItem('loginUserName') ? sessionStorage.getItem('loginUserName') : '123213@qq.com',
+				user: sessionStorage.getItem('loginUserName') ? sessionStorage.getItem('loginUserName') : '',
 				password:''
 			},
 			ruleInline: {
@@ -85,6 +85,14 @@ export default {
 					.then(function (response) {
 					    if(response.status == 200){//登陆成功
 					    	
+					    	let expires = 172800;//过期时间默认为2天
+					    	
+					    	let currentimeStr = String(new Date().getTime());
+					    	
+					    	let currentimeNum = Number(currentimeStr.substring(0,currentimeStr.length-3));
+					    	
+					    	localStorage.setItem('token',currentimeNum+expires);//登录令牌
+					    	
 							localStorage.setItem('userName',response.data.username);//把用户名存起来
 							
 							localStorage.setItem('userId',response.data.id);//把用户ID存起来
@@ -95,7 +103,7 @@ export default {
 							
 							//localStorage.setItem('isadmin',response.data.user_type);//管理员权限
 							
-							if(sessionStorage.getItem('params') && response.data.user_type == 2){
+							if(sessionStorage.getItem('params') && response.data.user_type == 2){//用户
 								
 								this.$router.replace({
 									name: 'invoicePages'
@@ -103,9 +111,9 @@ export default {
 								
 							}else{
 								
-								if(response.data.user_type == 1){
+								if(response.data.user_type == 1){//会计
 									
-									if(sessionStorage.removeItem('params')){
+									if(sessionStorage.getItem('params')){
 										sessionStorage.removeItem('params')
 									}
 									
@@ -113,7 +121,7 @@ export default {
 										name: 'invoicePages'
 									});
 									
-								}else if(response.data.user_type == 2){
+								}else if(response.data.user_type == 2){//用户
 									
 									this.$router.replace({
 										name: 'addCompany'
@@ -121,6 +129,10 @@ export default {
 									
 								}
 								
+							}
+							
+							if(sessionStorage.getItem('loginUserName')){
+								sessionStorage.removeItem('loginUserName');
 							}
 							
 							this.$Message.success(response.message);

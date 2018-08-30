@@ -17,6 +17,8 @@
 
 import axios from 'axios';
 
+import plant from '@/plant/index.js';//调用工厂
+
 let templateShow = () => {//公司发票模板表单显示
 
 	return new Promise(resolve => {
@@ -80,8 +82,8 @@ export default {
 		
 		let status = '';
 		
-		if(localStorage.getItem('userName') && sessionStorage.getItem('params') && localStorage.getItem('userType') == 2){//已登录并且是公司类型
-
+		if(localStorage.getItem('userName') && sessionStorage.getItem('params') && localStorage.getItem('userType') == 2){//已登录并且是用户登录
+			
 			(async() => {
 			
 				status = await templateShow();
@@ -100,6 +102,12 @@ export default {
 						
 						vm.tf = false;
 						
+						plant.title(to.meta.title);
+						
+						if(sessionStorage.getItem('params')){
+							sessionStorage.removeItem('params');
+						}
+						
 					}
 					
 				});
@@ -107,6 +115,10 @@ export default {
 			})();
 			
 		}else{
+			
+			if(sessionStorage.getItem('params')){
+				sessionStorage.removeItem('params');
+			}
 			
 			next();
 			
@@ -117,7 +129,7 @@ export default {
 		
 		let status = '';
 		
-		if(localStorage.getItem('userName') && sessionStorage.getItem('params') && localStorage.getItem('userType') == 2){//已登录并且是公司类型
+		if(localStorage.getItem('userName') && sessionStorage.getItem('params') && localStorage.getItem('userType') == 2){//已登录并且是用户登录
 
 			this.tf = true;
 			
@@ -135,10 +147,20 @@ export default {
 					
 					this.tf = false;
 					
+					plant.title(to.meta.title);
+					
+					if(sessionStorage.getItem('params')){
+						sessionStorage.removeItem('params');
+					}
+					
 				}
 				
 			})();
 			
+		}
+		
+		if(sessionStorage.getItem('params')){
+			sessionStorage.removeItem('params');
 		}
 		
 		next();

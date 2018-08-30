@@ -147,7 +147,7 @@
 									        </a>
 									        <DropdownMenu slot="list">
 									        	
-									            <DropdownItem name="myCenter">
+									            <!--<DropdownItem name="myCenter">
 									            	<Icon type="person" size="14"></Icon>
 									            	<span>个人中心</span>
 									            </DropdownItem>
@@ -155,7 +155,7 @@
 									            <DropdownItem name="set">
 									            	<Icon type="gear-a" size="14"></Icon>
 									            	<span>设置</span>
-									            </DropdownItem>
+									            </DropdownItem>-->
 									            
 									            <DropdownItem name="exit">
 									            	<Icon type="log-out" size="14"></Icon>

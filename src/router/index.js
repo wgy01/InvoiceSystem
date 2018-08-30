@@ -39,7 +39,7 @@ router.beforeEach((to, from, next) => {
 		
 	}
 	
-	else if(sessionStorage.getItem('locking') === '0' && to.name === 'locking') {
+	else if(sessionStorage.getItem('locking') === '0' && to.name === 'locking') {//已锁定
 		
 		//console.log('已锁定');
 		next(false);//中断所有路由
@@ -48,14 +48,32 @@ router.beforeEach((to, from, next) => {
 	
 	else {
 		
-		if(!localStorage.getItem('userName') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
+		if(localStorage.getItem('token')){//已登录(判断过期时间)
+			
+			let currentimeStr = String(new Date().getTime());
+		
+			let currentimeNum = Number(currentimeStr.substring(0,currentimeStr.length-3));
+			
+			if(Number(localStorage.getItem('token')) < currentimeNum){//已过期
+				
+				localStorage.clear();// 从localStorage删除所有保存的数据
+				
+				sessionStorage.clear();// 从sessionStorage删除所有保存的数据
+				
+				router.app.$Message.warning('登录信息已过期，请重新登录！');
+				
+			}
+			
+		}
+		
+		if(!localStorage.getItem('token') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
 			
 			//console.log('未登录，而且当前页面不是登录页');
 			next({
 				name: 'login'//这里表示要跳转到name值为'login'的路由(通过name来显示页面)
 			});
 			
-		}else if(localStorage.getItem('userName') && to.name === 'login') { // 判断是否已经登录且前往的是登录页
+		}else if(localStorage.getItem('token') && to.name === 'login') { // 判断是否已经登录且前往的是登录页
 			
 			//console.log('已经登录，而且当前页面是登录页');
 			next({
@@ -98,7 +116,17 @@ router.beforeEach((to, from, next) => {
 				
 				//console.log('没有要判断权限的路由');
 				plant.toDefaultPage([...routers], to.name, router, next);// 如果在地址栏输入的是一级菜单则默认打开其第一个二级菜单的页面
-				plant.title(to.meta.title);
+				
+				if(to.name == 'error-404' && to.params[0] && localStorage.getItem('userType') == 2){
+					
+					plant.title('');
+					
+				}else{
+					
+					plant.title(to.meta.title);
+					
+				}
+				
 				//router.app.$Message.info('This is a info tip');//iview的this在路由使用全局提示
 				
 			}
