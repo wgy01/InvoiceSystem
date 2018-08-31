@@ -31,8 +31,8 @@
 			    </Form>
 				
 				
-				<div style="padding: 26px 0 16px;">
-					<Alert type="warning" :show-icon="true">
+				<div style="padding: 16px 0">
+					<Alert type="info" :show-icon="true" style="max-width: 500px;margin-bottom: 20px;">
 						注意：生成的链接会计用户没有权限访问，只有公司用户才有权限访问。
 					</Alert>
 					<div style="display: flex;">

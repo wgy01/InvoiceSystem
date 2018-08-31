@@ -51,6 +51,10 @@
 					            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
 					        </FormItem>
 					        
+					        <FormItem label="地区选择" prop="areaData">
+					        	<al-selector class="my-class-al-selector" v-model="formInline.areaData" :searchable="true" data-type="code" />
+					        </FormItem>
+					        
 					    </Form>
 					    
 					    <forms-template
@@ -133,6 +137,7 @@ export default {
         	formInline: {
         		money: '',
         		companyId: null,
+        		areaData: [],
         	},
         	ruleInline: {
         		money: [
@@ -140,6 +145,9 @@ export default {
                 ],
                 companyId: [
                     { type: 'number', required: true, message: '请选择公司', trigger: 'change' }
+                ],
+                areaData: [
+                    { type: 'array', required: true, message: '请选择地区', trigger: 'change' }
                 ],
         	},
         	
@@ -331,6 +339,14 @@ export default {
     					invoice_number: '',
     					
     					ticket_code: '',
+    					
+    					province: this.formInline.areaData[0] || '',
+    					
+    					city: this.formInline.areaData[1] || '',
+    					
+    					area: this.formInline.areaData[2] || '',
+    					
+    					street: this.formInline.areaData[3] || '',
     					
 					})
 					.then(response => {
@@ -554,4 +570,11 @@ export default {
 </script>
 
 <style scoped>
+</style>
+
+<style>
+	.my-class-al-selector .ivu-row{
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
 </style>

@@ -32,6 +32,9 @@ Vue.prototype.$axios = ajax;//挂载到Vue
 import VueClipboard from 'vue-clipboard2'
 Vue.use(VueClipboard)
 
+import iviewArea from 'iview-area';//地区四级联动插件
+Vue.use(iviewArea);
+
 //主组件
 import App from './App'
 
