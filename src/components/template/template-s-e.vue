@@ -4,11 +4,11 @@
 		
 		<Form v-if="type == 'edit'" :label-width="60">
 	        <FormItem label="模板说明">
-	            <Input v-model="remark" type="textarea" :rows="1" placeholder="输入说明"></Input>
+	            <Input v-model="remark" placeholder="输入说明"></Input>
 	        </FormItem>
 	    </Form>
 	    
-	    <Card :bordered="false" dis-hover style="margin-bottom: 16px;">
+	    <Card v-if="type == 'show'" :bordered="false" dis-hover style="margin-bottom: 16px;">
 	    	
 	    	<h2 slot="title">模板说明：</h2>
 	    	

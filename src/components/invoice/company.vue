@@ -284,10 +284,6 @@ export default {
 				
 				this.companyBasicforms = arr2;
 				
-				this.companyBasicforms.forEach(item => {
-					console.log(item.name);
-				})
-				
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -348,6 +344,8 @@ export default {
 								imgSubmitData: [],//需要提交的图片数据
 				        		
 				        	};
+				        	
+				        	this.formInline2.invoiceURL = '';
 				        	
 				        	this.companyImgList = [];//公司图片列表
 							
@@ -448,19 +446,17 @@ export default {
 								
 									this.$parent.invoiceAllData = response.data;//所有表单数据
 									
-									this.formInline2.invoiceURL = '';
-									
 									this.$Message.success('获取成功');
 									
 								}else{
 									
-									this.$Message.error('编辑后的链接已失效，请从发票列表进行编辑!');
+									this.$Message.warning('链接已失效！');
 									
 								}
 								
 							}else{
 								
-								this.$Message.error('已完成的发票不能再编辑!');
+								this.$Message.warning('链接已失效！');
 								
 							}
 							

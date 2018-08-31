@@ -518,13 +518,13 @@ export default {
 								
 							}else{
 								
-								vm.$Message.error('编辑后的链接已失效，请从发票列表进行编辑!');
+								this.$Message.warning('链接已失效！');//用户编辑后，再使用此链接
 								
 							}
 							
 						}else{
 							
-							vm.$Message.error('已开票的链接不能再编辑!');
+							this.$Message.warning('链接已失效！');//完成开票后，再使用此链接
 							
 						}
 						

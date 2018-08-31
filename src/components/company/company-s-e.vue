@@ -20,7 +20,7 @@
 	        	
 	        	<Col span="12">
 	        		<FormItem label="公司描述">
-			            <Input type="textarea" :rows="1" v-model="companyFormsList.remark" clearable placeholder="公司描述..."></Input>
+			            <Input v-model="companyFormsList.remark" clearable placeholder="公司描述..."></Input>
 			        </FormItem>
 	        	</Col>
 	        	

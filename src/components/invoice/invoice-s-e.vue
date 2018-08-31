@@ -621,11 +621,17 @@ export default {
 				
 				if(response.status == 200){
 					
-					if(this.type == 'edit' && response.data.status == 1){
+					if(this.type == 'edit' && response.data.status == 1){//开票完成的发票不能进行编辑
 						
 						this.$parent.$parent.modalShow = false;
 						
 						this.$parent.$parent.$parent.$parent.updateData();
+						
+		                this.$Notice.error({
+		                    title: '开票已经完成，您不能再进行编辑此发票！',
+		                    desc: '',
+		                    duration: 6,
+		                });
 						
 						return false;
 						

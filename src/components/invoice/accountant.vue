@@ -30,27 +30,33 @@
 			        
 			    </Form>
 				
-				<div style="display: flex;padding: 26px 0 16px;">
-					
-					<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
-						<Icon type="link"></Icon>
-						<span>点击链接进行复制：</span>
-					</label>
-					
-					<div class="Masked-box">
+				
+				<div style="padding: 26px 0 16px;">
+					<Alert type="warning" :show-icon="true">
+						注意：生成的链接会计用户没有权限访问，只有公司用户才有权限访问。
+					</Alert>
+					<div style="display: flex;">
 						
-						<div class="Masked" v-show="masked">
-							<Icon type="information-circled"></Icon>
-							<span>链接已更新，请重新生成</span>
+						<label style="flex-shrink: 0;font-weight: bold;color: #ff9900;">
+							<Icon type="link"></Icon>
+							<span>点击链接进行复制：</span>
+						</label>
+						
+						<div class="Masked-box">
+							
+							<div class="Masked" v-show="masked">
+								<Icon type="information-circled"></Icon>
+								<span>链接已更新，请重新生成</span>
+							</div>
+							
+							<Tooltip content="点击链接进行复制" placement="top">
+								<a v-clipboard:copy="invoiceUrl" v-clipboard:success="onCopy">{{invoiceUrl}}</a>
+					        </Tooltip>
+					        
 						</div>
 						
-						<Tooltip content="点击链接进行复制" placement="top">
-							<a v-clipboard:copy="invoiceUrl" v-clipboard:success="onCopy">{{invoiceUrl}}</a>
-				        </Tooltip>
-				        
-					</div>
-					
-			    </div>
+				    </div>
+				</div>
 			    
 			    <Card style="margin-top: 16px">
 					
