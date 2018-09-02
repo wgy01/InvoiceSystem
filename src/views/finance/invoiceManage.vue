@@ -42,6 +42,8 @@
 			
 		</Card>
 		
+		<al-selector v-model="abc" />
+		
 	</div>
 	
 </template>
@@ -163,7 +165,7 @@ export default {
 	},
     data () {//数据
         return {
-        	
+        	abc: [],
         	companyId: 0,
         	
         	templateList: [],
