@@ -34,7 +34,7 @@ import axios from 'axios';
 			formData.append( v , _data[v]);
 			
 		}
-		//console.log('-->发送了数据:',_data);
+		console.log('-->发送了数据:',_data);
 		
 		// console.log('发送了数据:',formData);
 		
@@ -50,7 +50,7 @@ import axios from 'axios';
         let config = _config;
         //如果想每次请求的时候更改配置, 在这里增加config配置项
         
-		//console.log('-->请求了URL('+_config.method+'):',_config.baseURL+_config.url);
+		console.log('-->请求了URL('+_config.method+'):',_config.baseURL+_config.url);
 		
         return config;
         
@@ -63,7 +63,7 @@ import axios from 'axios';
 		
 		function(_res){//在这里对返回的数据进行处理
 			
-			//console.log('<--返回了数据',_res.data);
+			console.log('<--返回了数据',_res.data);
 			
 			if(_res.data.status == 200){//获取数据成功
 				

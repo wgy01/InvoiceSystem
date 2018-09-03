@@ -40,9 +40,11 @@
 			>
 			</list-component>
 			
+			<div>
+				<Page :total="pageInfo.total" show-total show-elevator @on-change="pageChange" />
+			</div>
+			
 		</Card>
-		
-		<al-selector v-model="abc" />
 		
 	</div>
 	
@@ -130,15 +132,17 @@ let companyInvoiceList = (companyID) => {//根据公司ID获取发票列表
 
 }
 
-let AllcompanyInvoiceList = () => {//所有公司发票列表（公共接口）
+let AllcompanyInvoiceList = (pageNum = 1) => {//所有公司发票列表（公共接口）
 
 	return new Promise(resolve => {
 
 		axios.post('Service/Order/index', {
 			user_id: localStorage.getItem('userId'),
+			page: pageNum,
 		})
 		.then(response => {
-			resolve(response.data || []);
+			console.log(response);
+			resolve(response);
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -165,7 +169,13 @@ export default {
 	},
     data () {//数据
         return {
-        	abc: [],
+        	
+        	pageInfo: {//页码信息
+        		total: 0,
+        		currentPage: 1,
+        		pageSize: 10,
+        	},
+        	
         	companyId: 0,
         	
         	templateList: [],
@@ -304,27 +314,41 @@ export default {
     },
     methods: {//方法
     	
+    	pageChange(pageNum){//页码改变
+    		
+    		(async() => {
+    			
+    			let listData = null;
+    			
+    			listData = await AllcompanyInvoiceList(pageNum);//所有公司发票列表
+    			
+				this.tableData = listData.data;
+    			
+    		})();
+    		
+    	},
+    	
     	companyChange(val){//表格筛选公司改变时
     		
     		(async() => {
     			
     			if(this.userType == 1){//会计
 					
-					let tableData = [];
+					let listData = null;
 					
 					if(val == 0){
 	    			
-		    			tableData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			listData = await AllcompanyInvoiceList(1);//所有公司发票列表
 		    			
 		    		}else{
 		    			
-		    			tableData = await companyInvoiceList(val);//单个公司发票列表
+		    			listData = await companyInvoiceList(val);//单个公司发票列表
 		    			
 		    		}
 					
 					let tableArr = [];
 					
-					tableData.forEach(item => {
+					listData.data.forEach(item => {
 						
 						if(item.company_id != 0){
 							tableArr.push(item);
@@ -336,13 +360,19 @@ export default {
 					
 				}else if(this.userType == 2){//用户
 					
+					let listData = null;
+					
 					if(val == 0){
-	    			
-		    			this.tableData = await AllcompanyInvoiceList();//所有公司发票列表
+	    				
+	    				listData = await AllcompanyInvoiceList(1);//所有公司发票列表
+	    				
+		    			this.tableData = listData.data;
 		    			
 		    		}else{
 		    			
-		    			this.tableData = await companyInvoiceList(val);//单个公司发票列表
+		    			listData = await companyInvoiceList(val);//单个公司发票列表
+		    			
+		    			this.tableData = listData.data;
 		    			
 		    		}
 					
@@ -360,7 +390,7 @@ export default {
 				
 				this.companyId = 0;
 				
-				this.tableData = await AllcompanyInvoiceList(localStorage.getItem('userId'));
+				this.tableData = await AllcompanyInvoiceList(1);
 				
 			})();
     		
@@ -371,21 +401,21 @@ export default {
 				
 				if(this.userType == 1){//会计
 					
-					let tableData = [];
+					let listData = null;
 					
 					if(this.companyId == 0){
-	    			
-		    			tableData = await AllcompanyInvoiceList();//所有公司发票列表
-		    			
+	    				
+	    				listData = await AllcompanyInvoiceList(1);//所有公司发票列表
+	    				
 		    		}else{
 		    			
-		    			tableData = await companyInvoiceList(this.companyId);//单个公司发票列表
+		    			listData = await companyInvoiceList(this.companyId);//单个公司发票列表
 		    			
 		    		}
 					
 					let tableArr = [];
 					
-					tableData.forEach(item => {
+					listData.data.forEach(item => {
 						
 						if(item.company_id != 0){
 							tableArr.push(item);
@@ -397,13 +427,20 @@ export default {
 					
 				}else if(this.userType == 2){//用户
 					
+					
+					let listData = null;
+					
 					if(this.companyId == 0){
-	    			
-		    			this.tableData = await AllcompanyInvoiceList();//所有公司发票列表
+	    				
+	    				listData = await AllcompanyInvoiceList(1);//所有公司发票列表
+	    				
+		    			this.tableData = listData.data;
 		    			
 		    		}else{
 		    			
-		    			this.tableData = await companyInvoiceList(this.companyId);//单个公司发票列表
+		    			listData = await companyInvoiceList(this.companyId);//单个公司发票列表
+		    			
+		    			this.tableData = listData.data;
 		    			
 		    		}
 					
@@ -440,20 +477,27 @@ export default {
 		
 		let companyDataList = [];//公司列表数据
 		
-		let tableData = [];//发票列表
+		let listData = null;//发票列表
 		
 		(async() => { //es7异步函数
 			
 			//-------------公用--------------------------------------------------
-			tableData = await AllcompanyInvoiceList();//所有公司发票列表
+			listData = await AllcompanyInvoiceList(1);//所有公司发票列表
 			
 			companyDataList = await companyList();//公司列表
 			
-			if(localStorage.getItem('userType') == 1){//会计
+			//--------------------------会计-----------------------------------
+			if(localStorage.getItem('userType') == 1){
 				
 				templateList = await template();//模板列表
 				
 				next(vm => {//回调
+					
+					vm.pageInfo = {//页码信息
+						total: Number(listData.page_info.record_count),
+		        		currentPage: Number(listData.page_info.page_absolute),
+		        		pageSize: Number(listData.page_info.page_size),
+					}
 					
 					if(templateList){
 						let arr = [];
@@ -477,12 +521,13 @@ export default {
 							});
 						})
 						vm.companyDataList = arr;
+						console.log(vm.companyDataList);
 					}
 					
 					//列出用户已编辑的发票列表数据
 					let tableArr = [];
 					
-					tableData.forEach(item => {
+					listData.data.forEach(item => {
 						
 						if(item.company_id != 0){
 							tableArr.push(item);
@@ -494,7 +539,10 @@ export default {
 					
 				})
 				
-			}else if(localStorage.getItem('userType') == 2){//用户
+			}
+			
+			//--------------------------用户-----------------------------------
+			else if(localStorage.getItem('userType') == 2){
 				
 				if(sessionStorage.getItem('params')){
 					
@@ -505,6 +553,12 @@ export default {
 				}
 				
 				next(vm => {
+					
+					vm.pageInfo = {//页码信息
+						total: Number(listData.page_info.record_count),
+		        		currentPage: Number(listData.page_info.page_absolute),
+		        		pageSize: Number(listData.page_info.page_size),
+					}
 					
 					if(templateForms){
 						
@@ -543,7 +597,7 @@ export default {
 						vm.companyDataList = arr;
 					}
 					
-					vm.tableData = tableData;
+					vm.tableData = listData.data;
 					
 				})
 				
