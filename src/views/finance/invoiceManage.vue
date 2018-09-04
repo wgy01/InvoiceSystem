@@ -22,27 +22,20 @@
 		
 		<Card>
 			
-			<div slot="title" style="display: flex;align-items: center;">
-				<h1>发票列表</h1>
-				<div style="margin-left: auto;">
-					<label style="font-size: 12px;">查看公司发票</label>
-		        	<Select v-model="companyId" filterable placeholder="选择公司" @on-change="companyChange" style="width: 250px;margin-left: 6px;">
-		                <Option :value="0">所有公司发票</Option>
-		                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-		            </Select>
-				</div>
-			</div>
+			<h1 slot="title">发票列表</h1>
 			
 			<list-component
 			:table-columns="tableColumns"
 			:table-data="tableData"
 			component-type="invoiceSE"
+			:total="total"
+			:companyDataList="companyDataList"
+			
+			@on-company-change="companyChange"
+			@on-page-change="pageChange"
+			@on-route-change="routeChange"
 			>
 			</list-component>
-			
-			<div>
-				<Page :total="pageInfo.total" show-total show-elevator @on-change="pageChange" />
-			</div>
 			
 		</Card>
 		
@@ -60,6 +53,15 @@ import listComponent from '@/components/list-component.vue';
 
 import axios from 'axios';
 
+let getUrlParams = (url,name) => {//获取url属性值
+	let startIndex = url.indexOf('?');
+	let parameter = url.substr(startIndex);
+    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+    let r = parameter.substr(1).match(reg);  
+    if (r != null) return unescape(r[2]);
+  	return null;
+};
+
 let template = () => {//模板列表（会计接口）
 
 	return new Promise(resolve => {
@@ -68,7 +70,7 @@ let template = () => {//模板列表（会计接口）
 			user_id: localStorage.getItem('userId')
 		})
 		.then(response => {
-			resolve(response.data);
+			resolve(response.data || []);
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -86,7 +88,7 @@ let templateShow = () => {//公司发票模板表单显示（用户接口）
 			id: sessionStorage.getItem('params')
 		})
 		.then(response => {
-			resolve(response.data || {});
+			resolve(response.data || null);
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -114,15 +116,24 @@ let companyList = () => {//公司列表（公共接口）
 
 }
 
-let companyInvoiceList = (companyID) => {//根据公司ID获取发票列表
-
+let companyInvoiceList = (companyID,currentPage) => {//根据公司ID获取发票列表
+	
+	let urlPageNum = getUrlParams(window.location.href,'currentPage');
+	
+	let urlCompanyId = getUrlParams(window.location.href,'currentCompanyId') || 0;
+	
+	if(!urlPageNum || urlPageNum == 0){
+		urlPageNum = 1;
+	}
+	
 	return new Promise(resolve => {
 
 		axios.post('Service/Order/get_by_company', {
-			cid: companyID,
+			cid: companyID || urlCompanyId,
+			page: currentPage || urlPageNum,
 		})
 		.then(response => {
-			resolve(response.data || []);
+			resolve(response);
 		})
 		.catch(function(error) {
 			console.log(error);
@@ -132,13 +143,19 @@ let companyInvoiceList = (companyID) => {//根据公司ID获取发票列表
 
 }
 
-let AllcompanyInvoiceList = (pageNum = 1) => {//所有公司发票列表（公共接口）
-
+let AllcompanyInvoiceList = (currentPage) => {//所有公司发票列表（公共接口）
+	
+	let urlPageNum = getUrlParams(window.location.href,'currentPage');
+	
+	if(!urlPageNum || urlPageNum == 0){
+		urlPageNum = 1;
+	}
+	
 	return new Promise(resolve => {
 
 		axios.post('Service/Order/index', {
 			user_id: localStorage.getItem('userId'),
-			page: pageNum,
+			page: currentPage || urlPageNum,
 		})
 		.then(response => {
 			console.log(response);
@@ -170,15 +187,9 @@ export default {
     data () {//数据
         return {
         	
-        	pageInfo: {//页码信息
-        		total: 0,
-        		currentPage: 1,
-        		pageSize: 10,
-        	},
+        	total: 0,
         	
-        	companyId: 0,
-        	
-        	templateList: [],
+        	templateList: [],//模板表单列表
         	
         	userType: localStorage.getItem('userType'),
         	
@@ -314,13 +325,51 @@ export default {
     },
     methods: {//方法
     	
-    	pageChange(pageNum){//页码改变
+    	routeChange(){//路由改变时
+    		
+    		(async() => {
+    			
+    			let listData = null;
+				
+				if(this.$route.query.currentCompanyId){
+					
+					if(this.$route.query.currentCompanyId == 0){
+    			
+		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			
+		    		}else{
+		    			
+		    			listData = await companyInvoiceList();//单个公司发票列表
+		    			
+		    		}
+					
+				}else{
+					
+					listData = await AllcompanyInvoiceList();//所有公司发票列表
+					
+				}
+				
+				this.tableData = listData.data;
+    			
+    		})();
+    		
+    	},
+    	
+    	pageChange(){//页码改变
     		
     		(async() => {
     			
     			let listData = null;
     			
-    			listData = await AllcompanyInvoiceList(pageNum);//所有公司发票列表
+    			if(this.$route.query.currentCompanyId == 0){
+    				
+    				listData = await AllcompanyInvoiceList();//所有公司发票列表
+    				
+    			}else{
+    				
+    				listData = await companyInvoiceList();//单个公司发票列表
+    				
+    			}
     			
 				this.tableData = listData.data;
     			
@@ -328,69 +377,54 @@ export default {
     		
     	},
     	
-    	companyChange(val){//表格筛选公司改变时
+    	companyChange(){//公司下拉选择改变时
     		
     		(async() => {
     			
-    			if(this.userType == 1){//会计
-					
-					let listData = null;
-					
-					if(val == 0){
+				let listData = null;
+				
+				if(this.$route.query.currentCompanyId == 0){
+    			
+	    			listData = await AllcompanyInvoiceList();//所有公司发票列表
 	    			
-		    			listData = await AllcompanyInvoiceList(1);//所有公司发票列表
-		    			
-		    		}else{
-		    			
-		    			listData = await companyInvoiceList(val);//单个公司发票列表
-		    			
-		    		}
-					
-					let tableArr = [];
-					
-					listData.data.forEach(item => {
-						
-						if(item.company_id != 0){
-							tableArr.push(item);
-						}
-						
-					})
-					
-					this.tableData = tableArr;
-					
-				}else if(this.userType == 2){//用户
-					
-					let listData = null;
-					
-					if(val == 0){
-	    				
-	    				listData = await AllcompanyInvoiceList(1);//所有公司发票列表
-	    				
-		    			this.tableData = listData.data;
-		    			
-		    		}else{
-		    			
-		    			listData = await companyInvoiceList(val);//单个公司发票列表
-		    			
-		    			this.tableData = listData.data;
-		    			
-		    		}
-					
-				}
+	    		}else{
+	    			
+	    			listData = await companyInvoiceList();//单个公司发票列表
+	    			
+	    		}
+				
+				this.tableData = listData.data;
     			
     		})();
     		
-    		
     	},
-    	submitSucceed(companyId){//提交发票成功时触发
+    	submitSucceed(){//提交发票成功时触发
     		
     		this.invoiceAllData = {};//发票所有数据
     		
 			(async() => {
 				
-				this.companyId = 0;
+				let listData = null;
 				
-				this.tableData = await AllcompanyInvoiceList(1);
+				if(this.$route.query.currentCompanyId){
+					
+					if(this.$route.query.currentCompanyId == 0){
+    			
+		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			
+		    		}else{
+		    			
+		    			listData = await companyInvoiceList();//单个公司发票列表
+		    			
+		    		}
+					
+				}else{
+					
+					listData = await AllcompanyInvoiceList();//所有公司发票列表
+					
+				}
+				
+				this.tableData = listData.data;
 				
 			})();
     		
@@ -399,52 +433,27 @@ export default {
     		
 			(async() => { //es7异步函数
 				
-				if(this.userType == 1){//会计
+				let listData = null;
+				
+				if(this.$route.query.currentCompanyId){
 					
-					let listData = null;
-					
-					if(this.companyId == 0){
-	    				
-	    				listData = await AllcompanyInvoiceList(1);//所有公司发票列表
-	    				
-		    		}else{
-		    			
-		    			listData = await companyInvoiceList(this.companyId);//单个公司发票列表
-		    			
-		    		}
-					
-					let tableArr = [];
-					
-					listData.data.forEach(item => {
-						
-						if(item.company_id != 0){
-							tableArr.push(item);
-						}
-						
-					})
-					
-					this.tableData = tableArr;
-					
-				}else if(this.userType == 2){//用户
-					
-					
-					let listData = null;
-					
-					if(this.companyId == 0){
-	    				
-	    				listData = await AllcompanyInvoiceList(1);//所有公司发票列表
-	    				
-		    			this.tableData = listData.data;
+					if(this.$route.query.currentCompanyId == 0){
+    			
+		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
 		    			
 		    		}else{
 		    			
-		    			listData = await companyInvoiceList(this.companyId);//单个公司发票列表
-		    			
-		    			this.tableData = listData.data;
+		    			listData = await companyInvoiceList();//单个公司发票列表
 		    			
 		    		}
+					
+				}else{
+					
+					listData = await AllcompanyInvoiceList();//所有公司发票列表
 					
 				}
+				
+				this.tableData = listData.data;
 				
 			})();
 			
@@ -471,78 +480,45 @@ export default {
 	
 	beforeRouteEnter (to, from, next) {//在组件创建之前调用
 		
-		let templateList = null;//模板列表
+		let templateList = [];//模板列表
 		
 		let templateForms = null;//模板表单
 		
 		let companyDataList = [];//公司列表数据
 		
-		let listData = null;//发票列表
+		let listData = null;//列表数据
+		
+		let urlCompanyId = getUrlParams(window.location.href,'currentCompanyId');
 		
 		(async() => { //es7异步函数
 			
 			//-------------公用--------------------------------------------------
-			listData = await AllcompanyInvoiceList(1);//所有公司发票列表
 			
-			companyDataList = await companyList();//公司列表
-			
-			//--------------------------会计-----------------------------------
-			if(localStorage.getItem('userType') == 1){
+			if(urlCompanyId){
 				
-				templateList = await template();//模板列表
+				if(urlCompanyId == 0){
 				
-				next(vm => {//回调
-					
-					vm.pageInfo = {//页码信息
-						total: Number(listData.page_info.record_count),
-		        		currentPage: Number(listData.page_info.page_absolute),
-		        		pageSize: Number(listData.page_info.page_size),
-					}
-					
-					if(templateList){
-						let arr = [];
-						templateList.forEach(item => {//模板数据
-							arr.push({
-								label: item.title,
-								value: item.id,
-								setting: item.setting,
-								remark: item.remark,
-							});
-						});
-						vm.templateList = arr;
-					}
-					
-					if(companyDataList){//公司列表
-						let arr = [];
-						companyDataList.forEach(item => {
-							arr.push({
-								label: item.title,
-								value: item.id,
-							});
-						})
-						vm.companyDataList = arr;
-						console.log(vm.companyDataList);
-					}
-					
-					//列出用户已编辑的发票列表数据
-					let tableArr = [];
-					
-					listData.data.forEach(item => {
-						
-						if(item.company_id != 0){
-							tableArr.push(item);
-						}
-						
-					})
-					
-					vm.tableData = tableArr;
-					
-				})
+					listData = await AllcompanyInvoiceList();//所有公司发票列表
+				
+				}else{
+				
+					listData = await companyInvoiceList();//单个公司发票列表
+				
+				}
+				
+			}else{
+				
+				listData = await AllcompanyInvoiceList();//所有公司发票列表
 				
 			}
 			
-			//--------------------------用户-----------------------------------
-			else if(localStorage.getItem('userType') == 2){
+			companyDataList = await companyList();//公司列表
+			
+			if(localStorage.getItem('userType') == 1){//会计
+				
+				templateList = await template();//模板列表
+				
+			}else if(localStorage.getItem('userType') == 2){//用户
 				
 				if(sessionStorage.getItem('params')){
 					
@@ -552,15 +528,43 @@ export default {
 					
 				}
 				
-				next(vm => {
+			}
+			
+			next(vm => {
+				
+				vm.total = listData.page_info ? Number(listData.page_info.record_count) : 0;
+				
+				let arr = [];
+				
+				companyDataList.forEach(item => {
+					arr.push({
+						label: item.title,
+						value: item.id,
+					});
+				})
+				
+				vm.companyDataList = arr;//公司列表
+				
+				vm.tableData = listData.data || [];//表格数据
+				
+				if(localStorage.getItem('userType') == 1){//会计
 					
-					vm.pageInfo = {//页码信息
-						total: Number(listData.page_info.record_count),
-		        		currentPage: Number(listData.page_info.page_absolute),
-		        		pageSize: Number(listData.page_info.page_size),
-					}
+					let arr = [];
 					
-					if(templateForms){
+					templateList.forEach(item => {
+						arr.push({
+							label: item.title,
+							value: item.id,
+							setting: item.setting,
+							remark: item.remark,
+						});
+					});
+					
+					vm.templateList = arr;//模板列表
+					
+				}else if(localStorage.getItem('userType') == 2){//用户
+					
+					if(templateForms){//模板表单
 						
 						if(templateForms.status != 1){
 								
@@ -574,38 +578,21 @@ export default {
 								
 							}else{
 								
-								this.$Message.warning('链接已失效！');//用户编辑后，再使用此链接
+								vm.$Message.info('链接已失效！');//用户编辑后，再使用此链接
 								
 							}
 							
 						}else{
 							
-							this.$Message.warning('链接已失效！');//完成开票后，再使用此链接
+							vm.$Message.info('链接已失效！');//完成开票后，再使用此链接
 							
 						}
 						
 					}
 					
-					if(companyDataList){//公司列表
-						let arr = [];
-						companyDataList.forEach(item => {
-							arr.push({
-								label: item.title,
-								value: item.id,
-							});
-						})
-						vm.companyDataList = arr;
-					}
-					
-					vm.tableData = listData.data;
-					
-				})
+				}
 				
-			}else{
-				
-				next();
-				
-			}
+			});
 			
 		})();
 		

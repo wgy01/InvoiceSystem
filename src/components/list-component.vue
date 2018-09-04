@@ -2,7 +2,26 @@
 
 	<div>
 		
+		<div style="margin-bottom: 14px;display: flex;align-items: center;">
+			
+			<Select v-model="initStateInfo.currentCompanyId" filterable placeholder="选择公司" @on-change="companyChange" style="max-width: 260px;">
+                <Option :value="0">所有公司发票</Option>
+                <Option v-for="item in companyDataList" :value="Number(item.value)" :key="item.value">{{ item.label }}</Option>
+            </Select>
+            
+            <div style="width: 400px;margin-left: 14px;">
+			    <al-cascader v-model="areaData" placeholder="请选择地区" data-type="code" @on-change="alCascader" />
+            </div>
+            
+		</div>
+		
 		<Table border :columns="tableColumns" :data="tableData"></Table>
+		
+		<div style="margin-top: 14px;display: flex;align-items: center;">
+			
+			<Page ref="pageInstance" :total="total" :current="initStateInfo.currentPage" show-total show-elevator @on-change="pageChange" style="margin-left: auto;" />
+			
+		</div>
 		
 		<!--弹窗控件-->
 		<Modal v-model="modalShow" width="80%">
@@ -85,6 +104,16 @@ export default {
 		
 		componentType: String,
 		
+		total: {
+			type: Number,
+			default: 0
+		},
+		
+		companyDataList: {
+			type: Array,
+			default: () => {return []}
+		},
+		
 	},
     data () {//数据
         return {
@@ -104,6 +133,16 @@ export default {
         	title: '',
         	
         	modalShow: false,
+        	
+        	//---------------------------------------------------
+        	
+        	areaData: [],//地区
+        	
+        	initStateInfo: {//初始化状态信息
+        		currentCompanyId: 0,//选中的公司id
+        		currentPage: 1,//当前页
+            	areaString: '',//地区字符
+        	},
         	
         }
     },
@@ -233,11 +272,75 @@ export default {
     		
     	},
     	
+    	alCascader(arrData){//地区选择改变时
+    		
+    		let arrStr = arrData.join(',');
+    		
+        	this.setRoutePara('areaString',arrStr);
+    		
+    	},
+    	
+    	companyChange(companyId){//公司下拉改变时
+    		
+    		this.setRoutePara('currentCompanyId',companyId);
+    		
+    		this.setRoutePara('currentPage',1);
+    		
+    		this.$emit('on-company-change');
+    		
+    	},
+    	
+    	pageChange(pageNum){//页码改变时
+    		
+    		this.setRoutePara('currentPage',pageNum);
+    		
+    		this.$emit('on-page-change');
+    		
+    	},
+    	
+    	setRoutePara(str,val){ //设置路由参数
+    		
+    		this.initStateInfo[str] = val;
+    			
+    		this.$router.push(
+	    		{
+	    			name: this.$route.name,
+	    			query: this.initStateInfo,//状态信息
+	    		}
+    		);
+    		
+    	},
+    	
+    	maintainData(route_query){//保持筛选数据
+    		
+			this.initStateInfo.currentPage = route_query.currentPage ? Number(route_query.currentPage) : 1;
+			
+			this.initStateInfo.currentCompanyId = route_query.currentCompanyId ? Number(route_query.currentCompanyId) : 0;
+			
+			if(route_query.areaString){
+				
+				this.areaData = route_query.areaString.split(',');
+				
+			}
+			
+			
+    	},
+    	
     },
     computed: {//计算属性
         	
     },
     watch: {//监测数据变化
+		
+		'$route' (to, from) {
+			
+			this.maintainData(to.query);//保持筛选数据
+			
+			this.$emit('on-route-change');
+			
+			console.log(to);
+			
+		},
 		
 	},
     
@@ -247,16 +350,17 @@ export default {
     	
     	this.init();//初始化表头
     	
+    	this.$nextTick(() => {
+    		
+    		this.maintainData(this.$route.query);//保持筛选数据
+    		
+    	});
+    	
 	},
     mounted () {//模板被渲染完毕之后执行
     	
 	},
-	
-	//=================组件路由勾子==============================
-	
-//	beforeRouteEnter (to, from, next) {//在组件创建之前调用
-//	},
-	
+		
 }
 </script>
 

@@ -60,7 +60,7 @@ router.beforeEach((to, from, next) => {
 				
 				sessionStorage.clear();// 从sessionStorage删除所有保存的数据
 				
-				router.app.$Message.warning('登录信息已过期，请重新登录！');
+				router.app.$Message.info('登录信息已过期，请重新登录！');
 				
 			}
 			

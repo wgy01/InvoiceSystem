@@ -52,11 +52,11 @@
 					        </FormItem>
 					        
 					        <FormItem label="地区选择" prop="areaData">
-					        	
+							    <al-cascader v-model="formInline.areaData" placeholder="请选择地区" data-type="code" style="max-width: 400px;" />
 					        </FormItem>
 					        
 					    </Form>
-					    <al-selector class="my-class-al-selector" v-model="formInline.areaData" :searchable="true" data-type="code" />
+					    
 					    <forms-template
 			            ref="formsInstance1"
 			            @on-change="formsChange"
@@ -147,7 +147,7 @@ export default {
                     { type: 'number', required: true, message: '请选择公司', trigger: 'change' }
                 ],
                 areaData: [
-                    { type: 'array', required: true, min: 1, message: '请选择地区', trigger: 'change' },
+                    { type: 'array', required: true, message: '请选择地区', trigger: 'change' },
                 ],
         	},
         	
@@ -364,7 +364,7 @@ export default {
 				        	
 				        	this.companyImgList = [];//公司图片列表
 							
-							this.$emit('on-submit',this.formInline.companyId);
+							this.$emit('on-submit');
 							
 							this.modal = false;
 							
@@ -457,21 +457,21 @@ export default {
 							
 							 if(response.data.status != 1){
 								
-//								if(response.data.company_id == 0){
+								if(response.data.company_id == 0){
 								
 									this.$parent.invoiceAllData = response.data;//所有表单数据
 									
 									this.$Message.success('获取成功');
 									
-//								}else{
-//									
-//									this.$Message.warning('链接已失效！');
-//									
-//								}
+								}else{
+									
+									this.$Message.info('链接已失效！');
+									
+								}
 								
 							}else{
 								
-								this.$Message.warning('链接已失效！');
+								this.$Message.info('链接已失效！');
 								
 							}
 							
@@ -548,10 +548,10 @@ export default {
     		
     		this.formInline.companyId = v.company_id != 0 ? v.company_id : null;//公司ID
     		
-//      	this.formInline.areaData[0] = v.province;
-//    		this.formInline.areaData[1] = v.city;
-//  		this.formInline.areaData[2] = v.area;
-//  		this.formInline.areaData[3] = v.street;
+        	this.formInline.areaData[0] = v.province;
+      		this.formInline.areaData[1] = v.city;
+    		this.formInline.areaData[2] = v.area;
+    		this.formInline.areaData[3] = v.street;
     		
     		this.formInline.money = v.money.toString() != 0 ? v.money.toString() : '';//金额
 			

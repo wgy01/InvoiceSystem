@@ -69,6 +69,10 @@
 		            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
 		        </FormItem>
 		        
+		        <FormItem label="地区选择" prop="areaData">
+		        	<al-cascader v-if="formInline.areaData.length > 0" v-model="formInline.areaData" placeholder="请选择地区" data-type="code" style="max-width: 400px;" />
+		        </FormItem>
+		        
 		    </Form>
 		    
 		    <Row v-if="userType == 1 || type == 'show'" style="padding: 16px 0 6px;">
@@ -79,6 +83,22 @@
     			
     			<Col span="20">
     				{{formInline.money}}
+    			</Col>
+    			
+    		</Row>
+    		
+		    <Row v-if="userType == 1 || type == 'show'" style="padding: 16px 0 6px;">
+    			
+    			<Col span="4" style="text-align: right;">
+    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">地区：</label>
+    			</Col>
+    			
+    			<Col span="20">
+    				<al-cascader v-if="formInline.areaData.length > 0" @on-change="alCascader" v-model="formInline.areaData" :disabled="true" placeholder="请选择地区" data-type="all" style="max-width: 400px;display: none;" />
+    				<span v-for="(itemArea,index) in allAreaData">
+    					{{itemArea.name}}
+    					{{index == (allAreaData.length-1) ? '' : ' —> '}}
+    				</span>
     			</Col>
     			
     		</Row>
@@ -250,11 +270,14 @@ export default {
     data () {//数据
         return {
         	
+        	allAreaData: [],//显示名称的地区数据
+        	
         	formInline: {
         		money: '',//金额
         		companyId: '',//公司id
         		invoiceNum: '',//发票编号
         		invoiceCode: '',//发票代码
+        		areaData: [],//地区
         	},
         	ruleInline: {
         		money: [
@@ -268,6 +291,9 @@ export default {
                 ],
                 invoiceCode: [
                     { required: true, message: '请输入发票代码', trigger: 'blur' }
+                ],
+                areaData: [
+                    { type: 'array', required: true, message: '请选择地区', trigger: 'change' },
                 ],
         	},
         	
@@ -311,6 +337,12 @@ export default {
         }
     },
     methods: {//方法
+    	
+    	alCascader(arrData){//详情,地区控件发生改变时
+    		
+    		this.allAreaData = arrData;
+    		
+    	},
     	
     	uploadSuccess(data){//上传成功后触发
     		
@@ -530,6 +562,14 @@ export default {
 		    					
 		    					ticket_code: this.formInline.invoiceCode,
 		    					
+		    					province: this.formInline.areaData[0] || '',
+    					
+		    					city: this.formInline.areaData[1] || '',
+		    					
+		    					area: this.formInline.areaData[2] || '',
+		    					
+		    					street: this.formInline.areaData[3] || '',
+		    					
 							})
 							.then(response => {
 								
@@ -687,6 +727,11 @@ export default {
 					this.formInline.invoiceNum = response.data.invoice_number;//发票编号
 					
 					this.formInline.invoiceCode = response.data.ticket_code;//发票代码
+					
+					this.formInline.areaData[0] = response.data.province;
+		      		this.formInline.areaData[1] = response.data.city;
+		    		this.formInline.areaData[2] = response.data.area;
+		    		this.formInline.areaData[3] = response.data.street;
 					
 					this.formInline.companyId = response.data.company_id;//公司id
 					
