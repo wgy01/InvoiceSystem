@@ -34,6 +34,7 @@
 			@on-company-change="companyChange"
 			@on-page-change="pageChange"
 			@on-route-change="routeChange"
+			@on-area-change="areaChange"
 			>
 			</list-component>
 			
@@ -324,6 +325,27 @@ export default {
         }
     },
     methods: {//方法
+    	
+    	areaChange(dataArr){//地区选择器改变时
+    		
+    		this.$axios.post('Service/Order/get_by_area', {
+				user_id: localStorage.getItem('userId'),
+				page: this.$route.query.currentPage || 1,
+				province: dataArr[0],
+				city: dataArr[1],
+				area: dataArr[2],
+				street: dataArr[3],
+			})
+			.then(response => {
+				
+				this.tableData = response.data;
+				
+			})
+			.catch(function(error) {
+				console.log(error);
+			});
+    		
+    	},
     	
     	routeChange(){//路由改变时
     		

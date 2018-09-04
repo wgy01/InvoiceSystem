@@ -272,11 +272,13 @@ export default {
     		
     	},
     	
-    	alCascader(arrData){//地区选择改变时
+    	alCascader(data_arr){//地区选择改变时
     		
-    		let arrStr = arrData.join(',');
+    		let arrStr = data_arr.join(',');
     		
         	this.setRoutePara('areaString',arrStr);
+        	
+        	this.$emit('on-area-change',data_arr);
     		
     	},
     	
@@ -319,10 +321,15 @@ export default {
 			
 			if(route_query.areaString){
 				
-				this.areaData = route_query.areaString.split(',');
+				this.areaData = route_query.areaString ? route_query.areaString.split(',') : [];
+			}else{
 				
+				this.areaData = [];
+				
+				let arrStr = this.areaData.join(',');
+    		
+        		this.setRoutePara('areaString',arrStr);
 			}
-			
 			
     	},
     	
@@ -337,8 +344,6 @@ export default {
 			this.maintainData(to.query);//保持筛选数据
 			
 			this.$emit('on-route-change');
-			
-			console.log(to);
 			
 		},
 		
