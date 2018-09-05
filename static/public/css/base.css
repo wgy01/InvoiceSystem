@@ -27,6 +27,10 @@ h3 {
 	font-size: 12px;
 }
 
+input:-webkit-autofill {
+-webkit-box-shadow: 0 0 0px 1000px white inset !important;
+}
+
 /*--------------------滚动条样式-----------------------*/
 
 /*滚动条整体部分，可以设置宽度啥的*/ 

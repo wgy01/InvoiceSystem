@@ -14,6 +14,8 @@ import iView from 'iview';
 
 import 'iview/dist/styles/iview.css';//这是默认主题
 
+import './main.less';//修改菜单色
+
 //import '../static/my-theme/r.css';//这是主题工具生成的自定义主题
 
 //import '../static/my-theme/index.less';//这是less的自定义主题（两者只能存在一个）

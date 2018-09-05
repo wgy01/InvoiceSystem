@@ -2,24 +2,34 @@
 
 	<div>
 		
-		<div style="margin-bottom: 14px;display: flex;align-items: center;">
+		<div v-if="controlShow" style="margin-bottom: 14px;display: flex;align-items: center;">
 			
-			<Select v-model="initStateInfo.currentCompanyId" filterable placeholder="选择公司" @on-change="companyChange" style="max-width: 260px;">
+			<Select v-model="screenInfo.companyId" filterable placeholder="选择公司" @on-change="companyChange" style="max-width: 260px;">
                 <Option :value="0">所有公司发票</Option>
                 <Option v-for="item in companyDataList" :value="Number(item.value)" :key="item.value">{{ item.label }}</Option>
             </Select>
             
-            <div style="width: 400px;margin-left: 14px;">
-			    <al-cascader v-model="areaData" placeholder="请选择地区" data-type="code" @on-change="alCascader" />
+            <div style="width: 400px;height: 32px;margin-left: 16px;position: relative;">
+            	<div style="position: absolute;left: 0;top: 0;z-index: 5;">
+	            	<Tooltip content="选择筛选级别" placement="top">
+		            	<Select v-model="levelNum" placeholder="选择公司" @on-change="levelChange" style="width: 60px;">
+			                <Option :value="0">省份</Option>
+			                <Option :value="1">城市</Option>
+			                <Option :value="2">地区</Option>
+			                <Option :value="3">街道</Option>
+			            </Select>
+			        </Tooltip>
+            	</div>
+			    <al-cascader class="al-cascader-class" v-if="alShow" v-model="screenInfo.areaData" :level="levelNum" placeholder="请选择地区" data-type="code" @on-change="alCascader" style="width: 100%;" />
             </div>
             
 		</div>
 		
 		<Table border :columns="tableColumns" :data="tableData"></Table>
 		
-		<div style="margin-top: 14px;display: flex;align-items: center;">
+		<div v-if="controlShow" style="margin-top: 14px;display: flex;align-items: center;">
 			
-			<Page ref="pageInstance" :total="total" :current="initStateInfo.currentPage" show-total show-elevator @on-change="pageChange" style="margin-left: auto;" />
+			<Page ref="pageInstance" :total="total" :current="screenInfo.currentPage" show-total show-elevator @on-change="pageChange" style="margin-left: auto;" />
 			
 		</div>
 		
@@ -114,6 +124,16 @@ export default {
 			default: () => {return []}
 		},
 		
+		screenInfo: {
+			type: Object,
+			default: () => {return {}}
+		},
+		
+		controlShow: {
+			type: Boolean,
+			default: false
+		},
+		
 	},
     data () {//数据
         return {
@@ -135,6 +155,10 @@ export default {
         	modalShow: false,
         	
         	//---------------------------------------------------
+        	
+        	levelNum: 3,
+        	
+        	alShow: true,
         	
         	areaData: [],//地区
         	
@@ -272,31 +296,47 @@ export default {
     		
     	},
     	
+    	levelChange(val){//级别改变时
+    		
+    		this.alShow = false;
+    		
+    		setTimeout(() => {
+    			this.alShow = true;
+    		},10);
+    		
+    	},
+    	
     	alCascader(data_arr){//地区选择改变时
     		
-    		let arrStr = data_arr.join(',');
+    		//let arrStr = data_arr.join(',');
     		
-        	this.setRoutePara('areaString',arrStr);
+        	//this.setRoutePara('areaString',arrStr);
         	
         	this.$emit('on-area-change',data_arr);
-    		
+        	
     	},
     	
     	companyChange(companyId){//公司下拉改变时
     		
-    		this.setRoutePara('currentCompanyId',companyId);
+    		//this.setRoutePara('currentCompanyId',companyId);
     		
-    		this.setRoutePara('currentPage',1);
+    		//this.setRoutePara('currentPage',1);
     		
-    		this.$emit('on-company-change');
+      		this.alShow = false;
+    		
+    		this.$emit('on-company-change',companyId);
+    		
+    		setTimeout(() => {
+    			this.alShow = true;
+    		},10);
     		
     	},
     	
     	pageChange(pageNum){//页码改变时
     		
-    		this.setRoutePara('currentPage',pageNum);
+    		//this.setRoutePara('currentPage',pageNum);
     		
-    		this.$emit('on-page-change');
+    		this.$emit('on-page-change',pageNum);
     		
     	},
     	
@@ -319,17 +359,7 @@ export default {
 			
 			this.initStateInfo.currentCompanyId = route_query.currentCompanyId ? Number(route_query.currentCompanyId) : 0;
 			
-			if(route_query.areaString){
-				
-				this.areaData = route_query.areaString ? route_query.areaString.split(',') : [];
-			}else{
-				
-				this.areaData = [];
-				
-				let arrStr = this.areaData.join(',');
-    		
-        		this.setRoutePara('areaString',arrStr);
-			}
+			this.areaData = route_query.areaString ? route_query.areaString.split(',') : [];
 			
     	},
     	
@@ -341,9 +371,9 @@ export default {
 		
 		'$route' (to, from) {
 			
-			this.maintainData(to.query);//保持筛选数据
+			//this.maintainData(to.query);//保持筛选数据
 			
-			this.$emit('on-route-change');
+			//this.$emit('on-route-change');
 			
 		},
 		
@@ -355,11 +385,11 @@ export default {
     	
     	this.init();//初始化表头
     	
-    	this.$nextTick(() => {
-    		
-    		this.maintainData(this.$route.query);//保持筛选数据
-    		
-    	});
+//  	this.$nextTick(() => {
+//  		
+//  		this.maintainData(this.$route.query);//保持筛选数据
+//  		
+//  	});
     	
 	},
     mounted () {//模板被渲染完毕之后执行
@@ -370,4 +400,9 @@ export default {
 </script>
 
 <style scoped>
+</style>
+<style>
+	.al-cascader-class input{
+		padding-left: 70px;
+	}
 </style>

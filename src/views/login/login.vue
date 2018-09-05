@@ -59,9 +59,22 @@ export default {
 
 <style scoped>
 	.box{
-		/*background:url(../../../static/public/images/bg.jpg) center center / cover no-repeat;*/
-		background: #ccc;
+		position: relative;
+		background:url(../../../static/public/images/kj01.png) center / cover no-repeat;
 		width:100%;
 		height:100%;
+		z-index:1;
+	}
+	/*背景模糊*/
+	.box:after{
+	    content: "";
+	    width:100%;
+	    height:100%;
+	    position: absolute;
+	    left:0;
+	    top:0;
+	    background: inherit;
+	    filter: blur(4px);
+	    z-index: 2;
 	}
 </style>

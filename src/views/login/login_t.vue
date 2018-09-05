@@ -4,7 +4,7 @@
 		
 		<div class="drag">
 			
-			<Card class="card">
+			<Card class="card" :bordered="false" dis-hover>
 				
 				<h1 class="title" slot="title">
 					<Icon type="log-in"></Icon>
@@ -15,13 +15,13 @@
 					
 					<Form ref="formInline" :model="formInline" :rules="ruleInline">
 						<FormItem prop="user">
-							<Input type="text" @on-enter="handleSubmit('formInline')" v-model="formInline.user" placeholder="手机号码">
-								<Icon type="ios-person-outline" slot="prepend"></Icon>
+							<Input class="input-bg-transparency" type="text" @on-enter="handleSubmit('formInline')" v-model="formInline.user" placeholder="手机号码">
+								<Icon type="ios-person-outline" slot="prepend" size="18" color="#1c2438"></Icon>
 							</Input>
 						</FormItem>
 						<FormItem prop="password">
-							<Input type="password" @on-enter="handleSubmit('formInline')" v-model="formInline.password" placeholder="密码">
-								<Icon type="ios-locked-outline" slot="prepend"></Icon>
+							<Input class="input-bg-transparency" type="password" @on-enter="handleSubmit('formInline')" v-model="formInline.password" placeholder="密码">
+								<Icon type="ios-locked-outline" slot="prepend" size="18" color="#1c2438"></Icon>
 							</Input>
 						</FormItem>
 						<div class="but">
@@ -56,12 +56,12 @@ export default {
 				user: [{
 					required: true,
 					message: '手机号不能为空',
-					trigger: 'blur'
+					trigger: 'change'
 				}],
 				password: [{
 						required: true,
 						message: '密码不能为空',
-						trigger: 'blur'
+						trigger: 'change'
 					},
 					{
 						type: 'string',
@@ -188,16 +188,23 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 	.drag{
 		position: absolute;
 		width: 320px;
 		height: 280px;
-		right:300px;
-		bottom:300px;
+		margin: auto;
+		/*right:300px;
+		bottom:300px;*/
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 10;
 	}
 	.card {
 		height:100%;
+		background: rgba(110,128,83,0) !important;
 	}
 	.title{
 	}
@@ -208,5 +215,24 @@ export default {
 		margin-top:16px;
 		text-align: center;
 		color:blue;
+	}
+	
+</style>
+
+<style lang="less">
+	.input-bg-transparency{
+		input{
+			border: none !important;
+			color: #1c2438;
+			background-color: rgba(255,255,255,.3) !important;
+			&::-webkit-input-placeholder{
+				color: #495060;
+			}
+		}
+		.ivu-input-group-prepend{
+			background-color: rgba(255,255,255,.3) !important;
+			border: none !important;
+			border-right: 1px solid rgba(255,255,255,.3) !important;
+		}
 	}
 </style>

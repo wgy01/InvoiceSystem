@@ -25,15 +25,17 @@
 			<h1 slot="title">发票列表</h1>
 			
 			<list-component
+			ref="tabelInstance"
 			:table-columns="tableColumns"
 			:table-data="tableData"
 			component-type="invoiceSE"
 			:total="total"
 			:companyDataList="companyDataList"
+			:screenInfo="screenInfo"
+			:controlShow="true"
 			
 			@on-company-change="companyChange"
 			@on-page-change="pageChange"
-			@on-route-change="routeChange"
 			@on-area-change="areaChange"
 			>
 			</list-component>
@@ -159,7 +161,29 @@ let AllcompanyInvoiceList = (currentPage) => {//所有公司发票列表（公�
 			page: currentPage || urlPageNum,
 		})
 		.then(response => {
-			console.log(response);
+			resolve(response);
+		})
+		.catch(function(error) {
+			console.log(error);
+		});
+
+	});
+
+}
+
+let getAreaScreenList = (areaArr,currentPage) => {//地区筛选后的发票列表数据
+	
+	return new Promise(resolve => {
+
+		axios.post('Service/Order/get_by_area', {
+			user_id: localStorage.getItem('userId'),
+			page: currentPage || 1,
+			province: areaArr[0] || '',
+			city: areaArr[1] || '',
+			area: areaArr[2] || '',
+			street: areaArr[3] || '',
+		})
+		.then(response => {
 			resolve(response);
 		})
 		.catch(function(error) {
@@ -189,6 +213,12 @@ export default {
         return {
         	
         	total: 0,
+        	
+        	screenInfo: {
+        		currentPage: 1,
+        		companyId: 0,
+        		areaData: [],
+        	},
         	
         	templateList: [],//模板表单列表
         	
@@ -328,70 +358,93 @@ export default {
     	
     	areaChange(dataArr){//地区选择器改变时
     		
-    		this.$axios.post('Service/Order/get_by_area', {
-				user_id: localStorage.getItem('userId'),
-				page: this.$route.query.currentPage || 1,
-				province: dataArr[0],
-				city: dataArr[1],
-				area: dataArr[2],
-				street: dataArr[3],
-			})
-			.then(response => {
-				
-				this.tableData = response.data;
-				
-			})
-			.catch(function(error) {
-				console.log(error);
-			});
+    		this.screenInfo.areaData = dataArr;
     		
-    	},
-    	
-    	routeChange(){//路由改变时
+    		this.screenInfo.currentPage = 1;
+    		
+    		this.screenInfo.companyId = 0;
+    		
+    		let listData = null;
     		
     		(async() => {
     			
-    			let listData = null;
-				
-				if(this.$route.query.currentCompanyId){
+	    		if(dataArr.length > 0){
+	    			
+	    			listData = await getAreaScreenList(dataArr,1);//地区筛选后的发票列表数据
+	    			
+	    		}else{
+	    			
+	  				listData = await AllcompanyInvoiceList();//所有公司发票列表
 					
-					if(this.$route.query.currentCompanyId == 0){
-    			
-		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
-		    			
-		    		}else{
-		    			
-		    			listData = await companyInvoiceList();//单个公司发票列表
-		    			
-		    		}
-					
-				}else{
-					
-					listData = await AllcompanyInvoiceList();//所有公司发票列表
-					
-				}
+	    		}
+	    		
+				this.total = listData.page_info ? listData.page_info.record_count : 0;
 				
 				this.tableData = listData.data;
     			
     		})();
     		
+    		
     	},
     	
-    	pageChange(){//页码改变
+//  	routeChange(){//路由改变时
+//  		
+//  		(async() => {
+//  			
+//  			let listData = null;
+//				
+//				if(this.$route.query.currentCompanyId){
+//					
+//					if(this.$route.query.currentCompanyId == 0){
+//  			
+//		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
+//		    			
+//		    		}else{
+//		    			
+//		    			listData = await companyInvoiceList();//单个公司发票列表
+//		    			
+//		    		}
+//					
+//				}else{
+//					
+//					listData = await AllcompanyInvoiceList();//所有公司发票列表
+//					
+//				}
+//				
+//				this.tableData = listData.data;
+//  			
+//  		})();
+//  		
+//  	},
+    	
+    	pageChange(pageNum){//页码改变
+    		
+    		this.screenInfo.currentPage = pageNum;
     		
     		(async() => {
     			
     			let listData = null;
     			
-    			if(this.$route.query.currentCompanyId == 0){
+    			if(this.screenInfo.areaData.length > 0){
     				
-    				listData = await AllcompanyInvoiceList();//所有公司发票列表
+    				listData = await getAreaScreenList(this.screenInfo.areaData,pageNum);//地区筛选后的发票列表数据
     				
     			}else{
     				
-    				listData = await companyInvoiceList();//单个公司发票列表
+    				if(this.screenInfo.companyId == 0){
+    				
+    					listData = await AllcompanyInvoiceList(pageNum);//所有公司发票列表
+    				
+    				}else{
+    				
+    					listData = await companyInvoiceList(this.screenInfo.companyId,pageNum);//单个公司发票列表
+    				
+    				}
     				
     			}
+    			
+    			
+    			this.total = listData.page_info ? listData.page_info.record_count : 0;
     			
 				this.tableData = listData.data;
     			
@@ -399,21 +452,29 @@ export default {
     		
     	},
     	
-    	companyChange(){//公司下拉选择改变时
+    	companyChange(companyId){//公司下拉选择改变时
+    		
+    		this.screenInfo.companyId = companyId;
+    		
+    		this.screenInfo.currentPage = 1;
+    		
+    		this.screenInfo.areaData = [];
     		
     		(async() => {
     			
 				let listData = null;
 				
-				if(this.$route.query.currentCompanyId == 0){
+				if(companyId == 0){
     			
 	    			listData = await AllcompanyInvoiceList();//所有公司发票列表
 	    			
 	    		}else{
 	    			
-	    			listData = await companyInvoiceList();//单个公司发票列表
+	    			listData = await companyInvoiceList(companyId,1);//单个公司发票列表
 	    			
 	    		}
+	    		
+	    		this.total = listData.page_info ? listData.page_info.record_count : 0;
 				
 				this.tableData = listData.data;
     			
@@ -428,23 +489,25 @@ export default {
 				
 				let listData = null;
 				
-				if(this.$route.query.currentCompanyId){
+//				if(this.$route.query.currentCompanyId){
 					
-					if(this.$route.query.currentCompanyId == 0){
+					if(this.screenInfo.companyId == 0){
     			
-		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			listData = await AllcompanyInvoiceList(this.screenInfo.currentPage);//所有公司发票列表
 		    			
 		    		}else{
 		    			
-		    			listData = await companyInvoiceList();//单个公司发票列表
+		    			listData = await companyInvoiceList(this.screenInfo.companyId,this.screenInfo.currentPage);//单个公司发票列表
 		    			
 		    		}
 					
-				}else{
-					
-					listData = await AllcompanyInvoiceList();//所有公司发票列表
-					
-				}
+//				}else{
+//					
+//					listData = await AllcompanyInvoiceList();//所有公司发票列表
+//					
+//				}
+				
+				this.total = listData.page_info ? listData.page_info.record_count : 0;
 				
 				this.tableData = listData.data;
 				
@@ -457,23 +520,25 @@ export default {
 				
 				let listData = null;
 				
-				if(this.$route.query.currentCompanyId){
+//				if(this.$route.query.currentCompanyId){
 					
-					if(this.$route.query.currentCompanyId == 0){
+					if(this.screenInfo.companyId == 0){
     			
-		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
+		    			listData = await AllcompanyInvoiceList(this.screenInfo.currentPage);//所有公司发票列表
 		    			
 		    		}else{
 		    			
-		    			listData = await companyInvoiceList();//单个公司发票列表
+		    			listData = await companyInvoiceList(this.screenInfo.companyId,this.screenInfo.currentPage);//单个公司发票列表
 		    			
 		    		}
 					
-				}else{
-					
-					listData = await AllcompanyInvoiceList();//所有公司发票列表
-					
-				}
+//				}else{
+//					
+//					listData = await AllcompanyInvoiceList();//所有公司发票列表
+//					
+//				}
+				
+				this.total = listData.page_info ? listData.page_info.record_count : 0;
 				
 				this.tableData = listData.data;
 				
@@ -510,29 +575,29 @@ export default {
 		
 		let listData = null;//列表数据
 		
-		let urlCompanyId = getUrlParams(window.location.href,'currentCompanyId');
+		//let urlCompanyId = getUrlParams(window.location.href,'currentCompanyId');
 		
 		(async() => { //es7异步函数
 			
 			//-------------公用--------------------------------------------------
 			
-			if(urlCompanyId){
-				
-				if(urlCompanyId == 0){
-				
-					listData = await AllcompanyInvoiceList();//所有公司发票列表
-				
-				}else{
-				
-					listData = await companyInvoiceList();//单个公司发票列表
-				
-				}
-				
-			}else{
+//			if(urlCompanyId){
+//				
+//				if(urlCompanyId == 0){
+//				
+//					listData = await AllcompanyInvoiceList();//所有公司发票列表
+//				
+//				}else{
+//				
+//					listData = await companyInvoiceList();//单个公司发票列表
+//				
+//				}
+//				
+//			}else{
 				
 				listData = await AllcompanyInvoiceList();//所有公司发票列表
 				
-			}
+//			}
 			
 			companyDataList = await companyList();//公司列表
 			

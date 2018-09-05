@@ -2,7 +2,7 @@
 	<div class="layout">
         <Layout :style="{minHeight: '100vh'}">
         	<!--左边栏-->
-            <Sider class="Sider" :style="themeType == 'light' ? {background: '#fff'} : {background: '#495060'}" ref="side1" hide-trigger collapsible :collapsed-width="60" v-model="isCollapsed">
+            <Sider class="Sider" :style="themeType == 'light' ? {background: '#fff'} : {background: '#001529'}" ref="side1" hide-trigger collapsible :collapsed-width="60" v-model="isCollapsed">
             	
             	<div class="sider-box" :style="isCollapsed ? { overflowY:'hidden', borderRight:'1px solid #DDDEE1' } : ''">
             		
@@ -59,7 +59,7 @@
 		            		<Dropdown v-if="item.children.length <= 1" key="index" :transfer="true" placement="right-start" @on-click="changeMenu">
 		            			
 		            			<div class="icon" @click="changeMenu(item.children[0].name)">
-		            				<Icon :color="themeType == 'light' ? '#495060' : ''" :type="item.children[0].icon || item.icon"></Icon>
+		            				<Icon :color="themeType == 'light' ? '#001529' : ''" :type="item.children[0].icon || item.icon"></Icon>
 		            			</div>
 		            			
 						        <DropdownMenu slot="list">
@@ -71,7 +71,7 @@
 		            		<Dropdown v-if="item.children.length > 1" :key="index" :transfer="true" placement="right-start" @on-click="changeMenu">
 		            			
 		            			<div class="icon">
-		            				<Icon :color="themeType == 'light' ? '#495060' : ''" :type="item.icon"></Icon>
+		            				<Icon :color="themeType == 'light' ? '#001529' : ''" :type="item.icon"></Icon>
 		            			</div>
 		            			
 						        <DropdownMenu slot="list">
@@ -166,7 +166,7 @@
 									    </Dropdown>
             						</div>
             						<!--头像-->
-            						<div class="avatar">
+            						<div class="avatar" v-if="false">
             							<!--带有消息提示的头像  dot ——> true/false-->
             							<Badge :dot="false">
             								<Avatar src="" icon="person" />
@@ -755,7 +755,7 @@
 		background: #fff;
 	}
 	.hCard .box .right{
-		right:16px;
+		right:36px;
 		display:flex;
 		background: #fff;
 	}

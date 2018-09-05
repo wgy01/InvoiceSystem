@@ -205,5 +205,6 @@ export default {
 		height: 280px;
 		right:300px;
 		bottom:300px;
+		z-index: 10;
 	}
 </style>
