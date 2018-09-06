@@ -29,15 +29,11 @@
 			:table-columns="tableColumns"
 			:table-data="tableData"
 			component-type="invoiceSE"
-			:total="total"
 			:companyDataList="companyDataList"
-			:screenInfo="screenInfo"
+			:pageInfo="pageInfo"
 			:controlShow="true"
 			
-			@on-company-change="companyChange"
-			@on-page-change="pageChange"
-			@on-area-change="areaChange"
-			>
+			@on-route-change="routeChange">
 			</list-component>
 			
 		</Card>
@@ -56,13 +52,34 @@ import listComponent from '@/components/list-component.vue';
 
 import axios from 'axios';
 
-let getUrlParams = (url,name) => {//获取url属性值
+let getUrlParams = (url,nameArr) => {//获取url属性值
+	
 	let startIndex = url.indexOf('?');
+	
 	let parameter = url.substr(startIndex);
-    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
-    let r = parameter.substr(1).match(reg);  
-    if (r != null) return unescape(r[2]);
-  	return null;
+	
+	let price_obj = {};
+	
+	nameArr.forEach(item => {
+		
+		let reg = new RegExp("(^|&)" + item + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+    
+    	let r = parameter.substr(1).match(reg);
+		
+		if (r != null){
+			price_obj[item] = unescape(r[2]);
+		}
+		
+	});
+	
+	let i = 0;
+	
+	for(let item in price_obj){
+		i++;
+	}
+	
+  	return price_obj;
+  	
 };
 
 let template = () => {//模板列表（会计接口）
@@ -119,69 +136,22 @@ let companyList = () => {//公司列表（公共接口）
 
 }
 
-let companyInvoiceList = (companyID,currentPage) => {//根据公司ID获取发票列表
+let invoiceList = (currentPage) => {//发票列表
 	
-	let urlPageNum = getUrlParams(window.location.href,'currentPage');
+	let urlProperty = getUrlParams(window.location.href,['currentPage','currentCompanyId','areaString']);
 	
-	let urlCompanyId = getUrlParams(window.location.href,'currentCompanyId') || 0;
-	
-	if(!urlPageNum || urlPageNum == 0){
-		urlPageNum = 1;
-	}
-	
-	return new Promise(resolve => {
-
-		axios.post('Service/Order/get_by_company', {
-			cid: companyID || urlCompanyId,
-			page: currentPage || urlPageNum,
-		})
-		.then(response => {
-			resolve(response);
-		})
-		.catch(function(error) {
-			console.log(error);
-		});
-
-	});
-
-}
-
-let AllcompanyInvoiceList = (currentPage) => {//所有公司发票列表（公共接口）
-	
-	let urlPageNum = getUrlParams(window.location.href,'currentPage');
-	
-	if(!urlPageNum || urlPageNum == 0){
-		urlPageNum = 1;
-	}
+	let area_arr = urlProperty.areaString ? urlProperty.areaString.split(',') : [];
 	
 	return new Promise(resolve => {
 
 		axios.post('Service/Order/index', {
 			user_id: localStorage.getItem('userId'),
-			page: currentPage || urlPageNum,
-		})
-		.then(response => {
-			resolve(response);
-		})
-		.catch(function(error) {
-			console.log(error);
-		});
-
-	});
-
-}
-
-let getAreaScreenList = (areaArr,currentPage) => {//地区筛选后的发票列表数据
-	
-	return new Promise(resolve => {
-
-		axios.post('Service/Order/get_by_area', {
-			user_id: localStorage.getItem('userId'),
-			page: currentPage || 1,
-			province: areaArr[0] || '',
-			city: areaArr[1] || '',
-			area: areaArr[2] || '',
-			street: areaArr[3] || '',
+			page: currentPage || urlProperty.currentPage || 1,
+			cid: urlProperty.currentCompanyId && urlProperty.currentCompanyId != 0 ? urlProperty.currentCompanyId : '',
+			province: area_arr[0] || '',
+			city: area_arr[1] || '',
+			area: area_arr[2] || '',
+			street: area_arr[3] || '',
 		})
 		.then(response => {
 			resolve(response);
@@ -212,12 +182,9 @@ export default {
     data () {//数据
         return {
         	
-        	total: 0,
-        	
-        	screenInfo: {
+        	pageInfo: {//页码信息
         		currentPage: 1,
-        		companyId: 0,
-        		areaData: [],
+        		total: 0,
         	},
         	
         	templateList: [],//模板表单列表
@@ -320,27 +287,6 @@ export default {
                     	
                     }
                 },
-//              {
-//                  title: '链接',
-//                  render: (h, params) => {
-//                  	
-//                  	let invoiceUrl = '';
-//  		
-//			    		let getUrlParams = (url,name) => {
-//			    			let startIndex = url.indexOf('?');
-//				    		let parameter = url.substr(startIndex);
-//						    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
-//						    let r = parameter.substr(1).match(reg);  
-//						    if (r != null) return unescape(r[2]);
-//						  	return null;
-//			    		}
-//			    		
-//			    		invoiceUrl = 'http://'+ window.location.host +'/#/'+ getUrlParams(params.row.link,'orderID');
-//                  	
-//                  	return h('span',invoiceUrl)
-//                  	
-//                  }
-//              },
                 {
                 	fixed: 'right',
                 	align: 'center',
@@ -356,193 +302,62 @@ export default {
     },
     methods: {//方法
     	
-    	areaChange(dataArr){//地区选择器改变时
+    	routeChange(){//路由改变时
     		
-    		this.screenInfo.areaData = dataArr;
-    		
-    		this.screenInfo.currentPage = 1;
-    		
-    		this.screenInfo.companyId = 0;
-    		
-    		let listData = null;
+    		let invoice_list_data = null;
     		
     		(async() => {
     			
-	    		if(dataArr.length > 0){
-	    			
-	    			listData = await getAreaScreenList(dataArr,1);//地区筛选后的发票列表数据
-	    			
-	    		}else{
-	    			
-	  				listData = await AllcompanyInvoiceList();//所有公司发票列表
-					
-	    		}
-	    		
-				this.total = listData.page_info ? listData.page_info.record_count : 0;
-				
-				this.tableData = listData.data;
+    			invoice_list_data = await invoiceList();//发票列表数据
     			
-    		})();
-    		
-    		
-    	},
-    	
-//  	routeChange(){//路由改变时
-//  		
-//  		(async() => {
-//  			
-//  			let listData = null;
-//				
-//				if(this.$route.query.currentCompanyId){
-//					
-//					if(this.$route.query.currentCompanyId == 0){
-//  			
-//		    			listData = await AllcompanyInvoiceList();//所有公司发票列表
-//		    			
-//		    		}else{
-//		    			
-//		    			listData = await companyInvoiceList();//单个公司发票列表
-//		    			
-//		    		}
-//					
-//				}else{
-//					
-//					listData = await AllcompanyInvoiceList();//所有公司发票列表
-//					
-//				}
-//				
-//				this.tableData = listData.data;
-//  			
-//  		})();
-//  		
-//  	},
-    	
-    	pageChange(pageNum){//页码改变
-    		
-    		this.screenInfo.currentPage = pageNum;
-    		
-    		(async() => {
-    			
-    			let listData = null;
-    			
-    			if(this.screenInfo.areaData.length > 0){
-    				
-    				listData = await getAreaScreenList(this.screenInfo.areaData,pageNum);//地区筛选后的发票列表数据
-    				
-    			}else{
-    				
-    				if(this.screenInfo.companyId == 0){
-    				
-    					listData = await AllcompanyInvoiceList(pageNum);//所有公司发票列表
-    				
-    				}else{
-    				
-    					listData = await companyInvoiceList(this.screenInfo.companyId,pageNum);//单个公司发票列表
-    				
-    				}
-    				
-    			}
-    			
-    			
-    			this.total = listData.page_info ? listData.page_info.record_count : 0;
-    			
-				this.tableData = listData.data;
+    			this.pageInfo = {//页码信息
+	        		currentPage: invoice_list_data.page_info ? Number(invoice_list_data.page_info.page_absolute) : 1,
+	        		total: invoice_list_data.page_info ? Number(invoice_list_data.page_info.record_count) : 0,
+	        	};
+	        	
+	        	this.tableData = invoice_list_data.data || [];//表格数据
     			
     		})();
     		
     	},
     	
-    	companyChange(companyId){//公司下拉选择改变时
-    		
-    		this.screenInfo.companyId = companyId;
-    		
-    		this.screenInfo.currentPage = 1;
-    		
-    		this.screenInfo.areaData = [];
-    		
-    		(async() => {
-    			
-				let listData = null;
-				
-				if(companyId == 0){
-    			
-	    			listData = await AllcompanyInvoiceList();//所有公司发票列表
-	    			
-	    		}else{
-	    			
-	    			listData = await companyInvoiceList(companyId,1);//单个公司发票列表
-	    			
-	    		}
-	    		
-	    		this.total = listData.page_info ? listData.page_info.record_count : 0;
-				
-				this.tableData = listData.data;
-    			
-    		})();
-    		
-    	},
     	submitSucceed(){//提交发票成功时触发
     		
     		this.invoiceAllData = {};//发票所有数据
     		
-			(async() => {
-				
-				let listData = null;
-				
-//				if(this.$route.query.currentCompanyId){
-					
-					if(this.screenInfo.companyId == 0){
+			let invoice_list_data = null;
+    		
+    		(async() => {
     			
-		    			listData = await AllcompanyInvoiceList(this.screenInfo.currentPage);//所有公司发票列表
-		    			
-		    		}else{
-		    			
-		    			listData = await companyInvoiceList(this.screenInfo.companyId,this.screenInfo.currentPage);//单个公司发票列表
-		    			
-		    		}
-					
-//				}else{
-//					
-//					listData = await AllcompanyInvoiceList();//所有公司发票列表
-//					
-//				}
-				
-				this.total = listData.page_info ? listData.page_info.record_count : 0;
-				
-				this.tableData = listData.data;
-				
-			})();
+    			invoice_list_data = await invoiceList(1);//发票列表数据
+    			
+    			this.pageInfo = {//页码信息
+	        		currentPage: invoice_list_data.page_info ? Number(invoice_list_data.page_info.page_absolute) : 1,
+	        		total: invoice_list_data.page_info ? Number(invoice_list_data.page_info.record_count) : 0,
+	        	};
+	        	
+	        	this.tableData = invoice_list_data.data || [];//表格数据
+    			
+    		})();
     		
     	},
+    	
     	updateData(){//更新表格数据
     		
-			(async() => { //es7异步函数
-				
-				let listData = null;
-				
-//				if(this.$route.query.currentCompanyId){
-					
-					if(this.screenInfo.companyId == 0){
+			let invoice_list_data = null;
+    		
+    		(async() => {
     			
-		    			listData = await AllcompanyInvoiceList(this.screenInfo.currentPage);//所有公司发票列表
-		    			
-		    		}else{
-		    			
-		    			listData = await companyInvoiceList(this.screenInfo.companyId,this.screenInfo.currentPage);//单个公司发票列表
-		    			
-		    		}
-					
-//				}else{
-//					
-//					listData = await AllcompanyInvoiceList();//所有公司发票列表
-//					
-//				}
-				
-				this.total = listData.page_info ? listData.page_info.record_count : 0;
-				
-				this.tableData = listData.data;
-				
-			})();
+    			invoice_list_data = await invoiceList();//发票列表数据
+    			
+    			this.pageInfo = {//页码信息
+	        		currentPage: invoice_list_data.page_info ? Number(invoice_list_data.page_info.page_absolute) : 1,
+	        		total: invoice_list_data.page_info ? Number(invoice_list_data.page_info.record_count) : 0,
+	        	};
+	        	
+	        	this.tableData = invoice_list_data.data || [];//表格数据
+    			
+    		})();
 			
     	},
     	
@@ -569,45 +384,34 @@ export default {
 		
 		let templateList = [];//模板列表
 		
-		let templateForms = null;//模板表单
+		let templateForms = null;//模板表单数据
 		
-		let companyDataList = [];//公司列表数据
+		let company_list_data = [];//公司列表数据
 		
-		let listData = null;//列表数据
+		let invoice_list_data = null;//发票列表数据
 		
-		//let urlCompanyId = getUrlParams(window.location.href,'currentCompanyId');
+		let invoice_url = '';//发票链接
 		
-		(async() => { //es7异步函数
+		(async() => {
 			
-			//-------------公用--------------------------------------------------
+			//-------------公共代码-------------
 			
-//			if(urlCompanyId){
-//				
-//				if(urlCompanyId == 0){
-//				
-//					listData = await AllcompanyInvoiceList();//所有公司发票列表
-//				
-//				}else{
-//				
-//					listData = await companyInvoiceList();//单个公司发票列表
-//				
-//				}
-//				
-//			}else{
-				
-				listData = await AllcompanyInvoiceList();//所有公司发票列表
-				
-//			}
+			invoice_list_data = await invoiceList();//发票列表数据
 			
-			companyDataList = await companyList();//公司列表
+			company_list_data = await companyList();//公司列表
+			
+			//-------------公共代码--------------
 			
 			if(localStorage.getItem('userType') == 1){//会计
 				
 				templateList = await template();//模板列表
 				
-			}else if(localStorage.getItem('userType') == 2){//用户
+			}
+			else if(localStorage.getItem('userType') == 2){//用户
 				
 				if(sessionStorage.getItem('params')){
+					
+					invoice_url = sessionStorage.getItem('params');//发票链接
 					
 					templateForms = await templateShow();//发票模板表单数据
 					
@@ -619,27 +423,30 @@ export default {
 			
 			next(vm => {
 				
-				vm.total = listData.page_info ? Number(listData.page_info.record_count) : 0;
+				vm.pageInfo = {//页码信息
+	        		currentPage: invoice_list_data.page_info ? Number(invoice_list_data.page_info.page_absolute) : 1,
+	        		total: invoice_list_data.page_info ? Number(invoice_list_data.page_info.record_count) : 0,
+	        	};
 				
-				let arr = [];
+				let companyArr = [];
 				
-				companyDataList.forEach(item => {
-					arr.push({
+				company_list_data.forEach(item => {
+					companyArr.push({
 						label: item.title,
 						value: item.id,
 					});
 				})
 				
-				vm.companyDataList = arr;//公司列表
+				vm.companyDataList = companyArr;//公司列表
 				
-				vm.tableData = listData.data || [];//表格数据
+				vm.tableData = invoice_list_data.data || [];//表格数据
 				
 				if(localStorage.getItem('userType') == 1){//会计
 					
-					let arr = [];
+					let templateArr = [];
 					
 					templateList.forEach(item => {
-						arr.push({
+						templateArr.push({
 							label: item.title,
 							value: item.id,
 							setting: item.setting,
@@ -647,9 +454,15 @@ export default {
 						});
 					});
 					
-					vm.templateList = arr;//模板列表
+					vm.templateList = templateArr;//模板列表
 					
-				}else if(localStorage.getItem('userType') == 2){//用户
+				}
+				else if(localStorage.getItem('userType') == 2){//用户
+					
+					if(invoice_url){//发票链接
+						vm.$refs.companyInstance.formInline2.invoiceURL = invoice_url;
+					}
+					
 					
 					if(templateForms){//模板表单
 						

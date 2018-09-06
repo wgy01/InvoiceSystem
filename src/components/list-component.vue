@@ -1,10 +1,10 @@
 <template>
 
 	<div>
-		
+		{{initStateInfo.companyId}}
 		<div v-if="controlShow" style="margin-bottom: 14px;display: flex;align-items: center;">
 			
-			<Select v-model="screenInfo.companyId" filterable placeholder="选择公司" @on-change="companyChange" style="max-width: 260px;">
+			<Select v-model="initStateInfo.currentCompanyId" filterable placeholder="选择公司" @on-change="companyChange" style="max-width: 260px;">
                 <Option :value="0">所有公司发票</Option>
                 <Option v-for="item in companyDataList" :value="Number(item.value)" :key="item.value">{{ item.label }}</Option>
             </Select>
@@ -12,7 +12,7 @@
             <div style="width: 400px;height: 32px;margin-left: 16px;position: relative;">
             	<div style="position: absolute;left: 0;top: 0;z-index: 5;">
 	            	<Tooltip content="选择筛选级别" placement="top">
-		            	<Select v-model="levelNum" placeholder="选择公司" @on-change="levelChange" style="width: 60px;">
+		            	<Select v-model="initStateInfo.levelNum" placeholder="选择级别" @on-change="levelChange" style="width: 60px;">
 			                <Option :value="0">省份</Option>
 			                <Option :value="1">城市</Option>
 			                <Option :value="2">地区</Option>
@@ -20,7 +20,7 @@
 			            </Select>
 			        </Tooltip>
             	</div>
-			    <al-cascader class="al-cascader-class" v-if="alShow" v-model="screenInfo.areaData" :level="levelNum" placeholder="请选择地区" data-type="code" @on-change="alCascader" style="width: 100%;" />
+			    <al-cascader class="al-cascader-class" v-if="alShow" v-model="areaData" :level="initStateInfo.levelNum" placeholder="请选择地区" data-type="code" @on-change="alCascader" style="width: 100%;" />
             </div>
             
 		</div>
@@ -29,7 +29,7 @@
 		
 		<div v-if="controlShow" style="margin-top: 14px;display: flex;align-items: center;">
 			
-			<Page ref="pageInstance" :total="total" :current="screenInfo.currentPage" show-total show-elevator @on-change="pageChange" style="margin-left: auto;" />
+			<Page ref="pageInstance" :total="pageInfo.total || 0" :current="initStateInfo.currentPage" show-total show-elevator @on-change="pageChange" style="margin-left: auto;" />
 			
 		</div>
 		
@@ -114,22 +114,17 @@ export default {
 		
 		componentType: String,
 		
-		total: {
-			type: Number,
-			default: 0
-		},
-		
 		companyDataList: {
 			type: Array,
 			default: () => {return []}
 		},
 		
-		screenInfo: {
+		pageInfo: {//页码信息
 			type: Object,
 			default: () => {return {}}
 		},
 		
-		controlShow: {
+		controlShow: {//是否显示筛选控件
 			type: Boolean,
 			default: false
 		},
@@ -156,8 +151,6 @@ export default {
         	
         	//---------------------------------------------------
         	
-        	levelNum: 3,
-        	
         	alShow: true,
         	
         	areaData: [],//地区
@@ -165,7 +158,8 @@ export default {
         	initStateInfo: {//初始化状态信息
         		currentCompanyId: 0,//选中的公司id
         		currentPage: 1,//当前页
-            	areaString: '',//地区字符
+            	currentArea: '',//地区数据
+            	levelNum: 3,//当前级别
         	},
         	
         }
@@ -298,7 +292,17 @@ export default {
     	
     	levelChange(val){//级别改变时
     		
-    		this.alShow = false;
+      		this.alShow = false;
+    		
+    		if(this.areaData.length > val+1){
+    			
+    			this.areaData.splice(val+1,this.areaData.length-val-1);
+    			
+      			this.setRoutePara('areaString',this.areaData.join(','));
+      			
+    		}
+    		
+    		this.setRoutePara('levelNum',val);
     		
     		setTimeout(() => {
     			this.alShow = true;
@@ -308,42 +312,28 @@ export default {
     	
     	alCascader(data_arr){//地区选择改变时
     		
-    		//let arrStr = data_arr.join(',');
+      		let arrStr = data_arr.join(',');
     		
-        	//this.setRoutePara('areaString',arrStr);
-        	
-        	this.$emit('on-area-change',data_arr);
-        	
+          	this.setRoutePara('areaString',arrStr);
+          	
     	},
     	
     	companyChange(companyId){//公司下拉改变时
     		
-    		//this.setRoutePara('currentCompanyId',companyId);
-    		
-    		//this.setRoutePara('currentPage',1);
-    		
-      		this.alShow = false;
-    		
-    		this.$emit('on-company-change',companyId);
-    		
-    		setTimeout(() => {
-    			this.alShow = true;
-    		},10);
+        	this.setRoutePara('currentCompanyId',companyId);
     		
     	},
     	
     	pageChange(pageNum){//页码改变时
     		
-    		//this.setRoutePara('currentPage',pageNum);
-    		
-    		this.$emit('on-page-change',pageNum);
+      		this.setRoutePara('currentPage',pageNum);
     		
     	},
     	
     	setRoutePara(str,val){ //设置路由参数
     		
     		this.initStateInfo[str] = val;
-    			
+    		
     		this.$router.push(
 	    		{
 	    			name: this.$route.name,
@@ -371,10 +361,21 @@ export default {
 		
 		'$route' (to, from) {
 			
-			//this.maintainData(to.query);//保持筛选数据
+			if(to.query.currentPage && Number(to.query.currentPage) <= 0){
+				this.setRoutePara('currentPage',1);
+			}
 			
-			//this.$emit('on-route-change');
+			this.maintainData(to.query);//保持筛选数据
 			
+			this.initStateInfo.levelNum = to.query.levelNum || Number(to.query.levelNum) === 0 ? Number(to.query.levelNum) : 3;
+			
+			this.$emit('on-route-change');
+			
+		},
+		pageInfo(newVal){//后台页码数据更新后
+			if(this.initStateInfo.currentPage > newVal.currentPage){//当前页码大于后台返回的页码
+				this.setRoutePara('currentPage',1);
+			}
 		},
 		
 	},
@@ -385,11 +386,11 @@ export default {
     	
     	this.init();//初始化表头
     	
-//  	this.$nextTick(() => {
-//  		
-//  		this.maintainData(this.$route.query);//保持筛选数据
-//  		
-//  	});
+    	this.$nextTick(() => {
+    		this.maintainData(this.$route.query);//保持筛选数据
+    	});
+    	
+    	this.initStateInfo.levelNum = this.$route.query.levelNum || Number(this.$route.query.levelNum) === 0 ? Number(this.$route.query.levelNum) : 3;
     	
 	},
     mounted () {//模板被渲染完毕之后执行

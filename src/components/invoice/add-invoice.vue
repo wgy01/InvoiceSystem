@@ -143,7 +143,6 @@ export default {
 			
     	},
     	handleSubmit(name) {//创建发票
-    		console.log(this.formsList);
             this.$refs[name].validate((valid) => {
                 if (valid) {
                     this.$Message.success('创建成功');

@@ -268,6 +268,7 @@ export default {
 			height: 100%;
 			background: rgba(255,255,255,0.8);
 			color: #ed3f14;
+			z-index: 100;
 		}
 	}
 	

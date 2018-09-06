@@ -4,48 +4,41 @@
 		
 		<div class="drag">
 			
-			<Card>
-			
-				<h1 slot="title">
+			<Card class="card" :bordered="false" dis-hover>
+				
+				<h1 style="text-align: center;color: #A4A68C;margin-bottom: 20px;">
 					<Icon type="person-add"></Icon>
-					注册
+					<span>注册</span>
 				</h1>
 				
 				<div>
 					
-					<div style="text-align: center;margin-bottom:24px;">
+					<div style="text-align: left;margin-bottom:24px;">
+						<label class="my-label">账户类型</label>
 						<RadioGroup v-model="accountType">
 					        <Radio :label="2">
-					            <span>申请开票</span>
+					            <span style="color: #A4A68C;">申请开票</span>
 					        </Radio>
 					        <Radio :label="1">
-					            <span>开票</span>
+					            <span style="color: #A4A68C;">开票</span>
 					        </Radio>
 				        </RadioGroup>
 					</div>
 					
 					<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="100">
 						
-				        <FormItem label="手机号码" prop="mobileNumber">
+				        <FormItem class="zc-input-bg-transparency" label="手机号码" prop="mobileNumber">
 				        	
-				        	<!--<AutoComplete
-						        v-model="formInline.mobileNumber"
-						        @on-search="handleSearch"
-						        placeholder="手机号码"
-						    >
-						        <Option v-for="item in hintList" :value="item" :key="item">{{ item }}</Option>
-						    </AutoComplete>-->
-						    
-						    <Input v-model="formInline.mobileNumber" placeholder="手机号码"></Input>
+						    <Input v-model="formInline.mobileNumber" placeholder="输入手机号码"></Input>
 				        	
 				        </FormItem>
 				        
-				        <FormItem label="密码" prop="password">
-				            <Input type="password" v-model="formInline.password" placeholder="密码"></Input>
+				        <FormItem class="zc-input-bg-transparency" label="密码" prop="password">
+				            <Input type="password" v-model="formInline.password" placeholder="输入密码"></Input>
 				        </FormItem>
 				        
-				        <FormItem label="确认密码" prop="passwdCheck">
-				            <Input type="password" v-model="formInline.passwdCheck" placeholder="确认密码"></Input>
+				        <FormItem class="zc-input-bg-transparency" label="确认密码" prop="passwdCheck">
+				            <Input type="password" v-model="formInline.passwdCheck" placeholder="请确认密码"></Input>
 				        </FormItem>
 				        
 				    </Form>
@@ -55,7 +48,7 @@
 			        </div>
 			        
 			        <div style="margin-top: 16px;text-align: center;">
-			        	<a @click="Aclick">已有账户立即登录</a>
+			        	<a @click="Aclick" style="color: #5cadff;">已有账户立即登录</a>
 			        </div>
 					
 				</div>
@@ -118,13 +111,13 @@ export default {
             },
             ruleInline: {
                 password: [
-                    { required: true, validator: validatePass, trigger: 'blur' }
+                    { required: true, validator: validatePass, trigger: 'change' }
                 ],
                 passwdCheck: [
                     { required: true, validator: validatePassCheck, trigger: 'blur' }
                 ],
                 mobileNumber: [
-                    { required: true, message: '请输入手机号码', trigger: 'blur' },
+                    { required: true, message: '请输入手机号码', trigger: 'change' },
                     { type: 'string', min: 11, max: 11, message: '手机号码格式错误', trigger: 'blur' }
                 ],
             },
@@ -171,13 +164,6 @@ export default {
             })
             
         },
-        handleSearch (value) {//自动完成
-            this.hintList = !value || value.indexOf('@') >= 0 ? [] : [
-                value + '@qq.com',
-                value + '@sina.com',
-                value + '@163.com'
-            ];
-        },
         Aclick(){
         	this.$parent.show = false;
         },
@@ -201,10 +187,53 @@ export default {
 <style scoped>
 	.drag{
 		position: absolute;
-		width: 320px;
-		height: 280px;
-		right:300px;
-		bottom:300px;
+		width: 360px;
+		height: 372px;
+		margin: auto;
+		right:0;
+		bottom:0;
+		left: 0;
+		top: 0;
 		z-index: 10;
+	}
+	.card {
+		height:100%;
+		background: rgba(0,0,0,.2) !important;
+	}
+	.my-label{
+		display: inline-block;
+		width: 100px;
+		text-align: right;
+		padding: 10px 12px 10px 0;
+		font-size: 12px;
+		color: #A4A68C;
+		line-height: 1;
+	}
+	.my-label:before{
+		content: '*';
+	    display: inline-block;
+	    margin-right: 4px;
+	    line-height: 1;
+	    font-family: SimSun;
+	    font-size: 12px;
+	    color: #ed3f14;
+	}
+</style>
+<style lang="less">
+	.zc-input-bg-transparency{
+		.ivu-input-wrapper{
+			border-bottom: 1px solid #A4A68C;
+		}
+		input{
+			border: none !important;
+			color: #A4A68C;
+			background-color: rgba(0,0,0,0) !important;
+			&::-webkit-input-placeholder{
+				color: #999;
+			}
+		}
+		.ivu-form-item-label{
+			color: #A4A68C;
+		}
 	}
 </style>
