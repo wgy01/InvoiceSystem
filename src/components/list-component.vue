@@ -15,8 +15,8 @@
 		            	<Select v-model="initStateInfo.levelNum" placeholder="选择级别" @on-change="levelChange" style="width: 60px;">
 			                <Option :value="0">省份</Option>
 			                <Option :value="1">城市</Option>
-			                <Option :value="2">地区</Option>
-			                <Option :value="3">街道</Option>
+			                <!--<Option :value="2">地区</Option>
+			                <Option :value="3">街道</Option>-->
 			            </Select>
 			        </Tooltip>
             	</div>
@@ -159,7 +159,7 @@ export default {
         		currentCompanyId: 0,//选中的公司id
         		currentPage: 1,//当前页
             	currentArea: '',//地区数据
-            	levelNum: 3,//当前级别
+            	levelNum: 1,//当前级别
         	},
         	
         }
@@ -367,7 +367,7 @@ export default {
 			
 			this.maintainData(to.query);//保持筛选数据
 			
-			this.initStateInfo.levelNum = to.query.levelNum || Number(to.query.levelNum) === 0 ? Number(to.query.levelNum) : 3;
+			this.initStateInfo.levelNum = to.query.levelNum || Number(to.query.levelNum) === 0 ? Number(to.query.levelNum) : 1;
 			
 			this.$emit('on-route-change');
 			
@@ -390,7 +390,7 @@ export default {
     		this.maintainData(this.$route.query);//保持筛选数据
     	});
     	
-    	this.initStateInfo.levelNum = this.$route.query.levelNum || Number(this.$route.query.levelNum) === 0 ? Number(this.$route.query.levelNum) : 3;
+    	this.initStateInfo.levelNum = this.$route.query.levelNum || Number(this.$route.query.levelNum) === 0 ? Number(this.$route.query.levelNum) : 1;
     	
 	},
     mounted () {//模板被渲染完毕之后执行

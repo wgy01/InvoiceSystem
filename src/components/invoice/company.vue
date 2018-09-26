@@ -52,7 +52,7 @@
 					        </FormItem>
 					        
 					        <FormItem label="地区选择" prop="areaData">
-							    <al-cascader v-model="formInline.areaData" placeholder="请选择地区" data-type="code" style="max-width: 400px;" />
+							    <al-cascader v-model="formInline.areaData" level="1" placeholder="请选择地区" data-type="code" style="max-width: 400px;" />
 					        </FormItem>
 					        
 					    </Form>

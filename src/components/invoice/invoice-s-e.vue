@@ -70,7 +70,7 @@
 		        </FormItem>
 		        
 		        <FormItem label="地区选择" prop="areaData">
-		        	<al-cascader v-if="formInline.areaData.length > 0" v-model="formInline.areaData" placeholder="请选择地区" data-type="code" style="max-width: 400px;" />
+		        	<al-cascader v-if="formInline.areaData.length > 0" level="1" v-model="formInline.areaData" placeholder="请选择地区" data-type="code" style="max-width: 400px;" />
 		        </FormItem>
 		        
 		    </Form>
@@ -94,7 +94,7 @@
     			</Col>
     			
     			<Col span="20">
-    				<al-cascader v-if="formInline.areaData.length > 0" @on-change="alCascader" v-model="formInline.areaData" :disabled="true" placeholder="请选择地区" data-type="all" style="max-width: 400px;display: none;" />
+    				<al-cascader v-if="formInline.areaData.length > 0" @on-change="alCascader" level="1" v-model="formInline.areaData" :disabled="true" placeholder="请选择地区" data-type="all" style="max-width: 400px;display: none;" />
     				<span v-for="(itemArea,index) in allAreaData">
     					{{itemArea.name}}
     					{{index == (allAreaData.length-1) ? '' : ' —> '}}

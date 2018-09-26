@@ -23,12 +23,6 @@ export default {
 	},
 	props:{
 		
-//		name: {
-//			type: Array | Number | String | Object,//类型
-//			required: true,//必传
-//			default: '',//默认值
-//		}
-		
 	},
     data () {//数据
     	
@@ -60,7 +54,7 @@ export default {
 <style scoped>
 	.box{
 		position: relative;
-		background:url(../../../static/public/images/kj01.png) center / cover no-repeat;
+		background:url(../../../static/public/images/bg.jpg) center / cover no-repeat;
 		width:100%;
 		height:100%;
 		z-index:1;

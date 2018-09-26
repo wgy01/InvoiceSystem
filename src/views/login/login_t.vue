@@ -2,35 +2,35 @@
 	
 	<div>
 		
-		<div class="drag">
+		<div class="drag" style="border: 1px solid red;">
 			
 			<Card class="card" :bordered="false" dis-hover>
 				
-				<h1 style="text-align: center;color: #A4A68C;margin-bottom: 20px;">
-					<Icon type="log-in"></Icon>
-					<span>登录</span>
-				</h1>
+				<div style="text-align: center;color: #A4A68C;padding: 20px 0 36px;">
+					<!--<Icon type="log-in"></Icon>-->
+					<span style="font-size: 36px;letter-spacing:6px;">发票管理系统</span>
+				</div>
 				
 				<div>
 					
 					<Form ref="formInline" :model="formInline" :rules="ruleInline">
 						<FormItem prop="user">
 							<Input class="input-bg-transparency" type="text" @on-enter="handleSubmit('formInline')" v-model="formInline.user" placeholder="手机号码">
-								<Icon type="ios-person-outline" slot="prepend" size="18" color="#A4A68C"></Icon>
+								<Icon type="ios-person-outline" slot="prepend" size="24" color="#A4A68C"></Icon>
 							</Input>
 						</FormItem>
 						<FormItem prop="password">
 							<Input class="input-bg-transparency" type="password" @on-enter="handleSubmit('formInline')" v-model="formInline.password" placeholder="密码">
-								<Icon type="ios-locked-outline" slot="prepend" size="18" color="#A4A68C"></Icon>
+								<Icon type="ios-locked-outline" slot="prepend" size="24" color="#A4A68C"></Icon>
 							</Input>
 						</FormItem>
 						<div class="but">
-							<Button type="primary" long size="large" @click="handleSubmit('formInline')">登陆</Button>
+							<Button style="font-size: 20px;" shape="circle" type="primary" long size="large" @click="handleSubmit('formInline')">登陆</Button>
 						</div>
 					</Form>
 					
 					<p class="register">
-						<a @click="Aclick" style="color: #5cadff;">没有账号立即注册</a>
+						<a @click="Aclick" style="color: #5cadff;font-size: 16px;">没有账号立即注册</a>
 					</p>
 					
 				</div>
@@ -191,8 +191,8 @@ export default {
 <style scoped lang="less">
 	.drag{
 		position: absolute;
-		width: 318px;
-		height: 261px;
+		width: 400px;
+		height: 500px;
 		margin: auto;
 		top: 0;
 		bottom: 0;
@@ -202,15 +202,16 @@ export default {
 	}
 	.card {
 		height:100%;
-		background: rgba(0,0,0,0) !important;
+		background: rgba(255,255,255,0) !important;
 	}
 	.title{
 	}
 	.but{
 		text-align:center;
+		padding-top: 26px;
 	}
 	.register{
-		margin-top:16px;
+		margin-top:20px;
 		text-align: center;
 		color:blue;
 	}
@@ -220,6 +221,8 @@ export default {
 <style lang="less">
 	.input-bg-transparency{
 		input{
+			font-size: 16px;
+			height: 45px !important;
 			border: none !important;
 			color: #A4A68C;
 			background-color: rgba(0,0,0,.2) !important;
@@ -230,7 +233,7 @@ export default {
 		.ivu-input-group-prepend{
 			background-color: rgba(0,0,0,.2) !important;
 			border: none !important;
-			border-right: 1px solid rgba(164, 166, 140,.2) !important;
+			padding: 4px 14px !important;
 		}
 	}
 </style>
