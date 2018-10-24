@@ -2,12 +2,11 @@
 	
 	<div>
 		
-		<div class="drag" style="border: 1px solid red;">
+		<div class="drag">
 			
 			<Card class="card" :bordered="false" dis-hover>
 				
-				<div style="text-align: center;color: #A4A68C;padding: 20px 0 36px;">
-					<!--<Icon type="log-in"></Icon>-->
+				<div style="text-align: center;color: #cecece;padding: 20px 0 56px;">
 					<span style="font-size: 36px;letter-spacing:6px;">发票管理系统</span>
 				</div>
 				
@@ -16,12 +15,12 @@
 					<Form ref="formInline" :model="formInline" :rules="ruleInline">
 						<FormItem prop="user">
 							<Input class="input-bg-transparency" type="text" @on-enter="handleSubmit('formInline')" v-model="formInline.user" placeholder="手机号码">
-								<Icon type="ios-person-outline" slot="prepend" size="24" color="#A4A68C"></Icon>
+								<Icon type="ios-person-outline" slot="prepend" size="32" color="#a2a2a2"></Icon>
 							</Input>
 						</FormItem>
 						<FormItem prop="password">
 							<Input class="input-bg-transparency" type="password" @on-enter="handleSubmit('formInline')" v-model="formInline.password" placeholder="密码">
-								<Icon type="ios-locked-outline" slot="prepend" size="24" color="#A4A68C"></Icon>
+								<Icon type="ios-locked-outline" slot="prepend" size="32" color="#a2a2a2"></Icon>
 							</Input>
 						</FormItem>
 						<div class="but">
@@ -30,7 +29,7 @@
 					</Form>
 					
 					<p class="register">
-						<a @click="Aclick" style="color: #5cadff;font-size: 16px;">没有账号立即注册</a>
+						<a @click="Aclick" style="font-size: 16px;">没有账号立即注册</a>
 					</p>
 					
 				</div>
@@ -192,23 +191,23 @@ export default {
 	.drag{
 		position: absolute;
 		width: 400px;
-		height: 500px;
+		height: 450px;
 		margin: auto;
 		top: 0;
 		bottom: 0;
-		left: 0;
-		right: 0;
+		right: 200px;
 		z-index: 10;
 	}
 	.card {
 		height:100%;
-		background: rgba(255,255,255,0) !important;
+		background: rgba(255,255,255,.1) !important;
+		border: 1px solid rgba(255,255,255,.1) !important;
 	}
 	.title{
 	}
 	.but{
 		text-align:center;
-		padding-top: 26px;
+		padding-top: 36px;
 	}
 	.register{
 		margin-top:20px;
@@ -224,14 +223,14 @@ export default {
 			font-size: 16px;
 			height: 45px !important;
 			border: none !important;
-			color: #A4A68C;
-			background-color: rgba(0,0,0,.2) !important;
+			color: #cecece;
+			background-color: rgba(255,255,255,.1) !important;
 			&::-webkit-input-placeholder{
 				color: #999;
 			}
 		}
 		.ivu-input-group-prepend{
-			background-color: rgba(0,0,0,.2) !important;
+			background-color: rgba(0,0,0,.6) !important;
 			border: none !important;
 			padding: 4px 14px !important;
 		}

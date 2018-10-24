@@ -6,31 +6,28 @@
 			
 			<Card class="card" :bordered="false" dis-hover>
 				
-				<h1 style="text-align: center;color: #A4A68C;margin-bottom: 20px;">
+				<div slot="title" style="text-align: center;color: #cecece;font-size: 24px;padding: 16px 0 6px;">
 					<Icon type="person-add"></Icon>
 					<span>注册</span>
-				</h1>
+				</div>
 				
 				<div>
 					
-					<div style="text-align: left;margin-bottom:24px;">
-						<label class="my-label">账户类型</label>
-						<RadioGroup v-model="accountType">
-					        <Radio :label="2">
-					            <span style="color: #A4A68C;">申请开票</span>
-					        </Radio>
-					        <Radio :label="1">
-					            <span style="color: #A4A68C;">开票</span>
-					        </Radio>
-				        </RadioGroup>
-					</div>
-					
-					<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="100">
+					<Form ref="formInline" :model="formInline" :rules="ruleInline" :label-width="70">
 						
+				        <FormItem class="zc-input-bg-transparency" label="账户类型" prop="accountType">
+						    <RadioGroup v-model="formInline.accountType">
+						        <Radio :label="2">
+						            <span style="color: #cecece;">申请开票</span>
+						        </Radio>
+						        <Radio :label="1">
+						            <span style="color: #cecece;">开票</span>
+						        </Radio>
+					        </RadioGroup>
+				        </FormItem>
+				        
 				        <FormItem class="zc-input-bg-transparency" label="手机号码" prop="mobileNumber">
-				        	
 						    <Input v-model="formInline.mobileNumber" placeholder="输入手机号码"></Input>
-				        	
 				        </FormItem>
 				        
 				        <FormItem class="zc-input-bg-transparency" label="密码" prop="password">
@@ -43,8 +40,8 @@
 				        
 				    </Form>
 				    
-				    <div style="text-align: center;">
-			            <Button long type="primary" @click="handleSubmit('formInline')">立即注册</Button>
+				    <div class="but">
+			            <Button style="font-size: 16px;" shape="circle" long type="primary" @click="handleSubmit('formInline')">立即注册</Button>
 			        </div>
 			        
 			        <div style="margin-top: 16px;text-align: center;">
@@ -100,16 +97,18 @@ export default {
     	
         return {
         	
-        	accountType: 2,
-        	
         	hintList: [],
         	
         	formInline: {
+        		accountType: 2,
         		mobileNumber: '',
                 password: '',
                 passwdCheck: '',
             },
             ruleInline: {
+                accountType: [
+                    { type: 'number', required: true, message: '请选择类型', trigger: 'change' }
+                ],
                 password: [
                     { required: true, validator: validatePass, trigger: 'change' }
                 ],
@@ -135,7 +134,7 @@ export default {
                     this.$axios.post('Service/User/register', {
                     	username: this.formInline.mobileNumber,
                     	password: this.formInline.password,
-                    	user_type: this.accountType,
+                    	user_type: this.formInline.accountType,
 					})
 					.then(response => {
 						
@@ -187,53 +186,45 @@ export default {
 <style scoped>
 	.drag{
 		position: absolute;
-		width: 360px;
-		height: 372px;
+		width: 400px;
+		height: 450px;
 		margin: auto;
-		right:0;
+		right: 200px;
 		bottom:0;
-		left: 0;
 		top: 0;
 		z-index: 10;
 	}
 	.card {
 		height:100%;
-		background: rgba(0,0,0,.2) !important;
+		background: rgba(255,255,255,.1) !important;
+		border: 1px solid rgba(255,255,255,.1) !important;
 	}
-	.my-label{
-		display: inline-block;
-		width: 100px;
-		text-align: right;
-		padding: 10px 12px 10px 0;
-		font-size: 12px;
-		color: #A4A68C;
-		line-height: 1;
-	}
-	.my-label:before{
-		content: '*';
-	    display: inline-block;
-	    margin-right: 4px;
-	    line-height: 1;
-	    font-family: SimSun;
-	    font-size: 12px;
-	    color: #ed3f14;
+	.but{
+		text-align:center;
+		padding-top: 26px;
 	}
 </style>
 <style lang="less">
+	.card{
+		.ivu-card-head{
+			border-bottom: none !important;
+		}
+	}
 	.zc-input-bg-transparency{
 		.ivu-input-wrapper{
-			border-bottom: 1px solid #A4A68C;
+			/*border-bottom: 1px solid #999;*/
 		}
 		input{
+			font-size: 14px;
 			border: none !important;
-			color: #A4A68C;
-			background-color: rgba(0,0,0,0) !important;
+			color: #cecece;
+			background-color: rgba(255,255,255,.1) !important;
 			&::-webkit-input-placeholder{
 				color: #999;
 			}
 		}
 		.ivu-form-item-label{
-			color: #A4A68C;
+			color: #cecece;
 		}
 	}
 </style>
