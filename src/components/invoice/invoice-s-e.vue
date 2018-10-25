@@ -2,107 +2,41 @@
 
 	<div>
 		
+		<!----------------------------------物流部分------------------------------------------------------------------>
+		
 		<Card v-if="type == 'show' && status == 1" :bordered="false" dis-hover style="margin-bottom: 16px;">
-			
 			<h2 slot="title">物流信息</h2>
-			
 			<div>
-				
 				<Row>
-					
 					<Col span="10">
-						
 						<Row style="padding: 6px 0;">
-    			
 			    			<Col span="8" style="text-align: right;">
 			    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">快递公司：</label>
 			    			</Col>
-			    			
-			    			<Col span="16">
-			    				{{expressInfo.company}}
-			    			</Col>
-			    			
+			    			<Col span="16">{{expressInfo.company}}</Col>
 			    		</Row>
-						
 					</Col>
-					
 					<Col span="10">
-						
 						<Row style="padding: 6px 0;">
-    			
 			    			<Col span="8" style="text-align: right;">
 			    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">快递单号：</label>
 			    			</Col>
-			    			
-			    			<Col span="16">
-			    				{{expressInfo.odd}}
-			    			</Col>
-			    			
+			    			<Col span="16">{{expressInfo.odd}}</Col>
 			    		</Row>
-						
 					</Col>
-					
 					<Col span="4">
 						<Button type="primary" @click="expressQuery">快递查询</Button>
 					</Col>
-					
 				</Row>
-	    		
 			</div>
-			
 		</Card>
 		
-		<!--用户部分-->
+		<!---------------------------------------------------用户部分-------------------------------------------------------------->
+		
 		<Card :bordered="false" dis-hover style="margin-bottom: 16px;">
 			
     		<h2 slot="title">{{Info.ticketName}}（用户）</h2>
     		
-			<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
-				
-				<FormItem label="需要开票的单位" prop="companyId">
-		        	<Select v-model="formInline.companyId" @on-change="companyChange" filterable placeholder="选择公司" style="max-width: 200px;">
-		                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-		            </Select>
-		        </FormItem>
-		        
-	            <FormItem label="开票金额(元)" prop="money">
-		            <Input v-model="formInline.money" clearable placeholder="输入金额" style="max-width: 200px;"></Input>
-		        </FormItem>
-		        
-		        <FormItem label="地区选择" prop="areaData">
-		        	<al-cascader v-if="formInline.areaData.length > 0" level="1" v-model="formInline.areaData" placeholder="请选择地区" data-type="code" style="max-width: 400px;" />
-		        </FormItem>
-		        
-		    </Form>
-		    
-		    <Row v-if="userType == 1 || type == 'show'" style="padding: 16px 0 6px;">
-    			
-    			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">开票金额(元)：</label>
-    			</Col>
-    			
-    			<Col span="20">
-    				{{formInline.money}}
-    			</Col>
-    			
-    		</Row>
-    		
-		    <Row v-if="userType == 1 || type == 'show'" style="padding: 16px 0 6px;">
-    			
-    			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">地区：</label>
-    			</Col>
-    			
-    			<Col span="20">
-    				<al-cascader v-if="formInline.areaData.length > 0" @on-change="alCascader" level="1" v-model="formInline.areaData" :disabled="true" placeholder="请选择地区" data-type="all" style="max-width: 400px;display: none;" />
-    				<span v-for="(itemArea,index) in allAreaData">
-    					{{itemArea.name}}
-    					{{index == (allAreaData.length-1) ? '' : ' —> '}}
-    				</span>
-    			</Col>
-    			
-    		</Row>
-		    
 		    <forms-template
             ref="formsInstance1"
             @on-change="formsChange"
@@ -110,8 +44,53 @@
             :out-forms-data="companyFormsData"
             :show-type="type == 'edit' && userType == 2 ? 'edit2' : 'show'"
             >
+            	
+            	<!--编辑-->
+        		<Form v-if="userType == 2 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120" slot="edit">
+					<Col span="12">
+						<FormItem label="需要开票的单位" prop="companyId">
+				        	<Select v-model="formInline.companyId" @on-change="companyChange" filterable placeholder="选择公司" style="width: 100%;">
+				                <Option v-for="item in companyDataList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+				            </Select>
+				        </FormItem>
+					</Col>
+					<Col span="12">
+						<FormItem label="开票金额(元)" prop="money">
+				            <Input v-model="formInline.money" clearable placeholder="输入金额" style="width: 100%;"></Input>
+				        </FormItem>
+					</Col>
+					<Col span="12">
+						<FormItem label="地区选择" prop="areaData">
+				        	<al-cascader v-if="formInline.areaData.length > 0" level="1" v-model="formInline.areaData" placeholder="请选择地区" data-type="code" style="width: 100%;" />
+				        </FormItem>
+					</Col>
+			    </Form>
+            	
+            	<!--详情-->
+            	<div slot="show">
+		            <Col span="12" style="padding: 6px 0;">
+		            	<Row>
+		    				<Col span="8" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;">开票金额(元)：</Col>
+							<Col span="16">{{formInline.money}}</Col>
+		    			</Row>
+		            </Col>
+		            <Col span="12" slot="show" style="padding: 6px 0;">
+		            	<Row>
+		    				<Col span="8" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;">地区：</Col>
+							<Col span="16">
+								<al-cascader v-if="formInline.areaData.length > 0" @on-change="alCascader" level="1" v-model="formInline.areaData" :disabled="true" placeholder="请选择地区" data-type="all" style="display: none;" />
+			    				<span v-for="(itemArea,index) in allAreaData">
+			    					{{itemArea.name}}
+			    					{{index == (allAreaData.length-1) ? '' : ' / '}}
+			    				</span>
+							</Col>
+		    			</Row>
+		            </Col>
+            	</div>
+            	
             </forms-template>
 		    
+		    <!--上传图片-->
 		    <Form :label-width="120">
 		        <FormItem v-if="userType == 2 && type == 'edit'" label="上传图片文件">
 		        	<upload
@@ -123,12 +102,11 @@
 		        </FormItem>
 		    </Form>
 		    
-	        <Row v-if="userType == 1 || type == 'show'" style="padding: 16px 0 6px;">
-    			
+		    <!--图片详情-->
+	        <Row v-if="userType == 1 || type == 'show'" style="padding: 6px 0;">
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
     			</Col>
-    			
     			<Col span="20">
     				<upload
 			    	show-type="show"
@@ -137,52 +115,17 @@
 		    		@on-del="del">
 			    	</upload>
     			</Col>
-    			
     		</Row>
 		    
 		</Card>
 		
-    	<!--会计部分-->
+    	<!-------------------------------------------会计部分----------------------------------------------------------------->
+    	
     	<Card :bordered="false" dis-hover v-show="userType == 1 || (userType == 2 && type == 'show' && status == 1)">
     		
     		<h2 slot="title">{{Info.accountName}}（会计）</h2>
     		
-    		<Form v-if="userType == 1 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
-    			
-				<FormItem label="发票代码" prop="invoiceCode">
-		            <Input v-model="formInline.invoiceCode" clearable placeholder="输入发票代码" style="max-width: 200px;"></Input>
-		        </FormItem>
-		        
-				<FormItem label="发票编号" prop="invoiceNum">
-		            <Input v-model="formInline.invoiceNum" clearable placeholder="输入发票编号" style="max-width: 200px;"></Input>
-		        </FormItem>
-		        
-		    </Form>
-    		
-    		<Row v-if="userType == 2 || type == 'show'" style="padding: 16px 0 6px;">
-    			
-    			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">发票代码：</label>
-    			</Col>
-    			
-    			<Col span="20" :style="{color: formInline.invoiceCode ? '' : '#bbbec4'}">
-    				{{formInline.invoiceCode || '- -无内容- -'}}
-    			</Col>
-    			
-    		</Row>
-    		
-    		<Row v-if="userType == 2 || type == 'show'" style="padding: 16px 0 6px;">
-    			
-    			<Col span="4" style="text-align: right;">
-    				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">发票编号：</label>
-    			</Col>
-    			
-    			<Col span="20" :style="{color: formInline.invoiceNum ? '' : '#bbbec4'}">
-    				{{formInline.invoiceNum || '- -无内容- -'}}
-    			</Col>
-    			
-    		</Row>
-    		
+            	<Form v-if="userType == 1 && type == 'edit'" ref="formInline" :model="formInline" :rules="ruleInline" :label-width="120">
     		<forms-template
             ref="formsInstance2"
             @on-change="formsChange"
@@ -190,10 +133,40 @@
             :out-forms-data="accountantFormsData"
             :show-type="type == 'edit' && userType == 1 ? 'edit2' : 'show'"
             >
+            	
+            	<!--编辑-->
+					<Col span="12">
+						<FormItem label="发票代码" prop="invoiceCode">
+				            <Input v-model="formInline.invoiceCode" clearable placeholder="输入发票代码"></Input>
+				        </FormItem>
+					</Col>
+					<Col span="12">
+						<FormItem label="发票编号" prop="invoiceNum">
+				            <Input v-model="formInline.invoiceNum" clearable placeholder="输入发票编号"></Input>
+				        </FormItem>
+					</Col>
+			    
+            	
+            	<!--详情-->
+            	<div slot="show">
+		            <Col span="12" style="padding: 6px 0;">
+		            	<Row>
+		    				<Col span="8" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;">发票代码：</Col>
+							<Col span="16" :style="{color: formInline.invoiceCode ? '' : '#bbbec4'}">{{formInline.invoiceCode || '- -'}}</Col>
+		    			</Row>
+		            </Col>
+		            <Col span="12" style="padding: 6px 0;">
+		            	<Row>
+		    				<Col span="8" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;">发票编号：</Col>
+							<Col span="16" :style="{color: formInline.invoiceCode ? '' : '#bbbec4'}">{{formInline.invoiceNum || '- -'}}</Col>
+		    			</Row>
+		            </Col>
+            	</div>
+            	
             </forms-template>
-    		
+    		</Form>
+    		<!--上传图片-->
     		<Form v-if="userType == 1 && type == 'edit'" :label-width="120">
-    			
 	    		<FormItem v-if="type == 'edit'" label="上传图片文件">
 		        	<upload
 			    	show-type="edit"
@@ -202,15 +175,13 @@
 		    		@on-del="del">
 			    	</upload>
 		        </FormItem>
-    			
     		</Form>
     		
-    		<Row v-if="userType == 2 || type == 'show'" style="padding: 16px 0 6px;">
-    			
+    		 <!--图片详情-->
+    		<Row v-if="userType == 2 || type == 'show'" style="padding: 6px 0;">
     			<Col span="4" style="text-align: right;">
     				<label style="width: 182px;text-align: right;font-size: 12px;font-weight:bold;">图片文件：</label>
     			</Col>
-    			
     			<Col span="20">
     				<upload
 			    	show-type="show"
@@ -219,7 +190,6 @@
 		    		@on-del="del">
 			    	</upload>
     			</Col>
-    			
     		</Row>
     		
     	</Card>

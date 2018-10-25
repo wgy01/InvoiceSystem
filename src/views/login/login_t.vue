@@ -222,6 +222,7 @@ export default {
 		input{
 			font-size: 16px;
 			height: 45px !important;
+			line-height: 45px !important;
 			border: none !important;
 			color: #cecece;
 			background-color: rgba(255,255,255,.1) !important;

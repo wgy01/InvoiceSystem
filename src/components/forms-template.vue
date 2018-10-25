@@ -3,103 +3,100 @@
 	<div ref="instance">
 		
 		<!--标题-->
-		<Row v-if="showType == 'edit'" type="flex" style="border-bottom:1px solid #e9eaec;margin-bottom:6px;">
+		<Row v-if="showType == 'edit'" type="flex" style="text-align: center;margin-bottom:6px;background: #e8eaec;">
 			
-			<Col span="4">名称 </Col>
+			<Col span="4" style="border-right: 1px solid #fff;padding: 6px 0;">名称 </Col>
 			
-			<Col span="8">内容 </Col>
+			<Col span="8" style="border-right: 1px solid #fff;padding: 6px 0;">内容 </Col>
 			
-			<Col span="12">字段描述</Col>
+			<Col span="12" style="padding: 6px 0;">字段描述</Col>
 
 	    </Row>
 	    
 	    <!--表单-->
-	    <Form ref="formsList" :model="formsList" :label-width="showType == 'edit2' ? 120 : 0">
 	    
-			<Row type="flex" :gutter="6" v-for="(item,index) in formsList.data" :key="index"  style="margin-top:10px;">
+	    <Form ref="formsList" :model="formsList" :label-width="showType == 'edit2' ? 120 : 0">
+	    	
+	    	<!------------------------------------模板编辑显示-------------------------------------->
+	    	
+			<Row type="flex" :gutter="16" v-for="(item,index) in formsList.data" :key="index" v-if="showType == 'edit'" :style="{marginTop: showType == 'edit' ? '10px' : 0}">
 				
-				<!----------------------字段名---------------------------->
-				
-				<!--编辑显示-->
+				<!--字段名-->
+				<!--添加表单时显示-->
 				<Col span="4" v-if="showType == 'edit' && item.is_add != 0">
 					<FormItem :prop="'data.' + index + '.name'" :rules="labelValidate">
 						<Input placeholder="输入名称" clearable v-model="item.name"></Input>
 					</FormItem>
 				</Col>
-				
-				<!--详情显示-->
-				<Col span="4" v-if="showType == 'show' && item.is_add != 0" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;padding: 6px 0;">
-					{{item.name}}：
-				</Col>
-				
-				<!--模板默认字段-->
+				<!--模板默认字段显示-->
 				<Col span="4" v-if="item.is_add == 0 && showType != 'edit2'" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;padding: 6px 0;">
 					{{item.name}}：
 				</Col>
 				
-				<!-----------------------字段值------------------------>
-				
-				<!--编辑显示-->
-				<Col v-if="showType == 'edit'" span="8">
-					
-					<!--模板默认字段-->
+				<!--字段值-->
+				<Col span="8" v-if="showType == 'edit'">
+					<!--模板默认字段显示-->
 					<div v-if="item.is_add == 0" style="height:100%;display: flex;align-items: center;font-size: 12px;color: #c5c8ce;">
 						<span>基础字段不可操作</span>
 					</div>
-					
+					<!--添加表单时显示-->
 					<Input v-if="item.is_add != 0" :disabled="NoHandle" :placeholder="placeholder(item.remark)" clearable  v-model="item.value"></Input>
-					
 				</Col>
 				
-				<!--编辑显示-->
-				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') < 0 && item.field.indexOf('express_company') < 0" span="24">
-					<FormItem :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate2">
-						<Input :disabled="NoHandle || noEdit(item.field)" :placeholder="placeholder(item.remark)" :clearable="!NoHandle && !noEdit(item.field)"  v-model="item.value" style="max-width: 400px;"></Input>
-					</FormItem>
-				</Col>
-				
-				<!--日期-->
-				<Col v-if="showType == 'edit2' && item.field.indexOf('_time') >= 0" span="24">
-					<FormItem :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate3">
-						<DatePicker :disabled="NoHandle" type="date" :value="item.value" @on-change="dateChange(index,$event)" placeholder="选择日期" style="width: 200px"></DatePicker>
-					</FormItem>
-				</Col>
-				
-				<!--下拉-->
-				<Col v-if="showType == 'edit2' && item.field.indexOf('express_company') >= 0" span="24">
-					<FormItem :label="item.name" :prop="'data.' + index + '.coding'" :rules="NoHandle ? [] : labelValidate4">
-						<Select :label-in-value="true" filterable :value="item.coding" @on-change="selectExpressC(index,$event)" style="width:200px">
-					        <Option v-for="item2 in expressCompanyList" :value="item2.value" :key="item2.value">{{ item2.label }}</Option>
-					    </Select>
-					</FormItem>
-				</Col>
-				
-				<!--详情显示-->
-				<Col v-if="showType == 'show'" span="20" style="padding: 6px 0;">
-					{{item.value}}
-					<span v-if="item.value == ''" style="color: #bbbec4;">- -无内容- -</span>
-				</Col>
-				
-				<!-------------------------------描述------------------------------>
-				
-				<!--编辑时显示-->
+				<!--描述-->
 				<Col span="12" v-if="showType == 'edit'">
-					
 					<!--模板默认字段-->
 					<div v-if="item.is_add == 0" style="height:100%;display: flex;align-items: center;font-size: 12px;color: #c5c8ce;">
 						<span>基础字段不可操作</span>
 					</div>
-					
+					<!--添加表单时显示-->
 					<div v-if="item.is_add != 0" style="display: flex;align-items: center;">
 						<Input placeholder="请输入描述" clearable  v-model="item.remark"></Input>
 						<Button style="margin-left: 4px;color: #ed3f14;" type="text" icon="minus-circled" size="small" @click="formsList.data.splice(index,1)">删除</Button>
 					</div>
-					
 				</Col>
 	
 		    </Row>
 		    
+		    <!-------------------------用户/会计编辑显示---------------------------------------->
+		    
+		    <Row v-if="showType == 'edit2'">
+		    	<slot name="edit"></slot>
+		    	<Col span="12" v-for="(item,index) in formsList.data" :key="index">
+		    		<!--文本框-->
+		    		<FormItem v-if="item.field.indexOf('_time') < 0 && item.field.indexOf('express_company') < 0" :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate2">
+						<Input :disabled="NoHandle || noEdit(item.field)" :placeholder="placeholder(item.remark)" :clearable="!NoHandle && !noEdit(item.field)"  v-model="item.value"></Input>
+					</FormItem>
+					<!--日期控件-->
+					<FormItem v-if="item.field.indexOf('_time') >= 0" :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate3">
+						<DatePicker :disabled="NoHandle" type="date" :value="item.value" @on-change="dateChange(index,$event)" placeholder="选择日期" style="width: 100%;"></DatePicker>
+					</FormItem>
+					<!--下拉控件-->
+					<FormItem v-if="item.field.indexOf('express_company') >= 0" :label="item.name" :prop="'data.' + index + '.coding'" :rules="NoHandle ? [] : labelValidate4">
+						<Select :label-in-value="true" filterable :value="item.coding" @on-change="selectExpressC(index,$event)" style="width: 100%">
+					        <Option v-for="item2 in expressCompanyList" :value="item2.value" :key="item2.value">{{ item2.label }}</Option>
+					    </Select>
+					</FormItem>
+		    	</Col>
+		    </Row>
+		    
 		</Form>
+		
+	    <!-----------------------------模板/用户/会计详情显示------------------------------------>
+	    
+    	<Row v-if="showType == 'show'">
+    		<slot name="show"></slot>
+    		<Col span="12" v-for="(item,index) in formsList.data" :key="index" style="padding: 6px 0;">
+    			<Row>
+    				<Col span="8" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;">
+						{{item.name}}：
+					</Col>
+					<Col span="16">
+						<span :style="{color: item.value ? '' : '#bbbec4'}">{{item.value || '- -'}}</span>
+					</Col>
+    			</Row>
+    		</Col>
+    	</Row>
 		
 		<div v-if="showType == 'edit'" style="margin-top:16px; text-align: center;">
 			<Button type="dashed" icon="plus-round" size="small" @click="add">增加字段</Button>
