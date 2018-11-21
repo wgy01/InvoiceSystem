@@ -2,7 +2,7 @@
 
 	<div>
 		
-		<Card style="margin-bottom: 16px;">
+		<Card :shadow="true" style="margin-bottom: 16px;">
 			
 			<h1 slot="title">创建公司</h1>
 			
@@ -42,7 +42,7 @@
 			
 		</Card>
 		
-		<Card>
+		<Card :shadow="true">
 			
 			<h1 slot="title">公司列表</h1>
 			

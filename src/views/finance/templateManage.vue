@@ -2,7 +2,7 @@
 
 	<div>
 		
-		<Card shadow style="margin-bottom:4px;">
+		<Card :shadow="true" style="margin-bottom:4px;">
 			<Button type="primary" @click="modal = true;">创建模板</Button>
 		</Card>
 		
@@ -26,7 +26,7 @@
 	        
 	    </Modal>
 		
-		<Card>
+		<Card :shadow="true">
 			
 			<h1 slot="title">模板列表</h1>
 			

@@ -20,7 +20,7 @@
 		>
 		</company>
 		
-		<Card>
+		<Card :shadow="true">
 			
 			<h1 slot="title">发票列表</h1>
 			
@@ -292,7 +292,7 @@ export default {
                 	align: 'center',
                 	width: 130,
                     title: '操作',
-                    handle: ['edit','show'],
+                    handle: ['show', 'edit'],
                 },
             ],
             

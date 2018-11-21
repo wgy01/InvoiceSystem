@@ -61,7 +61,6 @@
 		    <!-------------------------用户/会计编辑显示---------------------------------------->
 		    
 		    <Row v-if="showType == 'edit2'">
-		    	<slot name="edit"></slot>
 		    	<Col span="12" v-for="(item,index) in formsList.data" :key="index">
 		    		<!--文本框-->
 		    		<FormItem v-if="item.field.indexOf('_time') < 0 && item.field.indexOf('express_company') < 0" :label="item.name" :prop="'data.' + index + '.value'" :rules="NoHandle ? [] : labelValidate2">
@@ -85,7 +84,6 @@
 	    <!-----------------------------模板/用户/会计详情显示------------------------------------>
 	    
     	<Row v-if="showType == 'show'">
-    		<slot name="show"></slot>
     		<Col span="12" v-for="(item,index) in formsList.data" :key="index" style="padding: 6px 0;">
     			<Row>
     				<Col span="8" style="font-size: 12px;font-weight:bold;line-height: 20px;text-align: right;">

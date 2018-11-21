@@ -2,7 +2,7 @@
 
 	<div>
 		
-		<Card shadow>
+		<Card :shadow="true">
 			<Button type="primary" @click="modal = true">获取发票</Button>
 		</Card>
 		
